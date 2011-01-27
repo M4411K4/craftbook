@@ -25,14 +25,14 @@ import com.sk89q.craftbook.ic.*;
  *
  * @author sk89q
  */
-public class MC1202 extends BaseIC {
+public class MCX201 extends BaseIC {
     /**
      * Get the title of the IC.
      *
      * @return
      */
     public String getTitle() {
-        return "CHEST DISPENSER";
+        return "DISPENSER 2.0";
     }
 
     /**
@@ -57,16 +57,24 @@ public class MC1202 extends BaseIC {
 
         if (id.length() == 0) {
             return "Specify a item type on the third line.";
-        } else if (getItem(id) < 1) {
+        }
+        
+        
+        String[] args = id.split(":", 2);
+        int color = getColor(args);
+        
+        if(color >= 0)
+        	id = args[0];
+        else if(color == -2)
+        	return "Not a valid color/damage value: " + args[1] + ".";
+        
+        if (getItem(id) < 1) {
             return "Not a valid item type: " + sign.getLine3() + ".";
         }
 
-        if (sign.getLine4().length() > 0) {
-            try {
-                Math.min(64, Math.max(1, Integer.parseInt(sign.getLine4())));
-            } catch (NumberFormatException e) {
-                return "Not a valid quantity: " + sign.getLine4() + ".";
-            }
+        if (sign.getLine4().length() > 0 && getQuantity(sign.getLine4(), -2) == -2)
+        {
+        	return "Not a valid quantity: " + sign.getLine4() + ".";
         }
 
         return null;
@@ -78,12 +86,28 @@ public class MC1202 extends BaseIC {
      * @param id
      * @return
      */
-    private int getItem(String id) {
+    protected int getItem(String id) {
         try {
             return Integer.parseInt(id.trim());
         } catch (NumberFormatException e) {
             return etc.getDataSource().getItem(id.trim());
         }
+    }
+    
+    protected int getQuantity(String value, int defaultOut)
+    {
+    	int quantity;
+    	
+		try
+		{
+			quantity = Math.min(64, Math.max(-1, Integer.parseInt(value)));
+		}
+		catch (NumberFormatException e)
+		{
+			return defaultOut;
+		}
+		
+        return quantity;
     }
 
     /**
@@ -96,18 +120,16 @@ public class MC1202 extends BaseIC {
             return;
         }
         
-        NearbyChestBlockBag source = new NearbyChestBlockBag(chip.getPosition());
-        source.addSourcePosition(chip.getPosition());
-        
         String id = chip.getText().getLine3();
-        int quantity = 1;
-
-        try {
-            quantity = Math.min(64,
-                    Math.max(1, Integer.parseInt(chip.getText().getLine4())));
-        } catch (NumberFormatException e) {
-        }
-
+        
+        String[] args = id.split(":", 2);
+        int color = getColor(args);
+        
+        if(color >= 0)
+        	id = args[0];
+        
+        int quantity = getQuantity(chip.getText().getLine4(), 1);
+        
         int item = getItem(id);
 
         if (item > 0 && !(item >= 21 && item <= 34) && item != 36) {
@@ -118,17 +140,47 @@ public class MC1202 extends BaseIC {
 
             for (int y = pos.getBlockY() + 1; y <= maxY; y++) {
                 if (BlockType.canPassThrough(CraftBook.getBlockID(x, y, z))) {
-                    int n = 0;
-                    for(n=0;n<quantity;n++)
-                        try {
-                            source.fetchBlock(item);
-                        } catch (BlockSourceException e) {
-                            break;
-                        }
-                    if(n!=0) etc.getServer().dropItem(x, y, z, item, n);
+                	
+                	if(color >= 0)
+                		dropColorItem(x, y, z, item, quantity, color);
+                	else
+                		etc.getServer().dropItem(x, y, z, item, quantity);
                     return;
                 }
             }
         }
+    }
+    
+    protected int getColor(String[] args)
+    {
+    	int color;
+    	
+    	if(args.length < 2)
+    		return -1;
+    	
+    	try
+    	{
+    		color = Integer.parseInt(args[1]);
+    	}
+    	catch(NumberFormatException e)
+    	{
+    		return -2;
+    	}
+    	
+    	if(color < 0 || color > 15)
+    		return -2;
+    	
+    	return color;
+    }
+    
+    protected void dropColorItem(double x, double y, double z, int itemId, int quantity, int color)
+    {
+    	double d1 = etc.getMCServer().e.l.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
+    	double d2 = etc.getMCServer().e.l.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
+    	double d3 = etc.getMCServer().e.l.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
+    	
+    	OEntityItem localgl = new OEntityItem(etc.getMCServer().e, x + d1, y + d2, z + d3, new OItemStack(itemId, quantity, color));
+    	localgl.c = 10;
+    	etc.getMCServer().e.a(localgl);
     }
 }

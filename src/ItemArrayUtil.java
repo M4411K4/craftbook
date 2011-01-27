@@ -1,3 +1,5 @@
+import com.sk89q.craftbook.BlockType;
+
 // $Id$
 /*
  * CraftBook
@@ -58,24 +60,31 @@ public class ItemArrayUtil {
                                 setContents(inventories[invenIndex], chestItems);
                                 changed = true;
                                 throw new TransferredItemException();
-                            } else if (chestItem.getItemId() == cartItem.getItemId()
-                                    && chestItem.getAmount() < 64
-                                    && chestItem.getAmount() >= 0) {
-                                int spaceAvailable = 64 - chestItem.getAmount();
-                                
-                                if (spaceAvailable >= cartItem.getAmount()) {
-                                    chestItem.setAmount(chestItem.getAmount()
-                                            + cartItem.getAmount());
-                                    fromItems[cartSlot] = null;
-                                    setContents(inventories[invenIndex], chestItems);
-                                    changed = true;
-                                    throw new TransferredItemException();
-                                } else {
-                                    cartItem.setAmount(cartItem.getAmount()
-                                            - spaceAvailable);
-                                    chestItem.setAmount(64);
-                                    changed = true;
-                                }
+                            } else {
+                            	
+                            	int maxStack = getStackMax(chestItem);
+                            	
+                            	if (chestItem.getItemId() == cartItem.getItemId()
+                            			&& isSameColor(chestItem, cartItem)
+                                        && chestItem.getAmount() < maxStack
+                                        && chestItem.getAmount() >= 0)
+                            	{
+	                                int spaceAvailable = maxStack - chestItem.getAmount();
+	                                
+	                                if (spaceAvailable >= cartItem.getAmount()) {
+	                                    chestItem.setAmount(chestItem.getAmount()
+	                                            + cartItem.getAmount());
+	                                    fromItems[cartSlot] = null;
+	                                    setContents(inventories[invenIndex], chestItems);
+	                                    changed = true;
+	                                    throw new TransferredItemException();
+	                                } else {
+	                                    cartItem.setAmount(cartItem.getAmount()
+	                                            - spaceAvailable);
+	                                    chestItem.setAmount(maxStack);
+	                                    changed = true;
+	                                }
+                            	}
                             }
                         }
                     }
@@ -125,23 +134,30 @@ public class ItemArrayUtil {
                                 chestItems[chestSlot] = null;
                                 changed = true;
                                 throw new TransferredItemException();
-                            } else if (cartItem.getItemId() == chestItem.getItemId()
-                                    && cartItem.getAmount() < 64
-                                    && cartItem.getAmount() >= 0) {
-                                int spaceAvailable = 64 - cartItem.getAmount();
-                                
-                                if (spaceAvailable >= chestItem.getAmount()) {
-                                    cartItem.setAmount(cartItem.getAmount()
-                                            + chestItem.getAmount());
-                                    chestItems[chestSlot] = null;
-                                    changed = true;
-                                    throw new TransferredItemException();
-                                } else {
-                                    chestItem.setAmount(chestItem.getAmount()
-                                            - spaceAvailable);
-                                    cartItem.setAmount(64);
-                                    changed = true;
-                                }
+                            } else {
+                            	
+                            	int maxStack = getStackMax(chestItem);
+                            	
+                            	if (cartItem.getItemId() == chestItem.getItemId()
+                            			&& isSameColor(cartItem, chestItem)
+                                        && cartItem.getAmount() < maxStack
+                                        && cartItem.getAmount() >= 0)
+                            	{
+	                                int spaceAvailable = maxStack - cartItem.getAmount();
+	                                
+	                                if (spaceAvailable >= chestItem.getAmount()) {
+	                                    cartItem.setAmount(cartItem.getAmount()
+	                                            + chestItem.getAmount());
+	                                    chestItems[chestSlot] = null;
+	                                    changed = true;
+	                                    throw new TransferredItemException();
+	                                } else {
+	                                    chestItem.setAmount(chestItem.getAmount()
+	                                            - spaceAvailable);
+	                                    cartItem.setAmount(maxStack);
+	                                    changed = true;
+	                                }
+                            	}
                             }
                         }
                         
@@ -197,6 +213,30 @@ public class ItemArrayUtil {
                 itemArray.setSlot(contents[i], i);
             }
         }
+    }
+    
+    /*
+     * assumes item is valid
+     */
+    private static int getStackMax(Item item)
+    {
+    	return OItem.c[item.getItemId()].b();
+    }
+    
+    /*
+     * assumes item1 and item2 id types have already been compared
+     */
+    private static boolean isSameColor(Item item1, Item item2)
+    {
+    	if(item1.getItemId() != BlockType.CLOTH &&
+    		item1.getItemId() != BlockType.LOG &&
+    		item1.getItemId() != 351 //dye
+    		)
+    	{
+    		return true;
+    	}
+    	
+    	return item1.getDamage() == item2.getDamage();
     }
 
     /**

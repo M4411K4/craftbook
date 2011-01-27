@@ -54,4 +54,13 @@ public interface IC {
      * @param chip chip state.
      */
     public void think(ChipState chip);
+    
+    /**
+     * Called to clear special signs that might have stored information
+     * in static variables.
+     * 
+     * @param sign
+     * @return
+     */
+    public String clear(Vector pos, SignText sign);
 }

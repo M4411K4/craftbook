@@ -1137,13 +1137,13 @@ public class VehicleListener extends CraftBookDelegateListener {
         }
         
         if (line.equalsIgnoreCase("Animal")
-                && minecart.getEntity().j instanceof bl) {
+                && minecart.getEntity().j instanceof OEntityAnimals) {
             return true;
         }
         
         if (line.equalsIgnoreCase("Mob")
-                && (minecart.getEntity().j instanceof hq
-                        || minecart.getEntity().j instanceof hl)) {
+                && (minecart.getEntity().j instanceof OEntityMobs
+                        || minecart.getEntity().j instanceof OEntityPlayer)) {
             return true;
         }
         
@@ -1182,8 +1182,8 @@ public class VehicleListener extends CraftBookDelegateListener {
             } else if (parts[0].equalsIgnoreCase("Mob")) {
                 String testMob = parts[1];
 
-                if (minecart.getEntity().j instanceof mj) {
-                    Mob mob = new Mob((mj)minecart.getEntity().j);
+                if (minecart.getEntity().j instanceof OEntityLiving) {
+                    Mob mob = new Mob((OEntityLiving)minecart.getEntity().j);
                     if (testMob.equalsIgnoreCase(mob.getName())) {
                         return true;
                     }

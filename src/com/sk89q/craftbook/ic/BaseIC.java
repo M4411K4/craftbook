@@ -61,4 +61,16 @@ public abstract class BaseIC implements IC {
      * @param chip chip state.
      */
     public abstract void think(ChipState chip);
+    
+    /**
+     * Called to clear special signs that might have stored information
+     * in static variables.
+     * 
+     * @param sign
+     * @return
+     */
+    public String clear(Vector pos, SignText sign)
+    {
+    	return null;
+    }
 }

@@ -22,15 +22,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class SignPatch extends hi {
+public class SignPatch extends OBlockSign {
     public static final CopyOnWriteArrayList<ExtensionListener> LISTENERS = new CopyOnWriteArrayList<ExtensionListener>();
     
-    private static Class<hi> CLASS = hi.class;
+    private static Class<OBlockSign> CLASS = OBlockSign.class;
     private static Field[] FIELDS;
     
     private static int TYPE = Block.Type.WallSign.getType();
     
-    private hr old;
+    private OBlock old;
     
     static {
         ArrayList<Field> fields = new ArrayList<Field>();
@@ -41,8 +41,8 @@ public class SignPatch extends hi {
         FIELDS = fields.toArray(new Field[0]);
     }
     
-    public SignPatch(hr old) {
-        super(nullId(), lw.class, false);
+    public SignPatch(OBlock old) {
+        super(nullId(), OTileEntitySign.class, false);
         
         this.old = old;
         
@@ -58,7 +58,7 @@ public class SignPatch extends hi {
         }
     }
     private static int nullId() {
-    	hr.m[TYPE] = null;
+    	OBlock.m[TYPE] = null;
         return TYPE;
     }
 
@@ -67,7 +67,7 @@ public class SignPatch extends hi {
      * Should not be called.
      */
     @Deprecated
-    public void b(fv world, int x, int y, int z) {
+    public void b(OWorld world, int x, int y, int z) {
         ExtensionListener[] tasks = LISTENERS.toArray(new ExtensionListener[0]);
         for(int i=0;i<tasks.length;i++) tasks[i].onSignAdded(x,y,z);
         super.b(world,x,y,z);
@@ -78,13 +78,13 @@ public class SignPatch extends hi {
      * Call before using addListener or getListenerList().
      */
     public static void applyPatch() {
-        new SignPatch(hr.m[TYPE]);
+        new SignPatch(OBlock.m[TYPE]);
     }
     /**
      * Removes the patch if it is applied.
      */
     public static void removePatch() {
-        if(hr.m[TYPE] instanceof SignPatch) hr.m[TYPE] = ((SignPatch)hr.m[TYPE]).old;
+        if(OBlock.m[TYPE] instanceof SignPatch) OBlock.m[TYPE] = ((SignPatch)OBlock.m[TYPE]).old;
     }
     
     /**

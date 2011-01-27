@@ -25,7 +25,7 @@ import com.sk89q.craftbook.ic.*;
  *
  * @author sk89q
  */
-public class MC1202 extends BaseIC {
+public class MCX202 extends MCX201 {
     /**
      * Get the title of the IC.
      *
@@ -34,56 +34,22 @@ public class MC1202 extends BaseIC {
     public String getTitle() {
         return "CHEST DISPENSER";
     }
-
-    /**
-     * Returns true if this IC requires permission to use.
-     *
-     * @return
-     */
-    public boolean requiresPermission() {
-        return true;
-    }
-
-    /**
-     * Validates the IC's environment. The position of the sign is given.
-     * Return a string in order to state an error message and deny
-     * creation, otherwise return null to allow.
-     *
-     * @param sign
-     * @return
-     */
-    public String validateEnvironment(Vector pos, SignText sign) {
-        String id = sign.getLine3();
-
-        if (id.length() == 0) {
-            return "Specify a item type on the third line.";
-        } else if (getItem(id) < 1) {
-            return "Not a valid item type: " + sign.getLine3() + ".";
-        }
-
-        if (sign.getLine4().length() > 0) {
-            try {
-                Math.min(64, Math.max(1, Integer.parseInt(sign.getLine4())));
-            } catch (NumberFormatException e) {
-                return "Not a valid quantity: " + sign.getLine4() + ".";
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Get an item from its name or ID.
-     * 
-     * @param id
-     * @return
-     */
-    private int getItem(String id) {
-        try {
-            return Integer.parseInt(id.trim());
-        } catch (NumberFormatException e) {
-            return etc.getDataSource().getItem(id.trim());
-        }
+    
+    @Override
+    protected int getQuantity(String value, int defaultOut)
+    {
+    	int quantity;
+    	
+		try
+		{
+			quantity = Math.min(64, Math.max(1, Integer.parseInt(value)));
+		}
+		catch (NumberFormatException e)
+		{
+			return defaultOut;
+		}
+		
+        return quantity;
     }
 
     /**
@@ -100,13 +66,14 @@ public class MC1202 extends BaseIC {
         source.addSourcePosition(chip.getPosition());
         
         String id = chip.getText().getLine3();
-        int quantity = 1;
-
-        try {
-            quantity = Math.min(64,
-                    Math.max(1, Integer.parseInt(chip.getText().getLine4())));
-        } catch (NumberFormatException e) {
-        }
+        
+        String[] args = id.split(":", 2);
+        int color = getColor(args);
+        
+        if(color >= 0)
+        	id = args[0];
+        
+        int quantity = getQuantity(chip.getText().getLine4(), 1);
 
         int item = getItem(id);
 
@@ -125,7 +92,13 @@ public class MC1202 extends BaseIC {
                         } catch (BlockSourceException e) {
                             break;
                         }
-                    if(n!=0) etc.getServer().dropItem(x, y, z, item, n);
+                    if(n!=0)
+                    {
+                    	if(color >= 0)
+                    		dropColorItem(x, y, z, item, n, color);
+                    	else
+                    		etc.getServer().dropItem(x, y, z, item, n);
+                    }
                     return;
                 }
             }

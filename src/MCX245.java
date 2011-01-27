@@ -48,7 +48,7 @@ public class MCX245 extends MC1241 {
             Vector backDir = chip.getBlockPosition().subtract(
                     chip.getPosition());
             Vector firePos = chip.getBlockPosition().add(backDir);
-            jb arrow = new jb(etc.getMCServer().e);
+            OEntityEgg arrow = new OEntityEgg(etc.getMCServer().e);
             arrow.c(firePos.getBlockX() + 0.5, firePos.getBlockY() + 0.5,
                     firePos.getBlockZ() + 0.5, 0, 0);
             etc.getMCServer().e.a(arrow);

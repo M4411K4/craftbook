@@ -37,6 +37,7 @@ public class ChipState {
     private SignText text;
     private boolean hasErrored = false;
     private long time;
+    private char mode;
 
     /**
      * Construct the state.
@@ -47,12 +48,18 @@ public class ChipState {
      * @param out
      * @param text
      */
-    public ChipState(Vector pos, BlockVector blockPos, Signal[] in, Signal[] out, SignText text, long time) {
+    public ChipState(Vector pos, BlockVector blockPos, Signal[] in, Signal[] out, SignText text, long time)
+    {
+    	this(pos, blockPos, in, out, text, ' ', time);
+    }
+    
+    public ChipState(Vector pos, BlockVector blockPos, Signal[] in, Signal[] out, SignText text, char mode, long time) {
         this.pos = pos;
         this.blockPos = blockPos;
         this.in = in;
         this.out = out;
         this.text = text;
+        this.mode = mode;
 
         mem = new boolean[out.length];
         int i = 0;
@@ -81,7 +88,12 @@ public class ChipState {
     public Signal[] getInputs() {
         return in.clone();
     }
-
+    
+    public int inputAmount()
+    {
+    	return in.length;
+    }
+    
     /**
      * Get an output state.
      * 
@@ -176,5 +188,10 @@ public class ChipState {
     
     public long getTime() {
         return time;
+    }
+    
+    public char getMode()
+    {
+    	return mode;
     }
 }

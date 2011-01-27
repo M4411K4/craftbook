@@ -1,3 +1,59 @@
+2.0extra3:
+- re-added very old ability to toggle single input IC's from
+    any side (front, left, or right).
+- added new ability to swap the inputs and outputs for 3 input ICs and/or 3 output ICs.
+    Can not swap single input or single output. To swap inputs and outputs just
+    type something like: "[MCxxxx]abcdef" without quotes. "abc" stands for the input
+    arrangement, and "def" for the output arrangement. So you can swap inputs
+    by switching around the letters like "bca", or the outputs with "fde". You can also
+    type in a swap for just one set if you want, such as "[MCxxxx]edf" which will just
+    swap the outputs. 
+- added new UISO IC type
+
+- fixed minecart collector/depositor going past max amount for single stacks, which also
+    allowed armor/tools to be repaired.
+- added color items support to minecart collector/depositor
+- fixed duplication bug with chest dispenser MC1202
+
+- added new IC's. Sorry for the poor naming, but again, I'm trying to express which ones
+    will be removed when the official CraftBook is ready
+- MCX112 - Transporter. Transports players to matching destinations. Third line is for
+    destination IC name. Fourth line is for optional message. There is also a
+    "transporter pad" mode when typing "[MCX112]p" without the quotes, on the second line.
+    The 'p' must be lower case!
+    This transporter pad mode will teleport players from 2 blocks infront of the sign, and
+    2 blocks (or higher) up. This allows players to be able to use wood/stone plates to
+    teleport by having redstone under it and linked to the MCX112 sign. You can have
+    multiple teleporters for a single destination.
+- MCU113 - Destination. Please note the "U" in MCU113. The destionation the players that
+    are teleported by MCX112 will go to. The third line is the name of the destination that
+    teleporters need to use to link together.  Destinations can be turned on and off with
+    redstone wire.
+- MCX200 - Mob Spawner. Same as MC1200, but adds support for colored sheep, squids, and
+    ghasts. To create a colored sheep, on the third line type "Sheep:ID" without the quotes.
+    Where "ID" is a color id number (0-15).
+- MCX201 - Item Spawner. Same as MC1201, but adds "damage" support which allows you to
+    spawn colored dyes, wool, and the different logs. To spawn items with color/damage type
+    "item:id" without quotes. "item" is the item name or number, and "id" is the
+    damage/color value (0-15).
+- MCX202 - Chest Spawner. Same as MCX202 and MC1202.
+
+
+2.0previewX2o:
+- Updated for minecraft_servero.jar
+- Fixed arrow shooters shooting snowballs
+- Added snow ball shooters [MCX242] & barrage [MCX243], and egg shooters
+    [MCX244] & barrage [MCX245]
+- Please note that I chose "MCX" to symbolize my custom MCxxxx that will most
+    likely be removed when switching over to the official CraftBook. I have
+    no plans to patch them in when the official CraftBook is ready.
+
+2.0previewX1:
+- Custom update for 1.2_01 server update. Contains some unreleased content and
+    fixes, such as MC1250 (fireworks)
+- Fixes redstone pumpkin orientation - from Kerden
+- Fixes redstone [Area] toggle
+
 2.0preview11:
 - Added MC1260/MC0260 (water sensor), MC1261/MC0261 (lava sensor),
     MC1262/MC0262 (light sensor).
@@ -63,10 +119,8 @@
 - Added support for custom ICs using existing PLC languages.
 - Added new redstone-plcs-require-permission configuration.
 - Added /listics command.
-- Added Perlstone32 PLC language.
 - Fixed issue with the 32nd slot of Perlstone's tables.
 - Fixed chest dispenser IC being able to dispense -1 of an item.
-- Added Perlstone32 PLC language.
 [Block bags]
 - Overhauled block bag system for bridges, gates, etc. Now multiple
     block bags can be used simultaneously.

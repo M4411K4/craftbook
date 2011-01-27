@@ -26,7 +26,7 @@ import net.minecraft.server.MinecraftServer;
  * 
  * @authpr Lymia
  */
-public class TickPatch extends im {
+public class TickPatch extends OEntityTracker {
     @SuppressWarnings("unused")
     private static final Object HP_PATCH_APPLIED = null;
     /**
@@ -35,10 +35,10 @@ public class TickPatch extends im {
     @Deprecated
     public static final CopyOnWriteArrayList<Runnable> TASK_LIST = new CopyOnWriteArrayList<Runnable>();
     
-    private static Class<im> CLASS = im.class;
+    private static Class<OEntityTracker> CLASS = OEntityTracker.class;
     private static Field[] FIELDS = CLASS.getDeclaredFields();
     
-    private TickPatch(MinecraftServer arg0, im g) {
+    private TickPatch(MinecraftServer arg0, OEntityTracker g) {
         super(arg0);
         if(g.getClass()!=CLASS) throw new RuntimeException("unexpected type for im instance");
         for(Field f:FIELDS) try {
