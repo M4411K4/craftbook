@@ -77,7 +77,7 @@ public class MCX112 extends BaseIC {
                 chip.getOut(1).set(false);
             } else
             {
-            	dest = new Location(dest.x, dest.y, dest.z);
+            	dest = new Location(dest.x, dest.y, dest.z, dest.rotX, dest.rotY);
             	Vector pos;
             	
             	if(chip.getMode() == 'p')

@@ -34,9 +34,9 @@ public enum ICType {
      * Zero input, single output
      */
     ZISO("ZISO", true) {
-        void think(Vector pt, SignText signText, Sign sign, IC zisoIC) {
+        void think(Vector pt, SignText signText, Sign sign, IC zisoIC, Object extra) {
         	
-        	basicThink(pt, null, signText, sign, zisoIC, null, ' ', new int[]{0, 1, 2}, new int[]{0, 1, 2}, 0, 1);
+        	basicThink(pt, null, signText, sign, zisoIC, null, ' ', new int[]{0, 1, 2}, new int[]{0, 1, 2}, 0, 1, extra);
         }
     },
     /**
@@ -44,9 +44,9 @@ public enum ICType {
      */
     SISO("SISO") {
         void think(Vector pt, Vector changedRedstoneInput, SignText signText,
-                Sign sign, IC sisoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut) {
+                Sign sign, IC sisoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
         	
-        	basicThink(pt, changedRedstoneInput, signText, sign, sisoIC, r, mode, orderIn, orderOut, 1, 1);
+        	basicThink(pt, changedRedstoneInput, signText, sign, sisoIC, r, mode, orderIn, orderOut, 1, 1, extra);
         }
     },
     /**
@@ -54,9 +54,9 @@ public enum ICType {
      */
     SI3O("SI3O") {
         void think(Vector pt, Vector changedRedstoneInput, SignText signText,
-                Sign sign, IC si3oIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut) {
+                Sign sign, IC si3oIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
             
-        	basicThink(pt, changedRedstoneInput, signText, sign, si3oIC, r, mode, orderIn, orderOut, 1, 3);
+        	basicThink(pt, changedRedstoneInput, signText, sign, si3oIC, r, mode, orderIn, orderOut, 1, 3, extra);
         }
     },
     /**
@@ -64,9 +64,9 @@ public enum ICType {
      */
     _3ISO("3ISO") {
         void think(Vector pt, Vector changedRedstoneInput, SignText signText,
-                Sign sign, IC _3isoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut) {
+                Sign sign, IC _3isoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
             
-        	basicThink(pt, changedRedstoneInput, signText, sign, _3isoIC, r, mode, orderIn, orderOut, 3, 1);
+        	basicThink(pt, changedRedstoneInput, signText, sign, _3isoIC, r, mode, orderIn, orderOut, 3, 1, extra);
         }
     },
     /**
@@ -74,9 +74,9 @@ public enum ICType {
      */
     _3I3O("3I3O") {
         void think(Vector pt, Vector changedRedstoneInput, SignText signText,
-                Sign sign, IC _3i3oIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut) {
+                Sign sign, IC _3i3oIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
             
-        	basicThink(pt, changedRedstoneInput, signText, sign, _3i3oIC, r, mode, orderIn, orderOut, 3, 3);
+        	basicThink(pt, changedRedstoneInput, signText, sign, _3i3oIC, r, mode, orderIn, orderOut, 3, 3, extra);
         }
     },
     /**
@@ -84,7 +84,7 @@ public enum ICType {
      */
     VIVO("VIVO") {
         void think(Vector pt, Vector changedRedstoneInput, SignText signText,
-                Sign sign, IC vivoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut) {
+                Sign sign, IC vivoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
             Vector backVec = Util.getWallSignBack(pt, 1);
             Vector backShift = backVec.subtract(pt);
 
@@ -145,14 +145,14 @@ public enum ICType {
     },
     
     UISO("UISO", false, true) {
-    	void think(Vector pt, SignText signText, Sign sign, IC zisoIC) {
+    	void think(Vector pt, SignText signText, Sign sign, IC zisoIC, Object extra) {
         	
-        	basicThink(pt, null, signText, sign, zisoIC, null, ' ', new int[]{0, 1, 2}, new int[]{0, 1, 2}, 0, 1);
+        	basicThink(pt, null, signText, sign, zisoIC, null, ' ', new int[]{0, 1, 2}, new int[]{0, 1, 2}, 0, 1, extra);
         }
         void think(Vector pt, Vector changedRedstoneInput, SignText signText,
-                Sign sign, IC sisoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut) {
+                Sign sign, IC sisoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
         	
-        	basicThink(pt, changedRedstoneInput, signText, sign, sisoIC, r, mode, orderIn, orderOut, 1, 1);
+        	basicThink(pt, changedRedstoneInput, signText, sign, sisoIC, r, mode, orderIn, orderOut, 1, 1, extra);
         }
     };
 
@@ -178,10 +178,10 @@ public enum ICType {
         this.updateOnce = updateOnce;
     }
 
-    void think(Vector v, Vector c, SignText t, Sign s, IC i, TickDelayer r, char mode, int[] orderIn, int[] orderOut) {
+    void think(Vector v, Vector c, SignText t, Sign s, IC i, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
     }
 
-    void think(Vector v, SignText t, Sign s, IC i) {
+    void think(Vector v, SignText t, Sign s, IC i, Object extra) {
     }
 
     public static ICType forName(String name) {
@@ -204,7 +204,7 @@ public enum ICType {
     }
     
     private static void basicThink(Vector pt, Vector changedRedstoneInput, SignText signText,
-            Sign sign, IC ic, TickDelayer r, char mode, int[] orderIn, int[] orderOut, int inputs, int outputs)
+            Sign sign, IC ic, TickDelayer r, char mode, int[] orderIn, int[] orderOut, int inputs, int outputs, Object extra)
     {
     	
     	Vector backVec = Util.getWallSignBack(pt, 1);
@@ -270,7 +270,7 @@ public enum ICType {
 		}
     	
     	
-    	ChipState chip = new ChipState(pt, backVec.toBlockVector(), in, out, signText, mode, etc.getServer().getTime());
+    	ChipState chip = new ChipState(pt, backVec.toBlockVector(), in, out, signText, mode, etc.getServer().getTime(), extra);
 
     	// The most important part...
     	ic.think(chip);

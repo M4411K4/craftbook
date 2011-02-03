@@ -46,6 +46,10 @@ public abstract class BlockBag {
     public boolean setBlockID(int x, int y, int z, int id) throws BlockSourceException {
         return setBlockID(new Vector(x, y, z), id);
     }
+    
+    public boolean setBlockID(int x, int y, int z, int id, int data) throws BlockSourceException {
+        return setBlockID(new Vector(x, y, z), id, data);
+    }
 
     /**
      * Sets a block.
@@ -55,7 +59,13 @@ public abstract class BlockBag {
      * @return
      * @throws OutOfSpaceException
      */
-    public boolean setBlockID(Vector pos, int id) throws BlockSourceException {
+    public boolean setBlockID(Vector pos, int id) throws BlockSourceException
+    {
+    	return setBlockID(pos, id, 0);
+    }
+    
+    
+    public boolean setBlockID(Vector pos, int id, int data) throws BlockSourceException {
         if (id == 0) { // Clearing
             int existingID = CraftBook.getBlockID(pos);
 
@@ -76,6 +86,13 @@ public abstract class BlockBag {
                 try {
                     int existingID = CraftBook.getBlockID(pos);
 
+                    /* [TODO]: a replacement to recognize colors. Works, but there's another part of the code that needs to be fixed with
+                     * this, which is why it's currently commented out.
+                     * If using a colored wool, such as yellow, and attempting to replace another color such as white, the 
+                     * results in the chest when using "nearby-chests" is not correct.
+                     * 
+                     *if (existingID != 0 && (existingID != id || (BlockType.isColorTypeBlock(existingID) && CraftBook.getBlockData(pos) != data) )  ) {
+                    */
                     if (existingID != 0 && existingID != id) {
                         int dropped = BlockType.getDroppedBlock(existingID);
 
@@ -98,9 +115,11 @@ public abstract class BlockBag {
                                 || id == BlockType.CROPS
                                 || id == BlockType.REDSTONE_ORE
                                 || id == BlockType.GLOWING_REDSTONE_ORE
+                                || id == BlockType.LAPIS_LAZULI_ORE
                                 || id == BlockType.SNOW
                                 || id == BlockType.LIGHTSTONE
-                                || id == BlockType.PORTAL) {
+                                || id == BlockType.PORTAL
+                                || id == BlockType.CAKE_BLOCK) {
                             return false;
                         }
 
@@ -109,14 +128,14 @@ public abstract class BlockBag {
                                 || id == BlockType.STATIONARY_WATER
                                 || id == BlockType.LAVA
                                 || id == BlockType.STATIONARY_LAVA) {
-                            return CraftBook.setBlockID(pos, id);
+                            return CraftBook.setBlockIdAndData(pos, id, data);
                         }
 
                         fetchBlock(id);
-                        return CraftBook.setBlockID(pos, id);
+                        return CraftBook.setBlockIdAndData(pos, id, data);
                     } else if (existingID == 0) {
                         fetchBlock(id);
-                        return CraftBook.setBlockID(pos, id);
+                        return CraftBook.setBlockIdAndData(pos, id, data);
                     }
                 } catch (OutOfBlocksException e) {
                     // Look for cobblestone
@@ -141,7 +160,7 @@ public abstract class BlockBag {
                         throw e;
                     }
 
-                    return CraftBook.setBlockID(pos, id);
+                    return CraftBook.setBlockIdAndData(pos, id, data);
                 }
             } catch (OutOfBlocksException e) {
                 int missingID = e.getID();

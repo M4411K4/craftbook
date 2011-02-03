@@ -49,6 +49,11 @@ public final class BlockType {
     public static final int LEAVES = 18;
     public static final int SPONGE = 19;
     public static final int GLASS = 20;
+    public static final int LAPIS_LAZULI_ORE = 21;
+    public static final int LAPIS_LAZULI = 22;
+    public static final int DISPENSER = 23;
+    public static final int SANDSTONE = 24;
+    public static final int NOTE_BLOCK = 25;
     public static final int CLOTH = 35;
     public static final int YELLOW_FLOWER = 37;
     public static final int RED_FLOWER = 38;
@@ -105,6 +110,7 @@ public final class BlockType {
     public static final int LIGHTSTONE = 89;
     public static final int PORTAL = 90;
     public static final int JACKOLANTERN = 91;
+    public static final int CAKE_BLOCK = 92;
 
     /**
      * Stores a list of dropped blocks for blocks.
@@ -130,6 +136,11 @@ public final class BlockType {
         blockDrops.put(17, 17);
         blockDrops.put(18, 18);
         blockDrops.put(19, 19);
+        blockDrops.put(21, 351); //default type. needs color value with this, but no other block currently acts like this
+        blockDrops.put(22, 22);
+        blockDrops.put(23, 23);
+        blockDrops.put(24, 24);
+        blockDrops.put(25, 25);
         blockDrops.put(35, 35);
         blockDrops.put(37, 37);
         blockDrops.put(38, 38);
@@ -180,6 +191,7 @@ public final class BlockType {
         blockDrops.put(88, 88);
         blockDrops.put(89, 248);
         blockDrops.put(91, 91);
+        blockDrops.put(92, 354);
     }
 
     /**
@@ -304,6 +316,8 @@ public final class BlockType {
                 || id == REDSTONE_TORCH_OFF
                 || id == REDSTONE_TORCH_ON
                 || id == STONE_BUTTON
+                || id == CLOTH
+                || id == LOG
                 || id == CACTUS;
     }
 
@@ -316,6 +330,17 @@ public final class BlockType {
     public static boolean isLava(int id) {
         return id == STATIONARY_LAVA
                 || id == LAVA;
+    }
+    
+    /**
+     * Returns true if an ID is water.
+     * 
+     * @param id
+     * @return
+     */
+    public static boolean isWater(int id) {
+        return id == STATIONARY_WATER
+                || id == WATER;
     }
 
     /**
@@ -334,6 +359,17 @@ public final class BlockType {
                 || id == REDSTONE_WIRE
                 || id == WOODEN_DOOR
                 || id == IRON_DOOR;
+    }
+    
+    /**
+     * Returns true if a block uses data for color.
+     *
+     * @param id
+     * @return
+     */
+    public static boolean isColorTypeBlock(int id) {
+        return id == CLOTH
+                || id == LOG;
     }
 
     /**

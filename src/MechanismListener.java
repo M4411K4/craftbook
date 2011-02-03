@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import com.sk89q.craftbook.*;
+import com.sk89q.craftbook.ic.MCX120;
 
 /**
  * Listener for mechanisms.
@@ -62,6 +63,10 @@ public class MechanismListener extends CraftBookDelegateListener {
     private boolean dropBookshelves = true;
     private double dropAppleChance = 0;
     private boolean enableAmmeter = true;
+    private boolean usePageReader = true;
+    private boolean usePageWriter = false;
+    private int pageMaxCharacters = 400;
+    private int maxPages = 20;
 
     /**
      * Construct the object.
@@ -79,6 +84,15 @@ public class MechanismListener extends CraftBookDelegateListener {
     public void loadConfiguration() {
         maxToggleAreaSize = Math.max(0, properties.getInt("toggle-area-max-size", 5000));
         maxUserToggleAreas = Math.max(0, properties.getInt("toggle-area-max-per-user", 30));
+        
+        if(properties.containsKey("pagereader-enable"))
+        	usePageReader = properties.getBoolean("pagereader-enable", true);
+        if(properties.containsKey("pagewriter-enable"))
+        	usePageWriter = properties.getBoolean("pagewriter-enable", false);
+        if(properties.containsKey("page-max-characters"))
+        	pageMaxCharacters = properties.getInt("page-max-characters", 400);
+        if(properties.containsKey("max-pages"))
+        	maxPages = properties.getInt("max-pages", 20);
 
         useBookshelves = properties.getBoolean("bookshelf-enable", true);
         bookReadLine = properties.getString("bookshelf-read-text", "You pick out a book...");
@@ -287,13 +301,23 @@ public class MechanismListener extends CraftBookDelegateListener {
                 }
             }
 
-        // Bookshelf drops
-        } else if (dropBookshelves && block.getType() == BlockType.BOOKCASE
-                && checkPermission(player, "/bookshelfdrops")) {
-            if (block.getStatus() == 3) {
+        // Bookshelf drops and Page reset
+        } else if (block.getType() == BlockType.BOOKCASE) {
+        	
+            if (dropBookshelves && block.getStatus() == 3 && checkPermission(player, "/bookshelfdrops")) {
                     etc.getServer().dropItem(
                             block.getX(), block.getY(), block.getZ(),
                             BlockType.BOOKCASE);
+            }
+            else if(usePageReader && block.getStatus() == 0 && checkPermission(player, "/readpages"))
+            {
+            	//page reset
+            	Sign sign = Util.getWallSignNextTo(block.getX(), block.getY(), block.getZ());
+            	
+            	if(sign != null && sign.getText(1).equalsIgnoreCase("[Book]"))
+            	{
+            		PageWriter.resetPage(sign);
+            	}
             }
         }
 
@@ -437,7 +461,28 @@ public class MechanismListener extends CraftBookDelegateListener {
             } else {
                 player.sendMessage(Colors.Rose + "Bridges are disabled on this server.");
             }
-
+            
+         // Page Reader
+        } else if (line2.equalsIgnoreCase("[Book]")) {
+            listener.informUser(player);
+            
+            if (usePageReader)
+            {
+            	//PageWriter.validateEnvironment() handles the permissions.
+            	if(PageWriter.validateEnvironment(ply, pt, signText))
+            	{
+            		signText.flushChanges();
+            	}
+            	else
+            	{
+                    CraftBook.dropSign(pt);
+            	}
+            }
+            else
+            {
+                ply.printError("Page readers are disabled on this server.");
+            }
+            
         // Doors
         } else if (line2.equalsIgnoreCase("[Door Up]")
                 || line2.equalsIgnoreCase("[Door Down]")) {
@@ -555,6 +600,21 @@ public class MechanismListener extends CraftBookDelegateListener {
         int plyX = (int)Math.floor(player.getLocation().x);
         int plyY = (int)Math.floor(player.getLocation().y);
         int plyZ = (int)Math.floor(player.getLocation().z);
+        
+        // Page reading
+        if(usePageReader
+        		&& blockClicked.getType() == BlockType.BOOKCASE
+        		&& checkPermission(player, "/readpages")
+        		)
+        {
+        	Sign sign = Util.getWallSignNextTo(blockClicked.getX(), blockClicked.getY(), blockClicked.getZ());
+        	
+        	if(sign != null && sign.getText(1).equalsIgnoreCase("[Book]"))
+        	{
+            	PageWriter.readPage(player, sign);
+            	return true;
+        	}
+        }
 
         // Book reading
         if (useBookshelves
@@ -869,6 +929,90 @@ public class MechanismListener extends CraftBookDelegateListener {
             }
 
             return true;
+        }
+        else if(split[0].equalsIgnoreCase("/mcx120") && player.canUseCommand("/mcx120"))
+        {
+        	//[NOTE]: kept here for now since it's just one IC. Should move to RedstoneListener
+        	//if more are made.
+        	
+        	if(split.length < 2)
+        	{
+        		player.sendMessage(Colors.Gold + "Usage: /mcx120 [band name] <on/off/state>");
+        		player.sendMessage(Colors.Rose + "You must specify a band name after /mcx120.");
+        		player.sendMessage(Colors.Gold + "Optional \"on\" or \"off\" or \"state\". Will toggle if left blank.");
+        	}
+        	else
+        	{
+        		Boolean out = MCX120.airwaves.get(split[1]);
+        		if(out == null)
+        		{
+        			player.sendMessage(Colors.Rose + "Could not find band name: "+split[1]);
+        		}
+        		else
+        		{
+        			if(split.length > 2)
+        			{
+        				if(split[2].equalsIgnoreCase("on"))
+        					out = true;
+        				else if(split[2].equalsIgnoreCase("off"))
+        					out = false;
+        				else if(split[2].equalsIgnoreCase("state"))
+        				{
+        					String state = out ? "on" : "off";
+        					player.sendMessage(Colors.Gold + "Command IC "+split[1]+" current state: "+Colors.White+state);
+        					return true;
+        				}
+        				else
+        				{
+        					player.sendMessage(Colors.Rose + "Unknown command option: "+split[2]);
+        					return true;
+        				}
+        			}
+        			else
+        				out = !out;
+        			
+        			MCX120.airwaves.put(split[1], out);
+        			
+        			String state = out ? "on" : "off";
+        			player.sendMessage(Colors.Gold + "Command IC turned: "+Colors.White+state);
+        		}
+        	}
+        	
+        	return true;
+        }
+        else if(split[0].equalsIgnoreCase("/mcx120list") && player.canUseCommand("/mcx120list"))
+        {
+        	String out = "";
+        	for (Map.Entry<String, Boolean> entry : MCX120.airwaves.entrySet())
+        	{
+        		String color;
+        		Boolean state = entry.getValue();
+        		
+        		if(state == null)
+        			color = Colors.Gray;
+        		else
+        			color = state ? Colors.Green : Colors.Red;
+        		
+        		out += " ["+color+entry.getKey()+Colors.White+"]";
+        	}
+        	if(out.length() == 0)
+        		player.sendMessage(Colors.Red + "No command ICs found.");
+        	else
+        	{
+        		player.sendMessage(out);
+        	}
+        	
+        	return true;
+        }
+        else if(usePageWriter && split[0].equalsIgnoreCase("/cbpage") && player.canUseCommand("/cbpage"))
+        {
+        	PageWriter.handleCommand(player, split, pageMaxCharacters, maxPages);
+        	return true;
+        }
+        else if(usePageWriter && split[0].equalsIgnoreCase("/admincbpage") && player.canUseCommand("/admincbpage"))
+        {
+        	PageWriter.handleNSCommand(player, split, pageMaxCharacters, maxPages);
+        	return true;
         }
 
         return false;

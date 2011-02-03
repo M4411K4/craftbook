@@ -111,8 +111,11 @@ public class MCX200 extends BaseIC {
                 int x = pos.getBlockX();
                 int z = pos.getBlockZ();
 
-                for (int y = pos.getBlockY() + 1; y <= maxY; y++) {
-                    if (BlockType.canPassThrough(CraftBook.getBlockID(x, y, z))) {
+                for (int y = pos.getBlockY() + 1; y <= maxY; y++)
+                {
+                	int blockId = CraftBook.getBlockID(x, y, z);
+                    if (BlockType.canPassThrough(blockId) || BlockType.isWater(blockId))
+                    {
                         Location loc = new Location(x, y, z);
                         Mob mob = new Mob(id, loc);
                         if (rider.length() != 0 && isValidMob(rider)) {

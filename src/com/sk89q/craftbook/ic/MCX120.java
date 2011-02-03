@@ -17,28 +17,27 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+package com.sk89q.craftbook.ic;
 
 import java.util.Map;
 
 import com.sk89q.craftbook.*;
-import com.sk89q.craftbook.ic.BaseIC;
-import com.sk89q.craftbook.ic.ChipState;
 
 /**
  * Positive edge-triggered wireless receiver.
  *
  * @author sk89q
  */
-public class MCX113 extends BaseIC {
+public class MCX120 extends BaseIC {
 	
-	private final String TITLE = "DESTINATION";
+	private final String TITLE = "COMMAND";
+	
 	/**
      * Data store.
      */
-    public static Map<String,Location> airwaves =
-            new HistoryHashMap<String,Location>(100);
-	
+    public static Map<String,Boolean> airwaves =
+            new HistoryHashMap<String,Boolean>(100);
+    
     /**
      * Get the title of the IC.
      *
@@ -47,11 +46,16 @@ public class MCX113 extends BaseIC {
     public String getTitle() {
         return TITLE;
     }
-
+    
+    /**
+     * Returns true if this IC requires permission to use.
+     *
+     * @return
+     */
     public boolean requiresPermission() {
         return true;
     }
-    
+
     /**
      * Validates the IC's environment. The position of the sign is given.
      * Return a string in order to state an error message and deny
@@ -66,9 +70,6 @@ public class MCX113 extends BaseIC {
         if (id.length() == 0) {
             return "Specify a band name on the third line.";
         }
-        
-        //if(airwaves.containsKey(id))
-        	//return "Band name already exists. Please use another name.";
 
         return null;
     }
@@ -80,67 +81,34 @@ public class MCX113 extends BaseIC {
      */
     public void think(ChipState chip) {
         String id = chip.getText().getLine3();
-        
         if (!id.isEmpty())
         {
-        	Vector pt = chip.getPosition();
-        	
-        	boolean turnOn;
-        	if(chip.inputAmount() == 0)
-        	{
-        		turnOn = chip.getText().getLine1().charAt(0) == 'D';
-        	}
-        	else
-        	{
-        		turnOn = chip.getIn(1).is();
-        		
-        		if(turnOn && chip.getText().getLine1().charAt(0) == '-')
+            Boolean out = MCX120.airwaves.get(id);
+            if (out == null)
+            {
+            	out = chip.getText().getLine1().charAt(0) == 'C';
+            	
+            	airwaves.put(id, out);
+            }
+            else
+            {
+            	if(out && chip.getText().getLine1().charAt(0) == '-')
         		{
         			chip.getText().setLine1(TITLE);
         			chip.getText().supressUpdate();
         		}
-        		else if(!turnOn && chip.getText().getLine1().charAt(0) == 'D')
+        		else if(!out && chip.getText().getLine1().charAt(0) == 'C')
         		{
         			chip.getText().setLine1("-"+TITLE);
         			chip.getText().supressUpdate();
         		}
-        	}
-        	
-        	if(turnOn && !airwaves.containsKey(id))
-        	{
-	        	Vector bpos = chip.getBlockPosition();
-				
-				Location loc = new Location(bpos.getX(), bpos.getY(), bpos.getZ(), 90, 0);
-				
-				if(bpos.getBlockX() - pt.getBlockX() > 0)
-					loc.rotX = 90;
-				else if(bpos.getBlockX() - pt.getBlockX() < 0)
-					loc.rotX = 270;
-				else if(bpos.getBlockZ() - pt.getBlockZ() > 0)
-					loc.rotX = 180;
-				else
-					loc.rotX = 0;
-				
-	            airwaves.put(id, loc);
-        	}
-        	else if(!turnOn && airwaves.containsKey(id))
-        	{
-        		airwaves.remove(id);
-        	}
-        	
-        	chip.getOut(1).set(false);
-        } else {
+            }
+            
+            chip.getOut(1).set(out);
+        }
+        else
+        {
             chip.getOut(1).set(false);
         }
-    }
-    
-    public String clear(Vector pos, SignText sign)
-    {
-    	if(airwaves.containsKey(sign.getLine3()))
-    	{
-    		airwaves.remove(sign.getLine3());
-    	}
-    	
-    	return null;
     }
 }

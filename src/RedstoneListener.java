@@ -71,6 +71,8 @@ public class RedstoneListener extends CraftBookDelegateListener
     private boolean enableSelfTriggeredICs = true;
     private boolean restrictSelfTriggeredICs = false;
     
+    private boolean updateSelfTriggeredICList = false;
+    
     /**
      * Construct the object.
      * 
@@ -103,6 +105,9 @@ public class RedstoneListener extends CraftBookDelegateListener
         
         enableSelfTriggeredICs = properties.getBoolean("enable-self-triggered-ics",true);
         restrictSelfTriggeredICs = properties.getBoolean("self-triggered-ics-require-premission",false);
+        
+        if(properties.containsKey("chunk-updated-self-triggered-ic-list"))
+        	updateSelfTriggeredICList = properties.getBoolean("chunk-updated-self-triggered-ic-list",false);
 
         icList.clear();
         
@@ -210,15 +215,22 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterPLC("MC5033", "perlstone32_v1", ICType._3I3O);
         
         internalRegisterIC("MCX112", new MCX112(), ICType.SISO);
+        internalRegisterIC("MCX120", new MCX120(), ICType.SISO);
         internalRegisterIC("MCX200", new MCX200(), ICType.SISO);
         internalRegisterIC("MCX201", new MCX201(), ICType.SISO);
         internalRegisterIC("MCX202", new MCX202(), ICType.SISO);
+        internalRegisterIC("MCX207", new MCX207(), ICType.SISO);
+        internalRegisterIC("MCX208", new MCX208(), ICType.SISO);
+        internalRegisterIC("MCX209", new MCX209(), ICType.SISO);
+        internalRegisterIC("MCX210", new MCX210(), ICType.SISO);
         internalRegisterIC("MCX242", new MCX242(), ICType.SISO);
         internalRegisterIC("MCX243", new MCX243(), ICType.SISO);
         internalRegisterIC("MCX244", new MCX244(), ICType.SISO);
         internalRegisterIC("MCX245", new MCX245(), ICType.SISO);
         
         internalRegisterIC("MCU113", new MCX113(), ICType.UISO);
+        
+        internalRegisterIC("MCZ120", new MCX120(), ICType.ZISO);
     }
 
     /**
@@ -343,6 +355,14 @@ public class RedstoneListener extends CraftBookDelegateListener
         
         return false;
     }
+    
+    public void onSignShow(Player player, Sign sign)
+    {
+    	if(!enableSelfTriggeredICs || !updateSelfTriggeredICList || sign.getBlock().getType() != BlockType.WALL_SIGN)
+    		return;
+    	
+    	onSignAdded(sign);
+    }
 
     /**
      * Handles the wire input at a block in the case when the wire is
@@ -398,7 +418,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                     && line2.substring(0, 3).equalsIgnoreCase("[MC")
                     && line2.charAt(7) == ']') {
             	
-                String id = line2.substring(1, 7).toUpperCase();
+                final String id = line2.substring(1, 7).toUpperCase();
 
                 final SignText signText = new SignText(sign.getText(0),
                         sign.getText(1), sign.getText(2), sign.getText(3));
@@ -455,7 +475,13 @@ public class RedstoneListener extends CraftBookDelegateListener
                         new TickDelayer.Action(pt.toBlockVector(), 2) {
                     @Override
                     public void run() {
-                        ic.think(pt, changed, signText, sign, craftBook.getDelay(), mode, abc, def);
+                    	
+                    	//not too happy about putting in the "extra" param to get the blockbag access cuz it's a hack.
+                    	//hopefully I can change it later on.
+                    	if(id.equals("MCX207") || id.equals("MCX208") || id.equals("MCX209") || id.equals("MCX210"))
+                    		ic.think(pt, changed, signText, sign, craftBook.getDelay(), mode, abc, def, listener.getBlockBag(pt));
+                        else
+                        	ic.think(pt, changed, signText, sign, craftBook.getDelay(), mode, abc, def, null);
 
                         if (signText.isChanged()) {
                             sign.setText(0, signText.getLine1());
@@ -513,7 +539,7 @@ public class RedstoneListener extends CraftBookDelegateListener
             SignText signText = new SignText(sign.getText(0),
                     sign.getText(1), sign.getText(2), sign.getText(3));
             
-            ic.think(pt, signText, sign);
+            ic.think(pt, signText, sign, null);
             
             if (signText.isChanged()) {
                 sign.setText(0, signText.getLine1());
@@ -531,7 +557,13 @@ public class RedstoneListener extends CraftBookDelegateListener
         if(!enableSelfTriggeredICs) return;
             
         Sign sign = (Sign)etc.getServer().getComplexBlock(x,y,z);
-        String line2 = sign.getText(1);
+        
+        onSignAdded(sign);
+    }
+    
+    public void onSignAdded(Sign sign)
+    {
+    	String line2 = sign.getText(1);
         if(!line2.startsWith("[MC")) return;
         
         String id = line2.substring(1, 7).toUpperCase();
@@ -543,8 +575,8 @@ public class RedstoneListener extends CraftBookDelegateListener
         }
 
         if(!ic.type.isSelfTriggered && !ic.type.updateOnce) return;
-
-        instantICs.add(new BlockVector(x,y,z));
+        
+        instantICs.add(new BlockVector(sign.getX(),sign.getY(),sign.getZ()));
     }
     
     public boolean onBlockBreak(Player player, Block block)
@@ -848,8 +880,8 @@ public class RedstoneListener extends CraftBookDelegateListener
          * @param r
          */
         void think(Vector pt, Vector changedRedstoneInput, SignText signText,
-                Sign sign, TickDelayer r, char mode, int[] orderIn, int[] orderOut) {
-            type.think(pt, changedRedstoneInput, signText, sign, ic, r, mode, orderIn, orderOut);
+                Sign sign, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
+            type.think(pt, changedRedstoneInput, signText, sign, ic, r, mode, orderIn, orderOut, extra);
         }
 
         /**
@@ -860,8 +892,8 @@ public class RedstoneListener extends CraftBookDelegateListener
          * @param signText
          * @param sign
          */
-        void think(Vector pt, SignText signText, Sign sign) {
-            type.think(pt, signText, sign, ic);
+        void think(Vector pt, SignText signText, Sign sign, Object extra) {
+            type.think(pt, signText, sign, ic, extra);
         }
     }
     

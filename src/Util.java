@@ -20,6 +20,8 @@
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
+
+import com.sk89q.craftbook.BlockType;
 import com.sk89q.craftbook.InsufficientArgumentsException;
 import com.sk89q.craftbook.Vector;
 
@@ -126,6 +128,35 @@ public class Util {
         }
     
         return false;
+    }
+    
+    /**
+     * Checks if a wall sign is next to the input location point
+     * Does not check if wall sign is attached to the point
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public static Sign getWallSignNextTo(int x, int y, int z)
+    {
+    	ComplexBlock cBlock = null;
+    	if (CraftBook.getBlockID(x+1, y, z) == BlockType.WALL_SIGN)
+    		cBlock = etc.getServer().getComplexBlock(x+1, y, z);
+    	else if (CraftBook.getBlockID(x-1, y, z) == BlockType.WALL_SIGN)
+    		cBlock = etc.getServer().getComplexBlock(x-1, y, z);
+    	else if (CraftBook.getBlockID(x, y, z+1) == BlockType.WALL_SIGN)
+    		cBlock = etc.getServer().getComplexBlock(x, y, z+1);
+    	else if (CraftBook.getBlockID(x, y, z-1) == BlockType.WALL_SIGN)
+    		cBlock = etc.getServer().getComplexBlock(x, y, z-1);
+    	
+    	if(cBlock != null && cBlock instanceof Sign)
+    	{
+    		return (Sign)cBlock;
+    	}
+    	
+    	return null;
     }
 
     /**

@@ -1,3 +1,92 @@
+2.0extra4:
+- added "fix" for self-triggered ICs (wireless receivers [MC0111], clocks [MC0420], etc)
+    that stop working on server restarts.
+    This is disabled by default.
+    The fix *may* cause server lag depending on how many players you have on your server.
+    I should be able to improve this by a lot if I can learn more about map chunks.
+    To enable it, in the craftbook.properties set "chunk-updated-self-triggered-ic-list="
+        to "true"
+- updated blockbag to recognize the new blocks and colors. Still has issues with colors.
+- fixed transporter[MCX112]/destination[MCU113] player warp rotation.
+- updated destinations [MCU113] to now be "on" when created.
+- added ability for [MCX200] to spawn mobs in water
+[New ICs]
+- added command controlled ICs MCX120 and wireless MCZ120.
+    You can control MCX120 and MCZ120 with the command: /mcx120 [band name] <on/off/state>
+    Where [band name] is the band/network name on MCX120 or MCZ120.
+    /mcx120 [band name]       - will toggle the IC on or off
+    /mcx120 [band name] on    - will set the IC on
+    /mcx120 [band name] off   - will set the IC off
+    /mcx120 [band name] state - will display a message that the IC is on or off
+    Please remember that MCX120 needs to be manually updated! MCZ120 will automatically be
+        updated.
+    For admins/mods, the command /mcx120list will list all currently loaded band/network
+        names for this IC.
+        The band/network names will show up in green if "on", red if "off", and gray if
+            your server is doing odd things with this IC. Should never be gray, but can be.
+- added new bridge ICs MCX207 and MCX209, and door ICs MCX208 and MCX210
+    These are like advanced versions of the existing [Bridge] and [Door].
+    You are able to specify a width, length, and an up/down offset.
+    The max currently are:
+        width   = 11
+        length  = 30
+        up/down = between -10 and 10
+    There is no settings currently (if ever) to change these max values.
+    MCX207 and MCX208 are versions that are not allowed to "force" or delete existing blocks.
+        They can still have the "force" option on them, but it will not actually force/delete.
+    To use:
+        <first line blank>
+        [MCX???]
+        blockID#:color#
+        width:length
+    The color# is optional, and you can just have the blockID# by itself instead.
+    The third line can also have the "force" option added in front:
+        f:blockID#:color#
+    where "f" is the force option
+    The fourth line can also have the up/down offset:
+        width:length:offset
+[Page Reader]
+- added Page Reader. There are 4 new "craftbook.properties" settings for this.
+    Page Reader reads "pages" in a sequence rather than randomly. In addition,
+        it reads from many different .txt file sources. The .txt files are stored
+        in the folder "cbbooks" and in global or player namespace folders. So for
+        example, you are able to read from page 5 of a "book" .txt file written
+        by PlayerA, and also read from pages 3 to 14 of a "book" .txt file stored
+        in the "global" folder.
+    Page Readers are created by placing a sign on a bookshelf block with:
+        namespace
+        [Book]
+        book
+        pages
+    By default, players have access to their own namespace and the global namespace.
+        To access the global namespace, type "@" without the quotes on the first line.
+    The "book" on the third line is the .txt file name without ".txt" at the end.
+    Pages on the fourth line can be left blank. The Page Reader will only read from
+        page 1 if left blank. To read more pages, put on the fourth line: "start#:end#"
+        where start# and end# are page numbers divided by ":".
+    When reading through a range of pages (such as pages 3 to 14), you can *reset*
+        back to the start page by left-clicking the bookshelf.
+    Book titles are stored in the first line of the book .txt file.
+- added ability to *write* books for Page Reader.
+    Using this feature is NOT recommended! Disabled by default.
+    This allows groups with /cbpage or /admincbpage command permissions to write
+        "books" in-game. So they will be creating, editing, and deleting "book" .txt
+        files on the server.
+    This was added for servers with members that are highly trusted and have no
+        direct access to server files.
+    Writing pages in-game has more limits (and frustration) than directly editing the
+        .txt files.
+    If writing pages using the in-game commands, any pages after the max pages
+        allowed will be deleted! By default, the max page is 20, so page 21 and up
+        will be deleted if using the in-game commands.
+    Pages from in-game writing also have a max character limit of 400 characters by
+        default.
+    Again, directly editing the .txt file has no page or character limit, although it
+        is recommended to stay within the limits for server resource reasons.
+    The command /cbpage only allows access to the player's book folder.
+    The command /admincbpage allows access to any book folder, such as other player's
+        book folders and the global folder.
+
 2.0extra3:
 - re-added very old ability to toggle single input IC's from
     any side (front, left, or right).

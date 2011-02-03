@@ -124,6 +124,7 @@ public class CraftBook extends Plugin {
         listener.registerDelegate(mechanisms);
         
         registerHook(redstone, "SIGN_CHANGE", PluginListener.Priority.MEDIUM);
+        registerHook(redstone, "SIGN_SHOW", PluginListener.Priority.MEDIUM);
         registerHook(redstone, "BLOCK_BROKEN", PluginListener.Priority.MEDIUM);
         listener.registerDelegate(redstone);
 
@@ -289,6 +290,21 @@ public class CraftBook extends Plugin {
 
     protected static boolean setBlockData(Vector pt, int data) {
         return setBlockData(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), data);
+    }
+    
+    protected static boolean setBlockIdAndData(int x, int y, int z, int id, int data)
+    {
+    	if(data == 0)
+    		return setBlockID(x, y, z, id);
+    	
+    	boolean result = setBlockID(x, y, z, id);
+    	setBlockData(x, y, z, data);
+    	
+        return result;
+    }
+
+    protected static boolean setBlockIdAndData(Vector pt, int id, int data) {
+        return setBlockIdAndData(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), id, data);
     }
     
     protected static SignText getSignText(Vector pt) {
