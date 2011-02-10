@@ -229,6 +229,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX245", new MCX245(), ICType.SISO);
         
         internalRegisterIC("MCU113", new MCX113(), ICType.UISO);
+        internalRegisterIC("MCU440", new MCX440(), ICType.UISO);
         
         internalRegisterIC("MCZ120", new MCX120(), ICType.ZISO);
     }
@@ -471,6 +472,8 @@ public class RedstoneListener extends CraftBookDelegateListener
                 else
                 	def = orders[1];
                 
+                final RedstoneListener thisListener = this;
+                
                 craftBook.getDelay().delayAction(
                         new TickDelayer.Action(pt.toBlockVector(), 2) {
                     @Override
@@ -480,6 +483,8 @@ public class RedstoneListener extends CraftBookDelegateListener
                     	//hopefully I can change it later on.
                     	if(id.equals("MCX207") || id.equals("MCX208") || id.equals("MCX209") || id.equals("MCX210"))
                     		ic.think(pt, changed, signText, sign, craftBook.getDelay(), mode, abc, def, listener.getBlockBag(pt));
+                    	else if(id.equals("MCU440"))
+                    		ic.think(pt, changed, signText, sign, craftBook.getDelay(), mode, abc, def, thisListener);
                         else
                         	ic.think(pt, changed, signText, sign, craftBook.getDelay(), mode, abc, def, null);
 
@@ -529,7 +534,13 @@ public class RedstoneListener extends CraftBookDelegateListener
             
             if(ic.type.updateOnce)
             {
-            	this.instantICs.remove(pt);
+            	if(sign.getText(0).charAt(0) != '%')
+            	{
+            		this.instantICs.remove(pt);
+            		
+            		if(sign.getText(0).charAt(0) == '^')
+                		continue;
+            	}
             }
             else if(!ic.type.isSelfTriggered) {
                 this.instantICs.remove(pt);

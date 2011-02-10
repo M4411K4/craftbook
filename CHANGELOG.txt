@@ -1,3 +1,33 @@
+2.0extra5:
+- added color block support for minecart control block features
+- added minecart Direction block. Default block is Red Wool. No sign.
+    -when a player is on top of the Direction block (in a minecart), the minecart will
+        stop. The player then needs to face the direction they wish to go and type the
+        command: /cbgo
+- added minecart Cart Lift block. Default block is Orange wool. Uses [CartLift] sign.
+    -This works just like the [Sort] block except it "sorts" teleporting minecarts up or
+        down. Arrival messages can be placed on the *first* line of the [CartLift] sign.
+    -This currently contains some messages that spam. It is left in since this is a new
+        feature, and the messages help inform the players what they are missing. These
+        spam messages should never be seen if everything is configured correctly.
+- added minecart Launch block. Default block is Light Green wool. Uses [Launch] sign.
+    -This works similar to the [Sort] block, except if a sort line is left blank, it will
+        accept any cart except the type that is on the other sort line. If both sort lines
+        are left blank, it will launch any full cart, and stop any empty cart. The 3rd
+        line is for launching. The 4th line is for stopping.
+- added hidden switch ability to Page Reader: [Book][X]
+    -If a direct redstone wire is pointing to the [Book][X] sign, it will set the hidden
+        switches to the redstone wire input.
+- added new IC [MCU440] which is a special count down timer.
+    -When the input is "on" it will start the count down timer, and the timer will not
+        stop and can not be reset, until the timer has finished. To stop it you will need
+        to wait, or destroy it.
+    -Use the third line to specify the number to count down from, and the clock rate.
+        Ex:    10:5
+        This will count down from 10 at the clock rate of 5
+    -Mode '1' will set this IC to toggle the output back "off" after one clock cycle of
+        being "on" from reaching 0.
+
 2.0extra4:
 - added "fix" for self-triggered ICs (wireless receivers [MC0111], clocks [MC0420], etc)
     that stop working on server restarts.

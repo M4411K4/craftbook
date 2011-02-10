@@ -39,4 +39,62 @@ public class StringUtil {
         
         return str;
     }
+    
+    /**
+     * Get item id and color from property value.
+     * 
+     * @return
+     */
+    
+    public static int[] getPropColorInt(String prop, int itemDefault, int colorDefault)
+    {
+    	String[] props = prop.split(":", 2);
+    	int[] out = new int[2];
+    	
+    	if(props.length <= 1 && props[0].length() == 0)
+    	{
+    		out[0] = itemDefault;
+    		out[1] = colorDefault;
+    		return out;
+    	}
+    	
+    	try
+    	{
+    		out[0] = Integer.parseInt(props[0]);
+    	}
+    	catch(NumberFormatException e)
+    	{
+    		out[0] = itemDefault;
+    	}
+    	
+    	if(!BlockType.isColorTypeBlock(out[0]))
+    	{
+    		//not a color block so return color value 0.
+    		out[1] = 0;
+    		return out;
+    	}
+    	
+    	if(props.length > 1)
+    	{
+    		try
+    		{
+    			out[1] = Integer.parseInt(props[1]);
+    			
+    			//ensure value isn't greater than max color value
+    			//15 is current max color value.
+    			if(out[1] > 15)
+    				out[1] = colorDefault;
+    		}
+    		catch(NumberFormatException e)
+    		{
+    			out[1] = colorDefault;
+    		}
+    	}
+    	else
+    	{
+    		out[1] = colorDefault;
+    	}
+    	
+    	return out;
+    }
 }

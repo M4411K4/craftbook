@@ -269,4 +269,56 @@ public class Util {
     public static boolean canUse(Player player, String command) {
         return player.canUseCommand(command);
     }
+    
+    /**
+     * Gets the point in front of the direction
+     * [Note]: It appears player rotations and a few or maybe all other entities
+     * have different rotation values. Ex: player rotation seems to be 90 degrees
+     * off from minecarts.
+     * Hopefully this will change in more updates.
+     * 
+     * This follows player rotation.
+     * 
+     * @param rotation
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public static Vector getFrontPoint(float rotation, int x, int y, int z)
+    {
+    	rotation = rotation % 360;
+		if(rotation < 0)
+			rotation += 360;
+    	
+		Vector point = null;
+    	if(rotation < 45 || rotation >= 315)
+		{
+			//west
+    		point = new Vector(x, y, z + 1);
+		}
+		else if(rotation >= 45 && rotation < 135)
+		{
+			//north
+			point = new Vector(x - 1, y, z);
+		}
+		else if(rotation >= 135 && rotation < 225)
+		{
+			//east
+			point = new Vector(x, y, z - 1);
+		}
+		else if(rotation >= 225 && rotation < 315)
+		{
+			//south
+			point = new Vector(x + 1, y, z);
+		}
+    	
+    	return point;
+    }
+    
+    public static int getFrontBlockId(float rotation, int x, int y, int z)
+    {
+    	Vector point = getFrontPoint(rotation, x, y, z);
+    	return CraftBook.getBlockID(point);
+    }
 }

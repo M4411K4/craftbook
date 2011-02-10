@@ -67,6 +67,7 @@ public class MechanismListener extends CraftBookDelegateListener {
     private boolean usePageWriter = false;
     private int pageMaxCharacters = 400;
     private int maxPages = 20;
+    private boolean usePageSwitches = true;
 
     /**
      * Construct the object.
@@ -93,6 +94,8 @@ public class MechanismListener extends CraftBookDelegateListener {
         	pageMaxCharacters = properties.getInt("page-max-characters", 400);
         if(properties.containsKey("max-pages"))
         	maxPages = properties.getInt("max-pages", 20);
+        if(properties.containsKey("page-hidden-switches-enable"))
+        	usePageSwitches = properties.getBoolean("page-hidden-switches-enable", true);
 
         useBookshelves = properties.getBoolean("bookshelf-enable", true);
         bookReadLine = properties.getString("bookshelf-read-text", "You pick out a book...");
@@ -277,6 +280,36 @@ public class MechanismListener extends CraftBookDelegateListener {
                             }
                         }
                     });
+            } else if (usePageReader && usePageSwitches
+                    && line2.equalsIgnoreCase("[Book][X]")) {
+            	
+            	Vector redstonept = Util.getWallSignBack(pt, -1);
+            	if(changed.equals(redstonept)
+            		&& CraftBook.getBlockID(redstonept) == BlockType.REDSTONE_WIRE)
+            	{
+            		craftBook.getDelay().delayAction(
+            			new TickDelayer.Action(pt.toBlockVector(), 2) {
+            				@Override
+            				public void run() {
+            					Vector blockpt = Util.getWallSignBack(pt, 1);
+                	            
+        		            	int x = blockpt.getBlockX();
+        		                int y = blockpt.getBlockY();
+        		                int z = blockpt.getBlockZ();
+        		                String hiddenType = "[Book][X]";
+        		                
+        		                setHiddenSwitch(hiddenType, isOn, x, y - 1, z);
+        		                setHiddenSwitch(hiddenType, isOn, x, y + 1, z);
+        		                setHiddenSwitch(hiddenType, isOn, x - 1, y, z);
+        		                setHiddenSwitch(hiddenType, isOn, x + 1, y, z);
+        		                setHiddenSwitch(hiddenType, isOn, x, y, z - 1);
+        		                setHiddenSwitch(hiddenType, isOn, x, y, z + 1);
+        		                
+        		                etc.getServer().updateBlockPhysics(x, y+1, z, CraftBook.getBlockData(x, y+1, z));
+        		                etc.getServer().updateBlockPhysics(x, y-1, z, CraftBook.getBlockData(x, y-1, z));
+                            }
+                        });
+            	}
             }
         }
     }
@@ -314,7 +347,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             	//page reset
             	Sign sign = Util.getWallSignNextTo(block.getX(), block.getY(), block.getZ());
             	
-            	if(sign != null && sign.getText(1).equalsIgnoreCase("[Book]"))
+            	if(sign != null && (sign.getText(1).equalsIgnoreCase("[Book]") || sign.getText(1).equalsIgnoreCase("[Book][X]")) )
             	{
             		PageWriter.resetPage(sign);
             	}
@@ -463,7 +496,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             }
             
          // Page Reader
-        } else if (line2.equalsIgnoreCase("[Book]")) {
+        } else if (line2.equalsIgnoreCase("[Book]") || line2.equalsIgnoreCase("[Book][X]")) {
             listener.informUser(player);
             
             if (usePageReader)
@@ -609,9 +642,28 @@ public class MechanismListener extends CraftBookDelegateListener {
         {
         	Sign sign = Util.getWallSignNextTo(blockClicked.getX(), blockClicked.getY(), blockClicked.getZ());
         	
-        	if(sign != null && sign.getText(1).equalsIgnoreCase("[Book]"))
+        	if(sign != null && (sign.getText(1).equalsIgnoreCase("[Book]") || sign.getText(1).equalsIgnoreCase("[Book][X]")) )
         	{
             	PageWriter.readPage(player, sign);
+            	
+            	if(usePageSwitches && sign.getText(1).equalsIgnoreCase("[Book][X]"))
+            	{
+            		int x = blockClicked.getX();
+                    int y = blockClicked.getY();
+                    int z = blockClicked.getZ();
+                    String type = "[Book][X]";
+                    
+                    toggleHiddenSwitch(type, x, y - 1, z);
+                    toggleHiddenSwitch(type, x, y + 1, z);
+                    toggleHiddenSwitch(type, x - 1, y, z);
+                    toggleHiddenSwitch(type, x + 1, y, z);
+                    toggleHiddenSwitch(type, x, y, z - 1);
+                    toggleHiddenSwitch(type, x, y, z + 1);
+                    
+                    etc.getServer().updateBlockPhysics(x, y+1, z, CraftBook.getBlockData(x, y+1, z));
+	                etc.getServer().updateBlockPhysics(x, y-1, z, CraftBook.getBlockData(x, y-1, z));
+            	}
+            	
             	return true;
         	}
         }
@@ -771,13 +823,14 @@ public class MechanismListener extends CraftBookDelegateListener {
             int x = blockClicked.getX();
             int y = blockClicked.getY();
             int z = blockClicked.getZ();
+            String type = "[X]";
 
-            toggleHiddenSwitch(x, y - 1, z);
-            toggleHiddenSwitch(x, y + 1, z);
-            toggleHiddenSwitch(x - 1, y, z);
-            toggleHiddenSwitch(x + 1, y, z);
-            toggleHiddenSwitch(x, y, z - 1);
-            toggleHiddenSwitch(x, y, z + 1);
+            toggleHiddenSwitch(type, x, y - 1, z);
+            toggleHiddenSwitch(type, x, y + 1, z);
+            toggleHiddenSwitch(type, x - 1, y, z);
+            toggleHiddenSwitch(type, x + 1, y, z);
+            toggleHiddenSwitch(type, x, y, z - 1);
+            toggleHiddenSwitch(type, x, y, z + 1);
             
             return true;
         }
@@ -790,19 +843,36 @@ public class MechanismListener extends CraftBookDelegateListener {
      * 
      * @param pt
      */
-    private void toggleHiddenSwitch(int x, int y, int z) {
+    private void toggleHiddenSwitch(String type, int x, int y, int z) {
         ComplexBlock cblock = etc.getServer().getComplexBlock(x, y, z);
         
         if (cblock instanceof Sign) {
             Sign sign = (Sign)cblock;
             
-            if (sign.getText(1).equalsIgnoreCase("[X]")) {
+            if (sign.getText(1).equalsIgnoreCase(type)) {
                 Redstone.toggleOutput(new Vector(x, y - 1, z));
                 Redstone.toggleOutput(new Vector(x, y + 1, z));
                 Redstone.toggleOutput(new Vector(x - 1, y, z));
                 Redstone.toggleOutput(new Vector(x + 1, y, z));
                 Redstone.toggleOutput(new Vector(x, y, z - 1));
                 Redstone.toggleOutput(new Vector(x, y, z + 1));
+            }
+        }
+    }
+    
+    private void setHiddenSwitch(String type, boolean state, int x, int y, int z) {
+        ComplexBlock cblock = etc.getServer().getComplexBlock(x, y, z);
+        
+        if (cblock instanceof Sign) {
+            Sign sign = (Sign)cblock;
+            
+            if (sign.getText(1).equalsIgnoreCase(type)) {
+                Redstone.setOutput(new Vector(x, y - 1, z), state);
+                Redstone.setOutput(new Vector(x, y + 1, z), state);
+                Redstone.setOutput(new Vector(x - 1, y, z), state);
+                Redstone.setOutput(new Vector(x + 1, y, z), state);
+                Redstone.setOutput(new Vector(x, y, z - 1), state);
+                Redstone.setOutput(new Vector(x, y, z + 1), state);
             }
         }
     }
