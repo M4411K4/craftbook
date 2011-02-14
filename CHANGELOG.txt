@@ -1,3 +1,14 @@
+2.0extra5.1:
+- added new ICs, "PLAYER ABOVE?" [MCX116] and "PLAYER MINE" [MCX117]
+    -both are constructed the same way.
+        -If the third line is blank, the ICs will output "on" if *any* player is above
+            the IC block. And "off" otherwise.
+        -The third line can contain group names or player names.
+            -To specify a  group:      g:GROUPNAME
+            -To specify a player:      p:PLAYERNAME
+    -MCX117 will output if specified player is above AND will explode a tnt at the
+        player's position.
+
 2.0extra5:
 - added color block support for minecart control block features
 - added minecart Direction block. Default block is Red Wool. No sign.
