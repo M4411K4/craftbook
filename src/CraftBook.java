@@ -137,6 +137,7 @@ public class CraftBook extends Plugin {
         registerHook(vehicle, "VEHICLE_DAMAGE", PluginListener.Priority.MEDIUM);
         registerHook(vehicle, "VEHICLE_ENTERED", PluginListener.Priority.MEDIUM);
         registerHook(vehicle, "VEHICLE_DESTROYED", PluginListener.Priority.MEDIUM);
+        registerHook(vehicle, "VEHICLE_COLLISION", PluginListener.Priority.MEDIUM);
         listener.registerDelegate(vehicle);
         
         TickPatch.addTask(TickPatch.wrapRunnable(this, delay));

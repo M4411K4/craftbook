@@ -1,5 +1,86 @@
+2.0extra6:
+[ICs]:
+- added Password Command [MCX121] and [MCZ121], where [MCZ121] is self triggering.
+    -thanks TimeLordX4 for the suggestion!
+    -Specify password name reference on the third line of the sign.
+    -There are 4 commands to use:
+        -Toggle, set on/off, or check state, just like /mcx120, but with a
+         password to input
+            /mcx121 [pass name] [password] <on/off/state>
+        -Ability to add and change passwords, or see if a password exists
+            /mcx121pass add [pass name] [new password]
+            /mcx121pass change [pass name] [current password] [new password]
+            /mcx121pass has [pass name]
+        -Ability to remove passwords. RECOMMENDED FOR ADMINS ONLY!!!
+         Meant for times when users forget passwords.
+            /mcx121remove [pass name]
+        -The list of currently loaded password command ICs. Works same as /mcx120list
+            /mcx121list
+    -Incorrect passwords are logged to the server to help show if a player is trying
+        to guess passwords.
+    -Passwords are stored in the mcx121.txt located in the world's craftbook folder
+    -Passwords have a very low encryption, so low it should not even be considered 
+        encryption.
+- updated MCU440 to have a set amount of time to remain on, and a mode to swap the
+    output states. Also updated name to MONOFLOP
+    -thanks clouder for the suggestions and the better name!
+    -To set the amount of time for the output to remain "on", type on the third line:
+	    [count#]:[clock rate#]:[on count#]
+        Ex:
+        10:5:4
+        where [on count] is the number of "ticks" to remain on.
+[Minecarts]:
+- added new minecart Delay block. Default is Yellow Wool (id# 4). Uses [Delay] sign.
+    -Have the [Delay] sign face the direction you want the cart to go after the delay
+    -Place amount of time (in seconds) for minecarts to be held on the Third line of
+        sign.
+- added new minecart Load block. Default is Cyan Wool (id# 9). Optional [Load] sign.
+    -If there is no [Load] sign, minecarts will try to load players about 3 blocks
+        away in any direction.
+    -If there is a [Load] sign, minecarts will try to load players about 3 blocks
+        in the direction the [Load] sign is facing.
+    -Due to the potential to cause frustration on other players, this ability can be
+        disabled.
+        -To disable, in the craftbook.properties, set the following value from:
+            minecart-enable-loadblock=true
+                to
+            minecart-enable-loadblock=false
+- added new minecart collision "modes". These modes are added in an attempt to deal
+    with the slower empty minecarts on the tracks.
+    -Please note that these modes arn't perfect
+    -Slow moving minecarts will not use these modes, and have a regular collision.
+    -There are currently only 2 modes (push had a major problem so I took it out)
+        -Default mode - no change to how collision works currently.
+        -Ghost mode - sets player filled carts into a sort of "ghost" mode where they
+            go through *empty* minecarts including storage and powered.
+            -Known issue:
+                -Causes empty minecarts that the player cart went through to sometimes
+                    become lightly "pulled" by the player cart. Like a gust of wind
+                    went by.
+        -Plow mode - Player carts will destroy empty carts on contact.
+            -This will not destroy storage minecarts.
+            -The destroyed carts will end up in the player's inventory.
+    -To set the modes, in the craftbook.properties, change the value:
+        minecart-collision-type=default
+           to
+        minecart-collision-type=ghost
+           OR
+        minecart-collision-type=plow
+- added a helper mode for the new collision type modes. Disabled by default
+    -This was mostly used for collision modes that didn't work and are now removed, so
+        this helper doesn't do too much anymore, but can still provide some minor
+        improvements to the collision modes.
+    -This is disabled by default because it "helps" at the cost of more resources
+    -To enable it, in the craftbook.properties, change
+        minecart-enable-collision-type-helper=false
+            to
+        minecart-enable-collision-type-helper=true
+- fixed (hopefully) duplicating minecarts with the destroy on exit mode set on
+    -thanks Joy and DrTasslehoff for letting me know about it!
+
 2.0extra5.1:
 - added new ICs, "PLAYER ABOVE?" [MCX116] and "PLAYER MINE" [MCX117]
+    -thanks insaneHacker999 for the suggestion!
     -both are constructed the same way.
         -If the third line is blank, the ICs will output "on" if *any* player is above
             the IC block. And "off" otherwise.

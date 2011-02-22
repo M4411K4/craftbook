@@ -218,6 +218,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX116", new MCX116(), ICType.SISO);
         internalRegisterIC("MCX117", new MCX117(), ICType.SISO);
         internalRegisterIC("MCX120", new MCX120(), ICType.SISO);
+        internalRegisterIC("MCX121", new MCX121(), ICType.SISO);
         internalRegisterIC("MCX200", new MCX200(), ICType.SISO);
         internalRegisterIC("MCX201", new MCX201(), ICType.SISO);
         internalRegisterIC("MCX202", new MCX202(), ICType.SISO);
@@ -234,6 +235,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCU440", new MCX440(), ICType.UISO);
         
         internalRegisterIC("MCZ120", new MCX120(), ICType.ZISO);
+        internalRegisterIC("MCZ121", new MCX121(), ICType.ZISO);
     }
 
     /**

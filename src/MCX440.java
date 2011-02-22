@@ -27,7 +27,7 @@ import com.sk89q.craftbook.ic.ChipState;
 
 public class MCX440 extends BaseIC {
 	
-	private final String TITLE = "S-DOWN COUNT";
+	private final String TITLE = "MONOFLOP";
 	
     /**
      * Get the title of the IC.
@@ -61,10 +61,11 @@ public class MCX440 extends BaseIC {
             return "Specify counter configuration on line 3.";
         }
         
-        String[] param = sign.getLine3().split(":", 2);
+        String[] param = sign.getLine3().split(":", 3);
         
         int clockTime;
         int downCount;
+        int onCount = 0;
         if(param.length == 1)
         {
         	clockTime = 5;
@@ -90,9 +91,32 @@ public class MCX440 extends BaseIC {
         	return "Count value is not a number.";
         }
         
-        if(downCount < 1 || downCount > 99999)
+        if(param.length > 2)
         {
-        	return "Count value must be a number from 1 to 99999.";
+	        try
+	        {
+	        	onCount = Integer.parseInt(param[2]);
+	        }
+	        catch(NumberFormatException e)
+	        {
+	        	return "On-count value is not a number.";
+	        }
+	        
+	        if(downCount < 1 || downCount > 999)
+	        {
+	        	return "Count value must be a number from 1 to 999.";
+	        }
+	        if(onCount < 1 || onCount > 999)
+	        {
+	        	return "On-count value must be a number from 1 to 999.";
+	        }
+        }
+        else
+        {
+	        if(downCount < 1 || downCount > 99999)
+	        {
+	        	return "Count value must be a number from 1 to 99999.";
+	        }
         }
         
         if(clockTime < 5 || clockTime > 15)
@@ -105,7 +129,10 @@ public class MCX440 extends BaseIC {
             return "The fourth line must be empty.";
         }
         
-        sign.setLine3(downCount+":"+clockTime+":0");
+        if(param.length > 2)
+        	sign.setLine3(downCount+":"+clockTime+":"+onCount+":0");
+        else
+        	sign.setLine3(downCount+":"+clockTime+":0");
 
         return null;
     }
@@ -119,49 +146,80 @@ public class MCX440 extends BaseIC {
     {
     	if(chip.inputAmount() == 0)
     	{
-	    	String[] param = chip.getText().getLine3().split(":", 3);
+	    	String[] param = chip.getText().getLine3().split(":", 4);
 	        
 	        int downCount = Integer.parseInt(param[0]);
 	        int clockTime = Integer.parseInt(param[1]);
+	        int onCount = 0;
 	        int curCount = downCount;
 	        
-	        if(param.length > 2)
+	        
+	        if(param.length > 3)
+	        {
+	        	onCount = Integer.parseInt(param[2]);
+	        	curCount = Integer.parseInt(param[3]);
+	        }
+	        else if(param.length > 2)
+	        {
+	        	//assumes this isn't the on-count without the :0 at the end on init.
 	        	curCount = Integer.parseInt(param[2]);
+	        }
 	        
 	        int count = chip.getText().getLine4().length();
 	        if(count % clockTime == clockTime-1)
 	        {
 	        	curCount--;
 	        	
+	        	//since self-updates don't get mode, we need to get it
+        		char mode = ' ';
+        		if(chip.getText().getLine2().length() > 8)
+        			mode = chip.getText().getLine2().charAt(8);
+	        	
 	        	if(curCount <= 0)
 	        	{
-	        		//since self-updates don't get mode, we need to get it
-	        		char mode = ' ';
-	        		if(chip.getText().getLine2().length() > 8)
-	        			mode = chip.getText().getLine2().charAt(8);
-	        		
-	        		if(curCount < 0 && mode == '1')
+	        		if(onCount == 0)
 	        		{
-	        			chip.getOut(1).set(false);
+		        		
+		        		
+		        		if(curCount < 0 && mode == '1')
+		        		{
+		        			chip.getOut(1).set(mode == '+');
+		        		}
+		        		else
+		        		{
+		        			chip.getOut(1).set(mode != '+');
+		        		}
+		        		
+		        		if(curCount != 0 || mode != '1')
+		        		{
+		        			chip.getText().setLine1("^"+TITLE);
+		        		}
+		        		
+		        		curCount = 0;
 	        		}
 	        		else
 	        		{
-	        			chip.getOut(1).set(true);
+	        			if(-curCount >= onCount)
+	        			{
+	        				chip.getOut(1).set(mode == '+');
+	        				chip.getText().setLine1("^"+TITLE);
+	        				curCount = 0;
+	        			}
+	        			else
+	        			{
+	        				chip.getOut(1).set(mode != '+');
+	        			}
 	        		}
-	        		
-	        		if(curCount != 0 || mode != '1')
-	        		{
-	        			chip.getText().setLine1("^"+TITLE);
-	        		}
-	        		
-	        		curCount = 0;
 	        	}
 	        	else
 	        	{
-	        		chip.getOut(1).set(false);
+	        		chip.getOut(1).set(mode == '+');
 	        	}
 	        	
-	        	chip.getText().setLine3(downCount+":"+clockTime+":"+curCount);
+	        	if(onCount == 0)
+	        		chip.getText().setLine3(downCount+":"+clockTime+":"+curCount);
+	        	else
+	        		chip.getText().setLine3(downCount+":"+clockTime+":"+onCount+":"+curCount);
 	        	
 	            chip.getText().setLine4("");
 	        }
@@ -179,18 +237,19 @@ public class MCX440 extends BaseIC {
     		
     		RedstoneListener listener = (RedstoneListener) chip.getExtra();
     		
-    		String[] param = chip.getText().getLine3().split(":", 3);
-	        
-	        int downCount = Integer.parseInt(param[0]);
-	        int clockTime = Integer.parseInt(param[1]);
-	        int curCount = downCount;
+    		String[] param = chip.getText().getLine3().split(":", 4);
     		
-    		chip.getText().setLine3(downCount+":"+clockTime+":"+curCount);
+	        if(param.length > 3)
+	        	chip.getText().setLine3(param[0]+":"+param[1]+":"+param[2]+":"+param[0]);
+	        else
+	        	chip.getText().setLine3(param[0]+":"+param[1]+":"+param[0]);
     		
     		chip.getText().setLine1("%"+TITLE);
     		chip.getText().setLine4("");
     		
     		chip.getText().supressUpdate();
+    		
+    		chip.getOut(1).set(chip.getMode() == '+');
     		
     		listener.onSignAdded(chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     	}
