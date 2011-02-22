@@ -722,7 +722,8 @@ public class VehicleListener extends CraftBookDelegateListener {
                 	}
                 } else if (minecartEnableLoadBlock
                 			&& under == minecartLoadBlock[0] && underColor == minecartLoadBlock[1]
-                            && minecart.isEmpty()) {
+                            && minecart.isEmpty()
+                            && minecart.getType().getType() == 0) {
 	                Boolean test = Redstone.testAnyInput(underPt);
 	
 	                if (test == null || test)
