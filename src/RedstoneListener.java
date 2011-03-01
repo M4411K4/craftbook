@@ -401,7 +401,7 @@ public class RedstoneListener extends CraftBookDelegateListener
 
             if (useOn != null && useOn && CraftBook.getBlockID(above) == 0) {
                 CraftBook.setBlockID(above, BlockType.FIRE);
-            } else if (useOn != null && CraftBook.getBlockID(above) == BlockType.FIRE) {
+            } else if (useOn != null && !useOn && CraftBook.getBlockID(above) == BlockType.FIRE) {
                 CraftBook.setBlockID(above, 0);
             }
         } else if (type == BlockType.WALL_SIGN
