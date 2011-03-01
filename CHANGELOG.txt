@@ -1,3 +1,12 @@
+2.0extra7:
+- updated to minecraft 1.3
+- added ability to change location of [MC1262] Light sensor location.
+    - on the fourth line of the sign, you can set the x, y, and z offset from the
+        default light sensor position, which is right above the [MC1262] block
+        - an example:    3:4:-1
+          this sets the sensor 3 blocks away from the original position in the
+          x-direction, 4 blocks up, and -1 block in the z-direction
+
 2.0extra6:
 [ICs]:
 - added Password Command [MCX121] and [MCZ121], where [MCZ121] is self triggering.

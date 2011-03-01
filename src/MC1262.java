@@ -68,8 +68,33 @@ public class MC1262 extends BaseIC {
             return "The third line must indicate the minimum light level.";
         }
         
-        if (sign.getLine4().length() != 0) {
-            return "The fourth line must be blank.";
+        if(sign.getLine4().length() > 0)
+        {
+        	try
+        	{
+        		String[] attr = sign.getLine4().split(":", 3);
+        		
+        		int x = Integer.parseInt(attr[0]);
+        		int y = 0;
+        		int z = 0;
+        		
+        		if(attr.length > 1)
+        			y = Integer.parseInt(attr[1]);
+        		if(attr.length > 2)
+        			z = Integer.parseInt(attr[2]);
+        		
+        		if((x > 20) || (x < -20)
+        			|| (y > 20) || (y < -20)
+        			|| (z > 20) || (z < -20)
+        			)
+        		{
+        			return "The 4th line offsets must be a number from -20 to 20";
+        		}
+        	}
+        	catch(NumberFormatException e)
+        	{
+        		return "The 4th line must be blank or contain up to 3 offsets";
+        	}
         }
 
         return null;
@@ -91,6 +116,27 @@ public class MC1262 extends BaseIC {
         int y = blockPos.getBlockY();
         int z = blockPos.getBlockZ();
         int minLight;
+        
+        if(chip.getText().getLine4().length() > 0)
+        {
+        	try
+        	{
+        		String[] attr = chip.getText().getLine4().split(":", 3);
+        		
+        		x += Integer.parseInt(attr[0]);
+        		
+        		if(attr.length > 1)
+        			y += Integer.parseInt(attr[1]);
+        		if(attr.length > 2)
+        			z += Integer.parseInt(attr[2]);
+        	}
+        	catch(NumberFormatException e)
+        	{
+        		return;
+        	}
+        }
+        
+        y = Math.min(Math.max(0, y), 127);
         
         try{
             String minLightLine = chip.getText().getLine3();

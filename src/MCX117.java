@@ -77,6 +77,6 @@ public class MCX117 extends MCX116 {
         // Make TNT explode
     	OEntityTNTPrimed tnt = new OEntityTNTPrimed(etc.getMCServer().e);
         tnt.a(x, y, z);
-        tnt.b_();
+        tnt.f_();
     }
 }
