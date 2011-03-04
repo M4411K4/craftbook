@@ -164,7 +164,7 @@ public class MCX200 extends BaseIC {
     private void setSheep(OEntityLiving entity, int color)
 	{
 		OEntitySheep sheep = (OEntitySheep)entity;
-		sheep.a(color);
+		sheep.a_(color);
 	}
     
     private boolean isValidMob(String mob)

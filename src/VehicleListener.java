@@ -1502,6 +1502,19 @@ public class VehicleListener extends CraftBookDelegateListener {
             }
         // Dispenser
         } else if (line2.equalsIgnoreCase("[Dispenser]")) {
+            int data = CraftBook.getBlockData(
+                    sign.getX(), sign.getY(), sign.getZ());
+            
+            if (type == BlockType.WALL_SIGN) {
+                player.sendMessage(Colors.Rose + "The sign must be a sign post.");
+                CraftBook.dropSign(sign.getX(), sign.getY(), sign.getZ());
+                return true;
+            } else if (data != 0x0 && data != 0x4 && data != 0x8 && data != 0xC) {
+                player.sendMessage(Colors.Rose + "The sign cannot be at an odd angle.");
+                CraftBook.dropSign(sign.getX(), sign.getY(), sign.getZ());
+                return true;
+            }
+            
             listener.informUser(player);
             
             sign.setText(1, "[Dispenser]");

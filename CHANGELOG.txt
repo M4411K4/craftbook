@@ -1,3 +1,10 @@
+2.0extra7.1:
+- fixed MCX200 not spawning colored sheep. Thanks for the bug report tkausl!
+- fixed redstone netherrack error. Thanks for the bug report Nu11u5!
+- temporary fix for apple drops until hMod is hopefully updated. Thanks for the
+    bug report Joy!
+- added missing [Dispenser] sign checks. Thanks for the bug report countrylonja!
+
 2.0extra7:
 - updated to minecraft 1.3
 - added ability to change location of [MC1262] Light sensor location.
