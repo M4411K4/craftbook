@@ -327,7 +327,7 @@ public class MechanismListener extends CraftBookDelegateListener {
         // Random apple drops
         if (dropAppleChance > 0 && block.getType() == BlockType.LEAVES
                 && checkPermission(player, "/appledrops")) {
-            if (block.getStatus() == 2) {
+            if (block.getStatus() == 3 || block.getStatus() == 2) {
                 if (Math.random() <= dropAppleChance) {
                     etc.getServer().dropItem(
                             block.getX(), block.getY(), block.getZ(),
