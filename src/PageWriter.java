@@ -360,7 +360,11 @@ public class PageWriter
 			if(text[1] == null)
 				text[1] = "";
 			
-			player.sendMessage(text[1]);
+			String[] lines = text[1].split("<br>", 20); //max 20 so that it doesn't completely flood a user's chat
+			for(String line : lines)
+			{
+				player.sendMessage(line);
+			}
 		}
 		else
 		{

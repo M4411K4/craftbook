@@ -338,7 +338,7 @@ public class MechanismListener extends CraftBookDelegateListener {
         // Bookshelf drops and Page reset
         } else if (block.getType() == BlockType.BOOKCASE) {
         	
-            if (dropBookshelves && block.getStatus() == 3 && checkPermission(player, "/bookshelfdrops")) {
+            if (dropBookshelves && (block.getStatus() == 3 || block.getStatus() == 2) && checkPermission(player, "/bookshelfdrops")) {
                     etc.getServer().dropItem(
                             block.getX(), block.getY(), block.getZ(),
                             BlockType.BOOKCASE);

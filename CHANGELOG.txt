@@ -1,3 +1,13 @@
+2.0extra7.2:
+- added new-line support for Page Reader.
+    <br> is used to split a page to a new line.
+    Example: The brown<br>fox.
+    Will show as:
+    The brown
+    fox.
+- temporary fix for bookshelf drops until hMod is hopefully updated. Thanks
+    for the bug report TheRaph!
+
 2.0extra7.1:
 - fixed MCX200 not spawning colored sheep. Thanks for the bug report tkausl!
 - fixed redstone netherrack error. Thanks for the bug report Nu11u5!
