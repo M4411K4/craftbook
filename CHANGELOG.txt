@@ -1,3 +1,7 @@
+2.0extra8:
+- updated to minecraft 1.4
+- added a little more color support and support for some new blocks.
+
 2.0extra7.2:
 - added new-line support for Page Reader.
     <br> is used to split a page to a new line.
