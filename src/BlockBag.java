@@ -119,6 +119,7 @@ public abstract class BlockBag {
                                 || id == BlockType.SNOW
                                 || id == BlockType.LIGHTSTONE
                                 || id == BlockType.PORTAL
+                                || id == BlockType.BED
                                 || id == BlockType.CAKE_BLOCK) {
                             return false;
                         }
@@ -156,6 +157,9 @@ public abstract class BlockBag {
                     // Look for signs
                     } else if (id == BlockType.WALL_SIGN || id == BlockType.SIGN_POST) {
                         fetchBlock(323);
+                    // Look for lit redstone repeaters
+                    } else if (id == BlockType.REDSTONE_REPEATER_OFF || id == BlockType.REDSTONE_REPEATER_ON) {
+                        fetchBlock(356);
                     } else {
                         throw e;
                     }

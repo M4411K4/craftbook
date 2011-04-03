@@ -54,6 +54,7 @@ public final class BlockType {
     public static final int DISPENSER = 23;
     public static final int SANDSTONE = 24;
     public static final int NOTE_BLOCK = 25;
+    public static final int BED = 26;
     public static final int CLOTH = 35;
     public static final int YELLOW_FLOWER = 37;
     public static final int RED_FLOWER = 38;
@@ -111,6 +112,8 @@ public final class BlockType {
     public static final int PORTAL = 90;
     public static final int JACKOLANTERN = 91;
     public static final int CAKE_BLOCK = 92;
+    public static final int REDSTONE_REPEATER_OFF = 93;
+    public static final int REDSTONE_REPEATER_ON = 94;
 
     /**
      * Stores a list of dropped blocks for blocks.
@@ -141,6 +144,7 @@ public final class BlockType {
         blockDrops.put(23, 23);
         blockDrops.put(24, 24);
         blockDrops.put(25, 25);
+        blockDrops.put(26, 355);
         blockDrops.put(35, 35);
         blockDrops.put(37, 37);
         blockDrops.put(38, 38);
@@ -192,6 +196,8 @@ public final class BlockType {
         blockDrops.put(89, 248);
         blockDrops.put(91, 91);
         blockDrops.put(92, 354);
+        blockDrops.put(93, 356);
+        blockDrops.put(94, 356);
     }
 
     /**
@@ -217,6 +223,8 @@ public final class BlockType {
                 || id == WOODEN_PRESSURE_PLATE
                 || id == REDSTONE_TORCH_OFF
                 || id == REDSTONE_TORCH_ON
+                || id == REDSTONE_REPEATER_OFF
+                || id == REDSTONE_REPEATER_ON
                 || id == STONE_BUTTON;
     }
 
@@ -247,6 +255,9 @@ public final class BlockType {
                 || id == WOODEN_PRESSURE_PLATE
                 || id == REDSTONE_TORCH_OFF
                 || id == REDSTONE_TORCH_ON
+                || id == REDSTONE_REPEATER_OFF
+                || id == REDSTONE_REPEATER_ON
+                || id == BED
                 || id == STONE_BUTTON
                 || id == SNOW
                 || id == CACTUS
@@ -280,6 +291,8 @@ public final class BlockType {
                 || id == WOODEN_PRESSURE_PLATE
                 || id == REDSTONE_TORCH_OFF
                 || id == REDSTONE_TORCH_ON
+                || id == REDSTONE_REPEATER_OFF
+                || id == REDSTONE_REPEATER_ON
                 || id == STONE_BUTTON
                 || id == SNOW
                 || id == REED
@@ -315,9 +328,14 @@ public final class BlockType {
                 || id == WOODEN_PRESSURE_PLATE
                 || id == REDSTONE_TORCH_OFF
                 || id == REDSTONE_TORCH_ON
+                || id == REDSTONE_REPEATER_OFF
+                || id == REDSTONE_REPEATER_ON
+                || id == BED
                 || id == STONE_BUTTON
                 || id == CLOTH
                 || id == LOG
+                || id == DOUBLE_STEP
+                || id == STEP
                 || id == CACTUS;
     }
 
@@ -355,6 +373,8 @@ public final class BlockType {
                 || id == WOODEN_PRESSURE_PLATE
                 || id == REDSTONE_TORCH_ON
                 || id == REDSTONE_TORCH_OFF
+                || id == REDSTONE_REPEATER_OFF
+                || id == REDSTONE_REPEATER_ON
                 || id == STONE_BUTTON
                 || id == REDSTONE_WIRE
                 || id == WOODEN_DOOR
@@ -369,6 +389,8 @@ public final class BlockType {
      */
     public static boolean isColorTypeBlock(int id) {
         return id == CLOTH
+                || id == DOUBLE_STEP
+                || id == STEP
                 || id == LOG;
     }
 

@@ -180,6 +180,10 @@ public class Door extends SignOrientedMechanism {
         }
         
         int type = CraftBook.getBlockID(pt.add(vertDir));
+        int data = 0;
+        
+        if(BlockType.isColorTypeBlock(type))
+        	data = CraftBook.getBlockData(pt.add(vertDir));
 
         // Check construction
         if (!canUseBlock(type)) {
@@ -246,9 +250,9 @@ public class Door extends SignOrientedMechanism {
             clearColumn(pt.add(vertDir.multiply(2).add(sideDir)), vertDir, type, dist, bag);
             clearColumn(pt.add(vertDir.multiply(2).subtract(sideDir)), vertDir, type, dist, bag);
         } else {
-            setColumn(pt.add(vertDir.multiply(2)), vertDir, type, dist, bag);
-            setColumn(pt.add(vertDir.multiply(2).add(sideDir)), vertDir, type, dist, bag);
-            setColumn(pt.add(vertDir.multiply(2).subtract(sideDir)), vertDir, type, dist, bag);
+            setColumn(pt.add(vertDir.multiply(2)), vertDir, type, data, dist, bag);
+            setColumn(pt.add(vertDir.multiply(2).add(sideDir)), vertDir, type, data, dist, bag);
+            setColumn(pt.add(vertDir.multiply(2).subtract(sideDir)), vertDir, type, data, dist, bag);
         }
 
         bag.flushChanges();
@@ -283,13 +287,13 @@ public class Door extends SignOrientedMechanism {
      * @param change
      * @param dist
      */
-    private static void setColumn(Vector origin, Vector change, int type, int dist, BlockBag bag)
+    private static void setColumn(Vector origin, Vector change, int type, int data, int dist, BlockBag bag)
             throws BlockSourceException {
         for (int i = 0; i < dist; i++) {
             Vector p = origin.add(change.multiply(i));
             int t = CraftBook.getBlockID(p);
             if (canPassThrough(t)) {
-                bag.setBlockID(p, type);
+                bag.setBlockID(p, type, data);
             } else if (t != type) {
                 break;
             }

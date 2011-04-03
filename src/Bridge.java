@@ -191,6 +191,9 @@ public class Bridge extends SignOrientedMechanism {
 
         // Block above the sign
         int type = CraftBook.getBlockID(pt.add(0, 1, 0));
+        int data = 0;
+        if(BlockType.isColorTypeBlock(type))
+        	data = CraftBook.getBlockData(pt.add(0, 1, 0));
 
         // Attempt to detect whether the bridge is above or below the sign,
         // first assuming that the bridge is above
@@ -206,6 +209,9 @@ public class Bridge extends SignOrientedMechanism {
 
             // Block below the sign
             type = CraftBook.getBlockID(pt.add(0, -1, 0));
+            data = 0;
+            if(BlockType.isColorTypeBlock(type))
+            	data = CraftBook.getBlockData(pt.add(0, -1, 0));
             
             if (!canUseBlock(type)) {
                 throw new UnacceptableTypeException();
@@ -272,9 +278,9 @@ public class Bridge extends SignOrientedMechanism {
             clearRow(pt.add(0, centerShift, 0), change, type, dist, bag);
             clearRow(rightSide, change, type, dist, bag);
         } else {
-            setRow(leftSide, change, type, dist, bag);
-            setRow(pt.add(0, centerShift, 0), change, type, dist, bag);
-            setRow(rightSide, change, type, dist, bag);
+            setRow(leftSide, change, type, data, dist, bag);
+            setRow(pt.add(0, centerShift, 0), change, type, data, dist, bag);
+            setRow(rightSide, change, type, data, dist, bag);
         }
         
         return true;
@@ -307,13 +313,13 @@ public class Bridge extends SignOrientedMechanism {
      * @param change
      * @param dist
      */
-    private void setRow(Vector origin, Vector change, int type, int dist, BlockBag bag)
+    private void setRow(Vector origin, Vector change, int type, int data, int dist, BlockBag bag)
             throws BlockSourceException {
         for (int i = 1; i <= dist; i++) {
             Vector p = origin.add(change.multiply(i));
             int t = CraftBook.getBlockID(p);
             if (canPassThrough(t)) {
-                bag.setBlockID(p, type);
+                bag.setBlockID(p, type, data);
             } else if (t != type) {
                 break;
             }
