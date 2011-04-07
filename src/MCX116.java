@@ -77,7 +77,7 @@ public class MCX116 extends BaseIC {
      */
     public void think(ChipState chip) {
     	
-    	if(chip.getIn(1).is() && chip.getIn(1).isTriggered())
+    	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
     	{
     		chip.getOut(1).set(playerAbove(chip.getBlockPosition(), chip.getText().getLine3()) != null);
     	}

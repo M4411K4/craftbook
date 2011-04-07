@@ -33,18 +33,39 @@ public class ItemArrayUtil {
      */
     public static void moveItemArrayToChestBag(ItemArray<?> from,
             NearbyChestBlockBag bag) {
-        
+    	moveItemArrayToChestBag(from, bag, 0, 0, 0);
+    }
+	public static void moveItemArrayToChestBag(ItemArray<?> from,
+            NearbyChestBlockBag bag, int itemType, int itemColor, int itemAmount) {
+    	
         Item[] fromItems = from.getContents();
         Inventory[] inventories = bag.getInventories();
         int invenIndex = 0;
         boolean changed = false;
         
+        int currentAmount = 0;
+        
         try {
             for (int cartSlot = 0; cartSlot < fromItems.length; cartSlot++) {
                 Item cartItem = fromItems[cartSlot];
                 
-                if (cartItem == null || cartItem.getAmount() == 0) {
+                if (cartItem == null || cartItem.getAmount() == 0
+                	|| (itemType > 0 && (itemType != cartItem.getItemId() || itemColor != cartItem.getDamage()) )
+                	) {
                     continue;
+                }
+                
+                currentAmount += cartItem.getAmount();
+                Item itemCopy = null;
+                
+                if(itemAmount > 0 && currentAmount > itemAmount)
+                {
+                	itemCopy = new Item(cartItem.getItemId(),
+                						currentAmount - itemAmount,
+                						cartItem.getSlot(),
+                						cartItem.getDamage());
+                	
+                	cartItem.setAmount(cartItem.getAmount() - itemCopy.getAmount());
                 }
                 
                 try {
@@ -87,10 +108,29 @@ public class ItemArrayUtil {
                             	}
                             }
                         }
+                        
+                        if(changed)
+                        {
+                        	setContents(inventories[invenIndex], chestItems);
+                        }
                     }
                     
                     throw new TargetFullException();
                 } catch (TransferredItemException e) {
+                }
+                
+                if(itemAmount > 0 && currentAmount >= itemAmount)
+                {
+                	if(itemCopy != null)
+                	{
+                		if(fromItems[cartSlot] != null)
+                		{
+                			itemCopy.setAmount(itemCopy.getAmount() + fromItems[cartSlot].getAmount());
+                		}
+                		
+                		fromItems[cartSlot] = itemCopy;
+                	}
+                	break;
                 }
             }
         } catch (TargetFullException e) {
@@ -109,73 +149,133 @@ public class ItemArrayUtil {
      */
     public static void moveChestBagToItemArray(ItemArray<?> to,
             NearbyChestBlockBag bag) {
-        
-        Item[] toItems = to.getContents();
-        boolean changedDest = false;
-        
-        try {
-            for (Inventory inventory : bag.getInventories()) {
-                boolean changed = false;
-                Item[] chestItems = inventory.getContents();
+    	
+    	moveChestBagToItemArray(to, bag, 0, 0, 0);
+    }
     
-                try {
-                    for (int chestSlot = 0; chestSlot < chestItems.length; chestSlot++) {
-                        Item chestItem = chestItems[chestSlot];
-                        
-                        if (chestItem == null || chestItem.getAmount() == 0) {
-                            continue;
-                        }
-                        
-                        for (int cartSlot = 0; cartSlot < toItems.length; cartSlot++) {
-                            Item cartItem = toItems[cartSlot];
+    /*
+     * M4411K4: redoing code here because the last code from
+     * I guess sk89q, didn't work properly and used more resources
+     * than should have (using exceptions to break? o_O)
+     */
+    public static void moveChestBagToItemArray(ItemArray<?> to,
+            NearbyChestBlockBag bag, int itemType, int itemColor, int itemAmount) {
+    	
+        Item[] toItems = to.getContents();
+        Inventory[] bags = bag.getInventories();
+        boolean changed = false;
+        int currentAmount = 0;
         
-                            if (cartItem == null) {
-                                toItems[cartSlot] = chestItem;
-                                chestItems[chestSlot] = null;
-                                changed = true;
-                                throw new TransferredItemException();
-                            } else {
-                            	
-                            	int maxStack = getStackMax(chestItem);
-                            	
-                            	if (cartItem.getItemId() == chestItem.getItemId()
-                            			&& isSameColor(cartItem, chestItem)
-                                        && cartItem.getAmount() < maxStack
-                                        && cartItem.getAmount() >= 0)
-                            	{
-	                                int spaceAvailable = maxStack - cartItem.getAmount();
-	                                
-	                                if (spaceAvailable >= chestItem.getAmount()) {
-	                                    cartItem.setAmount(cartItem.getAmount()
-	                                            + chestItem.getAmount());
-	                                    chestItems[chestSlot] = null;
-	                                    changed = true;
-	                                    throw new TransferredItemException();
-	                                } else {
-	                                    chestItem.setAmount(chestItem.getAmount()
-	                                            - spaceAvailable);
-	                                    cartItem.setAmount(maxStack);
-	                                    changed = true;
-	                                }
-                            	}
-                            }
-                        }
-                        
-                        throw new TargetFullException();
-                    }
-                } catch (TransferredItemException e) {
-                }
-                
-                if (changed) {
-                    changedDest = true;
-                    setContents(inventory, chestItems);
-                }
-            }
-        } catch (TargetFullException e) {
+        for(int toSlot = 0; toSlot < toItems.length; toSlot++)
+        {
+        	Item toItem = toItems[toSlot];
+        	int maxStack = 0;
+        	if(toItem != null)
+        	{
+        		maxStack = getStackMax(toItem);
+        		if(toItem.getAmount() >= maxStack
+        			|| (itemType > 0 && (itemType != toItem.getItemId() || itemColor != toItem.getDamage()))
+        			)
+        		{
+        			continue;
+        		}
+        	}
+        	
+        	boolean moved = false;
+        	
+        	for(Inventory inventory : bags)
+        	{
+        		Item[] chestItems = inventory.getContents();
+        		for(int chestSlot = 0; chestSlot < chestItems.length; chestSlot++)
+        		{
+        			Item chestItem = chestItems[chestSlot];
+        			if(chestItem == null
+        				|| chestItem.getAmount() == 0
+        				|| (toItem != null && (chestItem.getItemId() != toItem.getItemId() || chestItem.getDamage() != toItem.getDamage()))
+        				|| (itemType > 0 && (itemType != chestItem.getItemId() || itemColor != chestItem.getDamage()))
+        				)
+        			{
+        				//empty or not the same item so move on to next slot
+        				continue;
+        			}
+        			
+        			currentAmount += chestItem.getAmount();
+        			Item itemCopy = null;
+        			if(itemAmount > 0 && currentAmount > itemAmount)
+        			{
+        				itemCopy = new Item(chestItem.getItemId(),
+				    						currentAmount - itemAmount,
+				    						chestItem.getSlot(),
+				    						chestItem.getDamage());
+        				
+        				chestItem.setAmount(chestItem.getAmount() - itemCopy.getAmount());
+        			}
+        			
+        			//can move to slot
+        			if(toItem == null)
+        			{
+        				toItems[toSlot] = chestItem;
+        				chestItems[chestSlot] = null;
+        			}
+        			else
+        			{
+        				//maxStack should have correct value since toItem is not null
+        				int spaceAvailable = maxStack - toItem.getAmount();
+        				if(spaceAvailable >= chestItem.getAmount())
+        				{
+        					//everything fits
+        					toItem.setAmount(toItem.getAmount() + chestItem.getAmount());
+        					chestItems[chestSlot] = null;
+        				}
+        				else
+        				{
+        					//doesn't fit into slot
+        					toItem.setAmount(maxStack);
+        					chestItem.setAmount(chestItem.getAmount() - spaceAvailable);
+        				}
+        			}
+        			
+        			//if not max, re-check slot
+        			maxStack = getStackMax(toItems[toSlot]);
+        			if(toItems[toSlot].getAmount() < maxStack)
+        			{
+        				toSlot--;
+        			}
+        			
+        			if(itemCopy != null)
+                	{
+                		if(chestItems[chestSlot] != null)
+                		{
+                			itemCopy.setAmount(itemCopy.getAmount() + chestItems[chestSlot].getAmount());
+                		}
+                		
+                		chestItems[chestSlot] = itemCopy;
+                	}
+        			
+        			moved = true;
+        			changed = true;
+        			break;
+        		}
+        		
+        		if(moved || (itemAmount > 0 && currentAmount >= itemAmount))
+        		{
+        			//set chest items with new values
+        			setContents(inventory, chestItems);
+        			
+        			//go to next item slot
+        			break;
+        		}
+        	}
+        	
+        	if(itemAmount > 0 && currentAmount >= itemAmount)
+        	{
+        		break;
+        	}
         }
         
-        if (changedDest) {
-            setContents(to, toItems);
+        if(changed)
+        {
+        	setContents(to, toItems);
         }
     }
     

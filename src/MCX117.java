@@ -49,7 +49,7 @@ public class MCX117 extends MCX116 {
      */
     public void think(ChipState chip) {
     	
-    	if(chip.getIn(1).is() && chip.getIn(1).isTriggered())
+    	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
     	{
     		Player player = playerAbove(chip.getBlockPosition(), chip.getText().getLine3());
     		

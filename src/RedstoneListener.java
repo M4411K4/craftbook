@@ -234,6 +234,8 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCU113", new MCX113(), ICType.UISO);
         internalRegisterIC("MCU440", new MCX440(), ICType.UISO);
         
+        internalRegisterIC("MCZ116", new MCX116(), ICType.ZISO);
+        internalRegisterIC("MCZ117", new MCX117(), ICType.ZISO);
         internalRegisterIC("MCZ120", new MCX120(), ICType.ZISO);
         internalRegisterIC("MCZ121", new MCX121(), ICType.ZISO);
     }

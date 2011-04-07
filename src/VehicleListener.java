@@ -84,6 +84,12 @@ public class VehicleListener extends CraftBookDelegateListener {
     private int[] minecartLoadBlock = new int[]{BlockType.CLOTH, 9};
     
     private int minecartCollisionType = 0;
+    
+    private int minecartMaxSpeed = 100; //higher values than 100 may cause minecarts to derail
+    private double minecartBoostFull = 2;
+    private double minecartBoostSmall = 1.25;
+    private double minecartBoostLaunch = 0.3;
+    private double minecartBoostFromRider = 0.1;
 
     /**
      * Construct the object.
@@ -127,6 +133,17 @@ public class VehicleListener extends CraftBookDelegateListener {
         minecartLaunchBlock = StringUtil.getPropColorInt(properties.getString("minecart-launch-block"), BlockType.CLOTH, 5);
         minecartDelayBlock = StringUtil.getPropColorInt(properties.getString("minecart-delay-block"), BlockType.CLOTH, 4);
         minecartLoadBlock = StringUtil.getPropColorInt(properties.getString("minecart-load-block"), BlockType.CLOTH, 9);
+        
+        if(properties.containsKey("minecart-max-speed"))
+        	minecartMaxSpeed = properties.getInt("minecart-max-speed", 100);
+        if(properties.containsKey("minecart-boost-full"))
+        	minecartBoostFull = properties.getDouble("minecart-boost-full", 2.0);
+        if(properties.containsKey("minecart-boost-small"))
+        	minecartBoostSmall = properties.getDouble("minecart-boost-small", 1.25);
+        if(properties.containsKey("minecart-boost-launch"))
+        	minecartBoostLaunch = properties.getDouble("minecart-boost-launch", 0.3);
+        if(properties.containsKey("minecart-boost-from-rider"))
+        	minecartBoostFromRider = properties.getDouble("minecart-boost-from-rider", 0.1);
         
         // If the configuration is merely reloaded, then this must be destroyed
         if (decayWatcher != null) {
@@ -197,9 +214,9 @@ public class VehicleListener extends CraftBookDelegateListener {
     			else
     			{
     				eminecart.b(point.getX(), point.getY(), point.getZ(), player.getRotation(), 0);
-        			eminecart.aN = (point.getX() - blockpt.getBlockX()) * 0.3;
+        			eminecart.aN = (point.getX() - blockpt.getBlockX()) * minecartBoostLaunch;
     				eminecart.aO = 0.0;
-    				eminecart.aP = (point.getZ() - blockpt.getBlockZ()) * 0.3;
+    				eminecart.aP = (point.getZ() - blockpt.getBlockZ()) * minecartBoostLaunch;
     			}
         		
         		return true;
@@ -310,13 +327,13 @@ public class VehicleListener extends CraftBookDelegateListener {
                     int data = CraftBook.getBlockData(signPos);
                     
                     if (data == 0x0) {
-                        minecart.setMotion(0, 0, -0.3);
+                        minecart.setMotion(0, 0, -minecartBoostLaunch);
                     } else if (data == 0x4) {
-                        minecart.setMotion(0.3, 0, 0);
+                        minecart.setMotion(minecartBoostLaunch, 0, 0);
                     } else if (data == 0x8) {
-                        minecart.setMotion(0, 0, 0.3);
+                        minecart.setMotion(0, 0, minecartBoostLaunch);
                     } else if (data == 0xC) {
-                        minecart.setMotion(-0.3, 0, 0);
+                        minecart.setMotion(-minecartBoostLaunch, 0, 0);
                     }
                 }
             } catch (BlockSourceException e) {
@@ -353,13 +370,13 @@ public class VehicleListener extends CraftBookDelegateListener {
                     pt.getBlockX(), cblock.getY(), pt.getBlockZ());
             
             if (data == 0x0) {
-                motion = new Vector(0, 0, -0.3);
+                motion = new Vector(0, 0, -minecartBoostLaunch);
             } else if (data == 0x4) {
-                motion = new Vector(0.3, 0, 0);
+                motion = new Vector(minecartBoostLaunch, 0, 0);
             } else if (data == 0x8) {
-                motion = new Vector(0, 0, 0.3);
+                motion = new Vector(0, 0, minecartBoostLaunch);
             } else if (data == 0xC) {
-                motion = new Vector(-0.3, 0, 0);
+                motion = new Vector(-minecartBoostLaunch, 0, 0);
             } else {
                 return;
             }
@@ -405,28 +422,28 @@ public class VehicleListener extends CraftBookDelegateListener {
 
             if (minecartControlBlocks) {
                 // Overflow prevention
-                if (Math.abs(minecart.getMotionX()) > 100) {
-                    minecart.setMotionX(Math.signum(minecart.getMotionX()) * 100);
+                if (Math.abs(minecart.getMotionX()) > minecartMaxSpeed) {
+                    minecart.setMotionX(Math.signum(minecart.getMotionX()) * minecartMaxSpeed);
                 }
                 
-                if (Math.abs(minecart.getMotionZ()) > 100) {
-                    minecart.setMotionZ(Math.signum(minecart.getMotionZ()) * 100);
+                if (Math.abs(minecart.getMotionZ()) > minecartMaxSpeed) {
+                    minecart.setMotionZ(Math.signum(minecart.getMotionZ()) * minecartMaxSpeed);
                 }
                 
                 if (under == minecart25xBoostBlock[0] && underColor == minecart25xBoostBlock[1]) {
                     Boolean test = Redstone.testAnyInput(underPt);
 
                     if (test == null || test) {
-                        minecart.setMotionX(minecart.getMotionX() * 1.25);
-                        minecart.setMotionZ(minecart.getMotionZ() * 1.25);
+                        minecart.setMotionX(minecart.getMotionX() * minecartBoostSmall);
+                        minecart.setMotionZ(minecart.getMotionZ() * minecartBoostSmall);
                         return;
                     }
                 } else if (under == minecart100xBoostBlock[0] && underColor == minecart100xBoostBlock[1]) {
                     Boolean test = Redstone.testAnyInput(underPt);
 
                     if (test == null || test) {
-                        minecart.setMotionX(minecart.getMotionX() * 2);
-                        minecart.setMotionZ(minecart.getMotionZ() * 2);
+                        minecart.setMotionX(minecart.getMotionX() * minecartBoostFull);
+                        minecart.setMotionZ(minecart.getMotionZ() * minecartBoostFull);
                         return;
                     }
                 } else if (under == minecart50xSlowBlock[0] && underColor == minecart50xSlowBlock[1]) {
@@ -501,12 +518,141 @@ public class VehicleListener extends CraftBookDelegateListener {
                             }
                             
                             if (bag.getChestBlockCount() > 0) {
-                                if (getControllerSign(pt.add(0, -1, 0), "[Deposit]") != null) {
-                                    ItemArrayUtil.moveChestBagToItemArray(
-                                            minecart.getStorage(), bag);
+                            	Sign sign = getControllerSign(pt.add(0, -1, 0), "[Deposit]");
+                                if (sign != null){
+                                	
+                                	//repeat call protection
+                                	long curtime = (long)Math.floor(System.currentTimeMillis() / 1000);
+                            		if(sign.getText(0).length() > 0)
+                            		{
+                            			try
+                            			{
+                            				int hashid = Integer.parseInt(sign.getText(0));
+                            				if(hashid == minecart.getEntity().hashCode())
+                            				{
+                            					if(sign.getText(3).length() > 0)
+                            					{
+                            						long lastTime = Long.parseLong(sign.getText(3));
+                            						if(curtime - lastTime < 2)
+                            							return;
+                            					}
+                            				}
+                            				else
+                            				{
+                            					sign.setText(0, ""+minecart.getEntity().hashCode());
+                            				}
+                            				sign.setText(3, ""+curtime);
+                            			}
+                            			catch(NumberFormatException e)
+                            			{
+                            				
+                            			}
+                            		}
+                            		else
+                            		{
+                            			sign.setText(0, ""+minecart.getEntity().hashCode());
+                            			sign.setText(3, ""+curtime);
+                            		}
+                                	
+                            		//the actual moving
+                                	if(sign.getText(2).length() > 0)
+                                	{
+                                		String[] args = sign.getText(2).split(":", 2);
+                                		int type = 0;
+                                		int color = 0;
+                                		int amount = 0;
+                                		
+                                		try
+                                		{
+                                			String[] args2 = args[0].split("@", 2);
+                                			type = Integer.parseInt(args2[0]);
+                                			if(args2.length > 1)
+                                				color = Integer.parseInt(args2[1]);
+                                			if(args.length > 1)
+                                				amount = Integer.parseInt(args[1]);
+                                		}
+                                		catch(NumberFormatException e)
+                                		{
+                                			return;
+                                		}
+                                		
+                                		ItemArrayUtil.moveChestBagToItemArray(
+                                				minecart.getStorage(), bag, type, color, amount);
+                                	}
+                                	else
+                                	{
+                                		ItemArrayUtil.moveChestBagToItemArray(
+                                				minecart.getStorage(), bag);
+                                	}
                                 } else {
-                                    ItemArrayUtil.moveItemArrayToChestBag(
-                                            minecart.getStorage(), bag);
+                                	sign = getControllerSign(pt.add(0, -1, 0), "[Collect]");
+                                	
+                                	if(sign != null)
+                                	{
+                                		//repeat call protection
+                                		long curtime = (long)Math.floor(System.currentTimeMillis() / 1000);
+                                		if(sign.getText(0).length() > 0)
+                                		{
+                                			try
+                                			{
+                                				int hashid = Integer.parseInt(sign.getText(0));
+                                				if(hashid == minecart.getEntity().hashCode())
+                                				{
+                                					if(sign.getText(3).length() > 0)
+                                					{
+                                						long lastTime = Long.parseLong(sign.getText(3));
+                                						if(curtime - lastTime < 2)
+                                							return;
+                                					}
+                                				}
+                                				else
+                                				{
+                                					sign.setText(0, ""+minecart.getEntity().hashCode());
+                                				}
+                                				sign.setText(3, ""+curtime);
+                                			}
+                                			catch(NumberFormatException e)
+                                			{
+                                				
+                                			}
+                                		}
+                                		else
+                                		{
+                                			sign.setText(0, ""+minecart.getEntity().hashCode());
+                                			sign.setText(3, ""+curtime);
+                                		}
+                                	}
+                                	
+                                	//the actual moving
+                                	if(sign != null && sign.getText(2).length() > 0)
+                                	{
+                                		String[] args = sign.getText(2).split(":", 2);
+                                		int type = 0;
+                                		int color = 0;
+                                		int amount = 0;
+                                		
+                                		try
+                                		{
+                                			String[] args2 = args[0].split("@", 2);
+                                			type = Integer.parseInt(args2[0]);
+                                			if(args2.length > 1)
+                                				color = Integer.parseInt(args2[1]);
+                                			if(args.length > 1)
+                                				amount = Integer.parseInt(args[1]);
+                                		}
+                                		catch(NumberFormatException e)
+                                		{
+                                			return;
+                                		}
+                                		
+                                		ItemArrayUtil.moveItemArrayToChestBag(
+                                				minecart.getStorage(), bag, type, color, amount);
+                                	}
+                                	else
+                                	{
+                                		ItemArrayUtil.moveItemArrayToChestBag(
+                                				minecart.getStorage(), bag);
+                                	}
                                 }
                             }
                         }
@@ -558,6 +704,8 @@ public class VehicleListener extends CraftBookDelegateListener {
                             loc.y = loc.y + 0.1;
                             loc.z = loc.z + 0.5;
 
+                            OEntity nullEntity = null; //to eject
+                            player.getEntity().b(nullEntity);
                             player.teleportTo(loc);
                         }
                     }
@@ -697,13 +845,13 @@ public class VehicleListener extends CraftBookDelegateListener {
 		                		
 		                		Vector motion = null;
 		                		if (data == 0x0) {
-		        	                motion = new Vector(0, 0, -0.3);
+		        	                motion = new Vector(0, 0, -minecartBoostLaunch);
 		        	            } else if (data == 0x4) {
-		        	                motion = new Vector(0.3, 0, 0);
+		        	                motion = new Vector(minecartBoostLaunch, 0, 0);
 		        	            } else if (data == 0x8) {
-		        	                motion = new Vector(0, 0, 0.3);
+		        	                motion = new Vector(0, 0, minecartBoostLaunch);
 		        	            } else if (data == 0xC) {
-		        	                motion = new Vector(-0.3, 0, 0);
+		        	                motion = new Vector(-minecartBoostLaunch, 0, 0);
 		        	            } else {
 		        	                return;
 		        	            }
@@ -813,7 +961,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                 }
             }
 
-            if (minecartDispensers) {
+            if (minecartDispensers && !minecart.getEntity().bb) {
                 Vector pt = new Vector(blockX, blockY, blockZ);
                 Vector depositPt = null;
 
@@ -851,7 +999,6 @@ public class VehicleListener extends CraftBookDelegateListener {
                     blockBag.addSingleSourcePosition(depositPt.add(0, 0, -1));
 
                     Minecart.Type type = minecart.getType();
-
                     if (type == Minecart.Type.Minecart) {
                         try {
                             blockBag.storeBlock(ItemType.MINECART);
@@ -969,13 +1116,13 @@ public class VehicleListener extends CraftBookDelegateListener {
                                         blockX, cblock.getY(), blockZ);
                                 
                                 if (data == 0x0) {
-                                    motion = new Vector(0, 0, -0.3);
+                                    motion = new Vector(0, 0, -minecartBoostLaunch);
                                 } else if (data == 0x4) {
-                                    motion = new Vector(0.3, 0, 0);
+                                    motion = new Vector(minecartBoostLaunch, 0, 0);
                                 } else if (data == 0x8) {
-                                    motion = new Vector(0, 0, 0.3);
+                                    motion = new Vector(0, 0, minecartBoostLaunch);
                                 } else if (data == 0xC) {
-                                    motion = new Vector(-0.3, 0, 0);
+                                    motion = new Vector(-minecartBoostLaunch, 0, 0);
                                 }
 
                                 if (motion != null) {
@@ -1097,7 +1244,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             {
                             	//west
                             	targetTrack = new Location(blockX, dest.getBlockY()+1, blockZ + 1, 0, 0);
-                            	motion = new Vector(0, 0, 0.3);
+                            	motion = new Vector(0, 0, minecartBoostLaunch);
                             }
                             if((wantedDir == -1 || wantedDir == 4)
                             		&& CraftBook.getBlockID(blockX + 1, dest.getBlockY()+1, blockZ) == BlockType.MINECART_TRACKS
@@ -1105,7 +1252,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             {
                             	//south
                             	targetTrack = new Location(blockX + 1, dest.getBlockY()+1, blockZ, 270, 0);
-                            	motion = new Vector(0.3, 0, 0);
+                            	motion = new Vector(minecartBoostLaunch, 0, 0);
                             }
                             if((wantedDir == -1 || wantedDir == 0)
                             		&& CraftBook.getBlockID(blockX, dest.getBlockY()+1, blockZ - 1) == BlockType.MINECART_TRACKS
@@ -1113,7 +1260,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             {
                             	//east
                             	targetTrack = new Location(blockX, dest.getBlockY()+1, blockZ - 1, 180, 0);
-                            	motion = new Vector(0, 0, -0.3);
+                            	motion = new Vector(0, 0, -minecartBoostLaunch);
                             }
                             if((wantedDir == -1 || wantedDir == 12)
                             		&& CraftBook.getBlockID(blockX - 1, dest.getBlockY()+1, blockZ) == BlockType.MINECART_TRACKS
@@ -1121,7 +1268,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             {
                             	//north
                             	targetTrack = new Location(blockX - 1, dest.getBlockY()+1, blockZ, 90, 0);
-                            	motion = new Vector(-0.3, 0, 0);
+                            	motion = new Vector(-minecartBoostLaunch, 0, 0);
                             }
                             
                             if(targetTrack != null)
@@ -1203,22 +1350,22 @@ public class VehicleListener extends CraftBookDelegateListener {
 		                		if (data == 0x0)
 		                		{
 		                			targetTrack = new Location(blockX, blockY, blockZ - 1, minecart.getRotation(), minecart.getPitch());
-		        	                motion = new Vector(0, 0, -0.3);
+		        	                motion = new Vector(0, 0, -minecartBoostLaunch);
 		        	            }
 		                		else if (data == 0x4)
 		        	            {
 		                			targetTrack = new Location(blockX + 1, blockY, blockZ, minecart.getRotation(), minecart.getPitch());
-		        	                motion = new Vector(0.3, 0, 0);
+		        	                motion = new Vector(minecartBoostLaunch, 0, 0);
 		        	            }
 		        	            else if (data == 0x8)
 		        	            {
 		        	            	targetTrack = new Location(blockX, blockY, blockZ + 1, minecart.getRotation(), minecart.getPitch());
-		        	                motion = new Vector(0, 0, 0.3);
+		        	                motion = new Vector(0, 0, minecartBoostLaunch);
 		        	            }
 		        	            else if (data == 0xC)
 		        	            {
 		        	            	targetTrack = new Location(blockX - 1, blockY, blockZ, minecart.getRotation(), minecart.getPitch());
-		        	                motion = new Vector(-0.3, 0, 0);
+		        	                motion = new Vector(-minecartBoostLaunch, 0, 0);
 		        	            }
 		        	            else
 		        	            {
@@ -1305,21 +1452,21 @@ public class VehicleListener extends CraftBookDelegateListener {
                 String dir = etc.getCompassPointForDirection(rot);
                 
                 if (dir.equals("N")) {
-                    vehicle.setMotion(-0.1, 0, 0);
+                    vehicle.setMotion(-minecartBoostFromRider, 0, 0);
                 } else if(dir.equals("NE")) {
-                    vehicle.setMotion(-0.1, 0, -0.1);
+                    vehicle.setMotion(-minecartBoostFromRider, 0, -minecartBoostFromRider);
                 } else if(dir.equals("E")) {
-                    vehicle.setMotion(0, 0, -0.1);
+                    vehicle.setMotion(0, 0, -minecartBoostFromRider);
                 } else if(dir.equals("SE")) {
-                    vehicle.setMotion(0.1, 0, -0.1);
+                    vehicle.setMotion(minecartBoostFromRider, 0, -minecartBoostFromRider);
                 } else if(dir.equals("S")) {
-                    vehicle.setMotion(0.1, 0, 0);
+                    vehicle.setMotion(minecartBoostFromRider, 0, 0);
                 } else if(dir.equals("SW")) {
-                    vehicle.setMotion(0.1, 0, 0.1);
+                    vehicle.setMotion(minecartBoostFromRider, 0, minecartBoostFromRider);
                 } else if(dir.equals("W")) {
-                    vehicle.setMotion(0, 0, 0.1);
+                    vehicle.setMotion(0, 0, minecartBoostFromRider);
                 } else if(dir.equals("NW")) {
-                    vehicle.setMotion(-0.1, 0, 0.1);
+                    vehicle.setMotion(-minecartBoostFromRider, 0, minecartBoostFromRider);
                 }
             }
 
@@ -1410,7 +1557,7 @@ public class VehicleListener extends CraftBookDelegateListener {
             	
                 if (sign == null) {
                     player.sendMessage(Colors.Rose
-                            + "A [Launch] sign is still needed.");
+                            + "A "+Colors.White+"[Launch] sign"+Colors.Rose+" is still needed.");
                 } else {
                     player.sendMessage(Colors.Gold
                             + "Minecart Launch block created.");
@@ -1949,6 +2096,64 @@ public class VehicleListener extends CraftBookDelegateListener {
             } else if (player != null && parts[0].equalsIgnoreCase("Ply")) {
                 if (parts[1].equalsIgnoreCase(player.getName())) {
                     return true;
+                }
+            } else if (minecart.getType() == Minecart.Type.StorageCart
+            		&& ( parts[0].equalsIgnoreCase("SCI")
+            				|| parts[0].equalsIgnoreCase("SCI+") )
+            		) {
+            	try
+            	{
+            		String[] parts2 = parts[1].split("@", 2);
+            		int item = Integer.parseInt(parts2[0]);
+            		int color = 0;
+            		if(parts2.length > 1)
+            		{
+            			color = Integer.parseInt(parts2[1]);
+            			if(color > 15 || color < 0)
+            				return false;
+            		}
+            		
+            		int amount = 1;
+            		if(parts.length > 2)
+            		{
+            			amount = Integer.parseInt(parts[2]);
+            		}
+                    
+                    StorageMinecart storage = minecart.getStorage();
+                    if(storage != null)
+                    {
+                    	if(parts[0].equalsIgnoreCase("SCI"))
+                    	{
+                    		//get from first slot
+                    		Item scItem = storage.getItemFromSlot(0);
+                    		if(scItem != null
+                    			&& scItem.getItemId() == item
+                    			&& scItem.getDamage() == color
+                    			&& scItem.getAmount() >= amount)
+                        	{
+                        		return true;
+                        	}
+                    	}
+                    	else if(parts[0].equalsIgnoreCase("SCI+"))
+                    	{
+                    		//get from any match
+                    		Item[] items = storage.getContents();
+                    		int foundAmt = 0;
+                            for (Item scItem : items)
+                            {
+                            	if(scItem != null
+                        			&& scItem.getItemId() == item
+                        			&& scItem.getDamage() == color)
+                            	{
+                            		foundAmt += scItem.getAmount();
+                            		
+                            		if(foundAmt >= amount)
+                            			return true;
+                            	}
+                            }
+                    	}
+                    }
+                } catch (NumberFormatException e) {
                 }
             } else if (parts[0].equalsIgnoreCase("Mob")) {
                 String testMob = parts[1];

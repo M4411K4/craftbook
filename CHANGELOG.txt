@@ -1,3 +1,51 @@
+2.0extra8.1:
+- added ability to specify minecart boost speeds in the settings.
+    - Adds 5 new properties in the "craftbook.properties" file.
+- added storage minecart sorting based on the first item (SCI) in the storage
+    minecart or anywhere (SCI+) in the storage minecart.
+    - For sorting with just the first item, on the [Sort] sign use:
+        SCI:itemID#
+        or
+        SCI:itemID#:amount#
+        or
+        SCI:itemID#@color#:amount#
+    Example:
+        SCI:351@9:12
+        will sort if there is 12 pink dye in the first slot of the storage cart.
+    - For sorting with an item match in any storage cart slot, It is the same as
+        above, but with a '+' at the end of "SCI"
+    Example:
+        SCI+:351@9:12
+        will sort if there is 12 pink dye, but anywhere in the storage cart.
+    - This will work on other minecart features that use sort such as [Launch]
+        and [CartLift]
+- added ability for minecart [Deposit] and [Collect] to only collect an item
+    of a certain type and a certain amount.
+    - On a [Deposit] or [Collect] sign, put on the 3rd line:
+        itemID#
+        or
+        itemID#:amount#
+        or
+        itemID#@color#:amount#
+    Example:
+        35@5:4
+        will collect or deposit 4 green wool
+    - The amount# is optional.
+- added self-triggered "Is player above?" [MCZ116] and "Player mine" [MCZ117]
+    - It is recommended to use the regular version, but I have a feeling
+        players will just add clocks to the regular vesrions anyways.
+- added some repeat call protection for [Deposit] and [Collect]
+    - Previously this feature attempted to repeat itself about 6 times, when only
+        one time was needed. So that's 6x each slot of the storage cart and chests
+    - This will now only repeat itself for the same storage cart every 2 seconds.
+    - This protection will only work for [Collect] when a [Collect] sign is used.
+- bug fix for minecart eject. Thanks to all that reported it!
+- bug fix for duplicated minecart depositing. Thanks wire for reporting it!
+- bug fix for minecart [Deposit]. I'm not sure it ever worked properly.
+    - A complete recode of it was done. This may not be the best code but it
+        is *for sure* better (performance and design) than what was originally
+        used.
+
 2.0extra8:
 - updated to minecraft 1.4
 - added a little more color support and support for some new blocks.
