@@ -33,7 +33,7 @@ public class ItemArrayUtil {
      */
     public static void moveItemArrayToChestBag(ItemArray<?> from,
             NearbyChestBlockBag bag) {
-    	moveItemArrayToChestBag(from, bag, 0, 0, 0);
+    	moveItemArrayToChestBag(from, bag, 0, -1, 0);
     }
 	public static void moveItemArrayToChestBag(ItemArray<?> from,
             NearbyChestBlockBag bag, int itemType, int itemColor, int itemAmount) {
@@ -50,7 +50,7 @@ public class ItemArrayUtil {
                 Item cartItem = fromItems[cartSlot];
                 
                 if (cartItem == null || cartItem.getAmount() == 0
-                	|| (itemType > 0 && (itemType != cartItem.getItemId() || itemColor != cartItem.getDamage()) )
+                	|| (itemType > 0 && (itemType != cartItem.getItemId() || (itemColor != -1 && itemColor != cartItem.getDamage()) ) )
                 	) {
                     continue;
                 }
@@ -150,7 +150,7 @@ public class ItemArrayUtil {
     public static void moveChestBagToItemArray(ItemArray<?> to,
             NearbyChestBlockBag bag) {
     	
-    	moveChestBagToItemArray(to, bag, 0, 0, 0);
+    	moveChestBagToItemArray(to, bag, 0, -1, 0);
     }
     
     /*
@@ -174,7 +174,7 @@ public class ItemArrayUtil {
         	{
         		maxStack = getStackMax(toItem);
         		if(toItem.getAmount() >= maxStack
-        			|| (itemType > 0 && (itemType != toItem.getItemId() || itemColor != toItem.getDamage()))
+        			|| (itemType > 0 && (itemType != toItem.getItemId() || (itemColor != -1 && itemColor != toItem.getDamage()) ))
         			)
         		{
         			continue;
@@ -192,7 +192,7 @@ public class ItemArrayUtil {
         			if(chestItem == null
         				|| chestItem.getAmount() == 0
         				|| (toItem != null && (chestItem.getItemId() != toItem.getItemId() || chestItem.getDamage() != toItem.getDamage()))
-        				|| (itemType > 0 && (itemType != chestItem.getItemId() || itemColor != chestItem.getDamage()))
+        				|| (itemType > 0 && (itemType != chestItem.getItemId() || (itemColor != -1 && itemColor != chestItem.getDamage())) )
         				)
         			{
         				//empty or not the same item so move on to next slot

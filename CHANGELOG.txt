@@ -1,3 +1,24 @@
+2.0extra8.2:
+- added ability for storage carts to [Collect] and [Deposit] to Dispenser blocks
+    - thanks wire for the suggestion!
+- added new "All" mode for minecart [Dispenser]
+    - On the third line of a [Dispenser] sign, type "All" without the quotes.
+    - This will collect all minecart types and dispense all minecart types
+    - Currently it has an order in which it dispenses
+        - It will attempt to dispense storage carts first. If a storage cart
+            is not found, or can not be built from a minecart and chest, then
+            it attempts to dispense a powered cart. If it can't dispense that
+            then it attempts to dispense a regular cart.
+    - Please note that to collect only storage or only powered carts, you can
+        use the existing modes of "Storage" and "Powered"
+    - thanks leecher123 for the suggestion!
+- bugfix for [Collect] and [Deposit] not collecting damaged items correctly.
+    - Now if the color/damage value is not added to a specified item on the
+        third line, it will collect/deposit all of the same item id type.
+        So a [Collect] sign with just "35" on the third line will collect
+        all wool of any color.
+    - thanks leecher123 for the bug report!
+
 2.0extra8.1:
 - added ability to specify minecart boost speeds in the settings.
     - Adds 5 new properties in the "craftbook.properties" file.

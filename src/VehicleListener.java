@@ -276,7 +276,44 @@ public class VehicleListener extends CraftBookDelegateListener {
             try {
                 Minecart minecart;
                 
-                if (collectType.equalsIgnoreCase("Storage")) {
+                if(collectType.equalsIgnoreCase("All"))
+                {
+                	Minecart.Type minecartType = Minecart.Type.StorageCart;
+                	
+                	try {
+                        blockBag.fetchBlock(ItemType.STORAGE_MINECART);
+                    } catch (BlockSourceException e) {
+                        // Okay, no storage minecarts... but perhaps we can
+                        // craft a minecart + chest!
+                        if (blockBag.peekBlock(BlockType.CHEST)) {
+                            blockBag.fetchBlock(ItemType.MINECART);
+                            blockBag.fetchBlock(BlockType.CHEST);
+                        } else {
+                        	minecartType = Minecart.Type.PoweredMinecart;
+                        	
+                        	try {
+                                blockBag.fetchBlock(ItemType.POWERED_MINECART);
+                            } catch (BlockSourceException e2) {
+                                // Okay, no storage minecarts... but perhaps we can
+                                // craft a minecart + chest!
+                                if (blockBag.peekBlock(BlockType.FURNACE)) {
+                                    blockBag.fetchBlock(ItemType.MINECART);
+                                    blockBag.fetchBlock(BlockType.FURNACE);
+                                } else {
+                                	minecartType = Minecart.Type.Minecart;
+                                	blockBag.fetchBlock(ItemType.MINECART);
+                                }
+                            }
+                        }
+                    }
+                    
+                    minecart = new Minecart(
+                            depositPt.getX(),
+                            depositPt.getY(),
+                            depositPt.getZ(),
+                            minecartType);
+                }
+                else if (collectType.equalsIgnoreCase("Storage")) {
                     try {
                         blockBag.fetchBlock(ItemType.STORAGE_MINECART);
                     } catch (BlockSourceException e) {
@@ -507,14 +544,14 @@ public class VehicleListener extends CraftBookDelegateListener {
                             NearbyChestBlockBag bag = new NearbyChestBlockBag(pt);
 
                             for (int y = -1; y <= 0; y++) {
-                                bag.addSingleSourcePosition(pt.add(1, y, 0));
-                                bag.addSingleSourcePosition(pt.add(2, y, 0));
-                                bag.addSingleSourcePosition(pt.add(-1, y, 0));
-                                bag.addSingleSourcePosition(pt.add(-2, y, 0));
-                                bag.addSingleSourcePosition(pt.add(0, y, 1));
-                                bag.addSingleSourcePosition(pt.add(0, y, 2));
-                                bag.addSingleSourcePosition(pt.add(0, y, -1));
-                                bag.addSingleSourcePosition(pt.add(0, y, -2));
+                                bag.addSingleSourcePositionExtra(pt.add(1, y, 0));
+                                bag.addSingleSourcePositionExtra(pt.add(2, y, 0));
+                                bag.addSingleSourcePositionExtra(pt.add(-1, y, 0));
+                                bag.addSingleSourcePositionExtra(pt.add(-2, y, 0));
+                                bag.addSingleSourcePositionExtra(pt.add(0, y, 1));
+                                bag.addSingleSourcePositionExtra(pt.add(0, y, 2));
+                                bag.addSingleSourcePositionExtra(pt.add(0, y, -1));
+                                bag.addSingleSourcePositionExtra(pt.add(0, y, -2));
                             }
                             
                             if (bag.getChestBlockCount() > 0) {
@@ -559,7 +596,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                                 	{
                                 		String[] args = sign.getText(2).split(":", 2);
                                 		int type = 0;
-                                		int color = 0;
+                                		int color = -1;
                                 		int amount = 0;
                                 		
                                 		try
@@ -628,7 +665,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                                 	{
                                 		String[] args = sign.getText(2).split(":", 2);
                                 		int type = 0;
-                                		int color = 0;
+                                		int color = -1;
                                 		int amount = 0;
                                 		
                                 		try
@@ -1010,7 +1047,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             ItemArrayUtil.moveItemArrayToChestBag(
                                     minecart.getStorage(), blockBag);
 
-                            if (collectType.equalsIgnoreCase("Storage")) {
+                            if (collectType.equalsIgnoreCase("Storage") || collectType.equalsIgnoreCase("All")) {
                                 blockBag.storeBlock(ItemType.STORAGE_MINECART);
                             } else {
                                 blockBag.storeBlock(ItemType.MINECART);
@@ -1023,7 +1060,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                         }
                     } else if (type == Minecart.Type.PoweredMinecart) {
                         try {
-                            if (collectType.equalsIgnoreCase("Powered")) {
+                            if (collectType.equalsIgnoreCase("Powered") || collectType.equalsIgnoreCase("All")) {
                                 blockBag.storeBlock(ItemType.POWERED_MINECART);
                             } else {
                                 blockBag.storeBlock(ItemType.MINECART);

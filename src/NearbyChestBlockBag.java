@@ -195,6 +195,39 @@ public class NearbyChestBlockBag extends BlockBag {
         }
     }
     
+    public void addSingleSourcePositionExtra(Vector pos) {
+        int x = pos.getBlockX();
+        int y = pos.getBlockY();
+        int z = pos.getBlockZ();
+        
+        if (CraftBook.getBlockID(pos) == BlockType.CHEST) {
+            ComplexBlock complexBlock =
+                    etc.getServer().getComplexBlock(x, y, z);
+
+            if (complexBlock instanceof Chest) {
+                Chest chest = (Chest)complexBlock;
+                chests.add(new ComparableInventory(pos.toBlockVector(), chest));
+            } else if (complexBlock instanceof DoubleChest) {
+                DoubleChest chest = (DoubleChest)complexBlock;
+                chests.add(new ComparableInventory(
+                        new Vector(chest.getX(), chest.getY(), chest.getZ()), chest));
+                // Double chests have two chest blocks, so creating a new Vector
+                // should theoretically prevent duplication (but it doesn't
+                // (yet...)
+            }
+        }
+        else if(CraftBook.getBlockID(pos) == BlockType.DISPENSER)
+        {
+        	ComplexBlock complexBlock = etc.getServer().getComplexBlock(x, y, z);
+        	
+        	if(complexBlock instanceof Dispenser)
+        	{
+        		Dispenser dispenser = (Dispenser) complexBlock;
+        		chests.add(new ComparableInventory(pos.toBlockVector(), dispenser));
+        	}
+        }
+    }
+    
     /**
      * Get the number of chest blocks. A double-width chest will count has
      * two chest blocks.
