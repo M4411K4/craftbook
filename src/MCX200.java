@@ -174,6 +174,6 @@ public class MCX200 extends BaseIC {
     	
     	OEntity entity = OEntityList.a(mob, etc.getMCServer().e);
     	
-    	return (entity instanceof OEntityCreature) || (entity instanceof OIMobs);
+    	return (entity instanceof OEntityCreature) || (entity instanceof OIMob);
     }
 }

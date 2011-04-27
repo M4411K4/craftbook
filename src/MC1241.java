@@ -51,7 +51,7 @@ public class MC1241 extends MC1240 {
             OEntityArrow arrow = new OEntityArrow(etc.getMCServer().e);
             arrow.c(firePos.getBlockX() + 0.5, firePos.getBlockY() + 0.5,
                     firePos.getBlockZ() + 0.5, 0, 0);
-            etc.getMCServer().e.a(arrow);
+            etc.getMCServer().e.b(arrow);
             arrow.a(backDir.getBlockX(), vertVel, backDir.getBlockZ(),
                     speed, spread);
         }

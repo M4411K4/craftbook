@@ -55,6 +55,9 @@ public final class BlockType {
     public static final int SANDSTONE = 24;
     public static final int NOTE_BLOCK = 25;
     public static final int BED = 26;
+    public static final int POWERED_RAIL = 27;
+    public static final int DETECTOR_RAIL = 28;
+    public static final int WEB = 30;
     public static final int CLOTH = 35;
     public static final int YELLOW_FLOWER = 37;
     public static final int RED_FLOWER = 38;
@@ -145,6 +148,9 @@ public final class BlockType {
         blockDrops.put(24, 24);
         blockDrops.put(25, 25);
         blockDrops.put(26, 355);
+        blockDrops.put(27, 27);
+        blockDrops.put(28, 28);
+        blockDrops.put(30, 30);
         blockDrops.put(35, 35);
         blockDrops.put(37, 37);
         blockDrops.put(38, 38);
@@ -218,6 +224,8 @@ public final class BlockType {
                 || id == SIGN_POST
                 || id == WALL_SIGN
                 || id == MINECART_TRACKS
+                || id == POWERED_RAIL
+                || id == DETECTOR_RAIL
                 || id == LEVER
                 || id == STONE_PRESSURE_PLATE
                 || id == WOODEN_PRESSURE_PLATE
@@ -248,6 +256,8 @@ public final class BlockType {
                 || id == WOODEN_DOOR
                 || id == LADDER
                 || id == MINECART_TRACKS
+                || id == POWERED_RAIL
+                || id == DETECTOR_RAIL
                 || id == WALL_SIGN
                 || id == LEVER
                 || id == STONE_PRESSURE_PLATE
@@ -285,6 +295,8 @@ public final class BlockType {
                 || id == SIGN_POST
                 || id == LADDER
                 || id == MINECART_TRACKS
+                || id == POWERED_RAIL
+                || id == DETECTOR_RAIL
                 || id == WALL_SIGN
                 || id == LEVER
                 || id == STONE_PRESSURE_PLATE
@@ -296,6 +308,7 @@ public final class BlockType {
                 || id == STONE_BUTTON
                 || id == SNOW
                 || id == REED
+                || id == WEB
                 || id == PORTAL;
     }
 
@@ -320,6 +333,8 @@ public final class BlockType {
                 || id == WOODEN_DOOR
                 || id == LADDER
                 || id == MINECART_TRACKS
+                || id == POWERED_RAIL
+                || id == DETECTOR_RAIL
                 || id == COBBLESTONE_STAIRS
                 || id == WALL_SIGN
                 || id == LEVER

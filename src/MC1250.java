@@ -119,7 +119,7 @@ public class MC1250 extends BaseIC {
         public Firework(OEntityArrow arrow) {
             expireTime = System.currentTimeMillis() + 5000;
             this.arrow = arrow;
-            lastY = arrow.aL;
+            lastY = arrow.aM;
         }
 
         /**
@@ -128,14 +128,14 @@ public class MC1250 extends BaseIC {
         public void run() {
             try {
                 while (true) {
-                    final double arrowX = arrow.aK;
-                    final double arrowY = arrow.aL;
-                    final double arrowZ = arrow.aM;
+                    final double arrowX = arrow.aL;
+                    final double arrowY = arrow.aM;
+                    final double arrowZ = arrow.aN;
                     
                     if (arrowY < lastY) {
                         etc.getServer().addToServerQueue(new Runnable() {
                             public void run() {
-                                etc.getMCServer().e.e(arrow);
+                                etc.getMCServer().e.f(arrow);
                                 
                                 // Make TNT explode
                                 explodeTNT(arrowX, arrowY, arrowZ);
@@ -173,7 +173,7 @@ public class MC1250 extends BaseIC {
     protected OEntityArrow shoot(double x, double y, double z) {
         OEntityArrow arrow = new OEntityArrow(etc.getMCServer().e);
         arrow.c(x, y, z, 0, 0);
-        etc.getMCServer().e.a(arrow);
+        etc.getMCServer().e.b(arrow);
         arrow.a(0, 50, 0, 1.05F, 20);
         return arrow;
     }
@@ -189,6 +189,6 @@ public class MC1250 extends BaseIC {
         // Make TNT explode
     	OEntityTNTPrimed tnt = new OEntityTNTPrimed(etc.getMCServer().e);
         tnt.a(x, y, z);
-        tnt.f_();
+        tnt.p_();
     }
 }

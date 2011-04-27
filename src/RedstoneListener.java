@@ -230,9 +230,11 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX243", new MCX243(), ICType.SISO);
         internalRegisterIC("MCX244", new MCX244(), ICType.SISO);
         internalRegisterIC("MCX245", new MCX245(), ICType.SISO);
+        internalRegisterIC("MCX255", new MCX255(), ICType.SISO);
         
         internalRegisterIC("MCU113", new MCX113(), ICType.UISO);
         internalRegisterIC("MCU440", new MCX440(), ICType.UISO);
+        internalRegisterIC("MCU700", new MCX700(), ICType.UISO);
         
         internalRegisterIC("MCZ116", new MCX116(), ICType.ZISO);
         internalRegisterIC("MCZ117", new MCX117(), ICType.ZISO);
@@ -254,7 +256,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         int len = line2.length();
         
         // ICs
-        if (line2.length() > 4
+        if (line2.length() > 7
                 && line2.substring(0, 3).equalsIgnoreCase("[MC") &&
                 line2.charAt(7) == ']') {
 
@@ -421,7 +423,7 @@ public class RedstoneListener extends CraftBookDelegateListener
             
             // ICs
             if (redstoneICs && type == BlockType.WALL_SIGN
-                    && line2.length() > 4
+                    && line2.length() > 7
                     && line2.substring(0, 3).equalsIgnoreCase("[MC")
                     && line2.charAt(7) == ']') {
             	
@@ -489,7 +491,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                     	//hopefully I can change it later on.
                     	if(id.equals("MCX207") || id.equals("MCX208") || id.equals("MCX209") || id.equals("MCX210"))
                     		ic.think(pt, changed, signText, sign, craftBook.getDelay(), mode, abc, def, listener.getBlockBag(pt));
-                    	else if(id.equals("MCU440"))
+                    	else if(id.equals("MCU440") || id.equals("MCU700"))
                     		ic.think(pt, changed, signText, sign, craftBook.getDelay(), mode, abc, def, thisListener);
                         else
                         	ic.think(pt, changed, signText, sign, craftBook.getDelay(), mode, abc, def, null);

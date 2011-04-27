@@ -1,3 +1,43 @@
+2.0extra9:
+- updated to minecraft 1.5x
+- added Lightning IC [MCX255]
+    -took me less than a minute to make, so I'll probably add more to it
+- added Music/Midi player [MCU700]
+    -This is not done yet!
+    -I know nothing about music, so this is difficult for me to get it right
+    -Currently plays music to nearby players.
+        -I plan to add more types such as playing to everyone, and more admin
+        controls.
+    -To play MIDI:
+        -place .mid file into "cbmusic" server folder. If there is no "cbmusic"
+            folder, create one.
+        -In game, build an IC as normal and type on the sign:
+            line1:
+            line2: [MCU700]
+            line3: songname.m
+            line4:
+        -where "songname" is the .mid file name and ".m" let's the IC know it's
+            a midi file
+        -Behind the IC where the lever usually goes, place a NoteBlock.
+            -I hope to add support for more NoteBlock positions, but currently
+            it has to be behind the IC
+        -When ever you turn on the redstone wire for the IC, it will load and
+            play. It will stop when you turn off the redstone wire.
+    -To play player made text music
+        -Same setup as MIDI, but for the song name don't add ".m" at the end
+        -How to write the text music will need to be provided else where since
+        it's best seen with an example, and the example is too big for a
+        changelog.
+- added P mode for MCX112
+    -This will force the pressure plate the player was on top of to turn "off"
+    -To set the P mode, place next to [MCX112] like:
+    [MCX112]P
+    -thanks leecher123 for the suggestion/bug report
+- bugfix (i hope) for players getting stuck in the ground using MCX112
+    -thanks leecher123 for the bug report and fix suggestion!
+- bugfix for missing permissions for MC1510
+    -thanks Riot for the report!
+
 2.0extra8.2:
 - added ability for storage carts to [Collect] and [Deposit] to Dispenser blocks
     - thanks wire for the suggestion!

@@ -1,7 +1,7 @@
 // $Id$
 /*
  * CraftBook
- * Copyright (C) 2010 tmhrtly <http://www.tmhrtly.com>
+ * Copyright (C) 2010 sk89q <http://www.sk89q.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Broadcasts a message to a specified player.
- *
- * @author Tom (tmhrtly)
- */
-
 import com.sk89q.craftbook.*;
 import com.sk89q.craftbook.ic.*;
 
-public class MC1510 extends BaseIC {
+/**
+ * Dispenser.
+ *
+ * @author sk89q
+ */
+public class MCX255 extends BaseIC {
     /**
      * Get the title of the IC.
      *
      * @return
      */
     public String getTitle() {
-        return "MESSAGE PLAYER";
+        return "LIGHTNING";
     }
-    
+
     /**
      * Returns true if this IC requires permission to use.
      *
@@ -44,7 +43,7 @@ public class MC1510 extends BaseIC {
     public boolean requiresPermission() {
         return true;
     }
-    
+
     /**
      * Validates the IC's environment. The position of the sign is given.
      * Return a string in order to state an error message and deny
@@ -53,37 +52,34 @@ public class MC1510 extends BaseIC {
      * @param sign
      * @return
      */
-    
     public String validateEnvironment(Vector pos, SignText sign) {
-        String id = sign.getLine3();
-
-        if (id.length() == 0 || id.contains(" ")) {
-            return "Put a player's name on line 3, with no spaces.";
+        if (sign.getLine3().length() != 0) {
+            return "Third line needs to be blank";
         }
 
-        if (sign.getLine4().equals("")) {
-            return "Please put the message to broadcast on line 4.";
+        if (sign.getLine4().length() != 0) {
+            return "Fourth line needs to be blank";
         }
+
         return null;
     }
-    
-    
+
     /**
      * Think.
-     * 
+     *
      * @param chip
      */
     public void think(ChipState chip) {
-        if (chip.getIn(1).is()) {
-            String thePlayerString = chip.getText().getLine3();
-            String theMessage = chip.getText().getLine4();
-            Player thePlayer = etc.getServer().matchPlayer(thePlayerString);
-            if (thePlayer==null) {
-                chip.getOut(1).set(false);
-                return;
-            }
-            chip.getOut(1).set(true);
-            thePlayer.sendMessage(theMessage);
+        if (!chip.getIn(1).is()) {
+        	chip.getOut(1).set(false);
+            return;
         }
+        
+        Vector pos = chip.getBlockPosition();
+        
+        OWorld world = etc.getMCServer().e;
+        world.a(new OEntityLightningBolt(world, pos.getX(), pos.getY(), pos.getZ()));
+
+        chip.getOut(1).set(true);
     }
 }

@@ -77,10 +77,10 @@ public class MCX112 extends BaseIC {
                 chip.getOut(1).set(false);
             } else
             {
-            	dest = new Location(dest.x, dest.y, dest.z, dest.rotX, dest.rotY);
+            	dest = new Location(dest.x+0.5, dest.y, dest.z+0.5, dest.rotX, dest.rotY);
             	Vector pos;
             	
-            	if(chip.getMode() == 'p')
+            	if(chip.getMode() == 'p' || chip.getMode() == 'P')
             	{
             		pos = Util.getWallSignBack(chip.getPosition(), -2);
             		
@@ -109,7 +109,7 @@ public class MCX112 extends BaseIC {
                 			(pVec.getBlockZ() == z || pVec.getBlockZ() == z + 1 || pVec.getBlockZ() == z - 1)
                 		)
                 	{
-                        dest.y = getSafeY(new Vector(dest.x, dest.y, dest.z));
+                        dest.y = getSafeY(new Vector(dest.x, dest.y, dest.z)) + 0.2;
                         
                         String msg = chip.getText().getLine4();
                 		if(msg.length() == 0)
@@ -117,6 +117,25 @@ public class MCX112 extends BaseIC {
                 		player.sendMessage(Colors.Gold+msg);
                         
                 		player.teleportTo(dest);
+                		
+                		if(chip.getMode() == 'P')
+                		{
+                			//force plate off
+	                		int bdata = CraftBook.getBlockID(pVec);
+	                		if(bdata == BlockType.STONE_PRESSURE_PLATE || bdata == BlockType.WOODEN_PRESSURE_PLATE)
+	                		{
+	                			OWorld world = player.getEntity().aH;
+	                			
+	                			int bx = pVec.getBlockX();
+	                			int by = pVec.getBlockY();
+	                			int bz = pVec.getBlockZ();
+	                			
+	                			world.c(bx, by, bz, 0);
+	                            world.h(bx, by, bz, bdata);
+	                            world.h(bx, by - 1, bz, bdata);
+	                            world.b(bx, by, bz, bx, by, bz);
+	                		}
+                		}
                 		
                 		chip.getOut(1).set(true);
                 		break;
