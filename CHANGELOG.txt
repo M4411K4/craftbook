@@ -1,3 +1,106 @@
+2.0extra9.1:
+- For weather ICs, please remember not all biomes have weather.
+- added Weather Control IC [MCT233]
+    - Takes in 3 inputs
+    - When the front input is turned "on" it will set the weather based on the
+        left and right inputs.
+    - left input = weather on/off
+    - right input = stormy weather (chance of lightning) on/off
+    - Example:
+        - If the left input is "on" and right input is "off" the weather will
+            turn on when the front input is turned "on"
+        - If the left input is "off" the weather will turn off when the front
+            input is turned "on"
+    - This works similar to [MC3231] Time Control
+- added Simple Weather Control IC [MCX233]
+    - 3rd line = duration. Can be left blank. Duration is from 1 to 24000.
+    - mode t = storym weather (chance of lightning)
+        -example:
+            line1:
+            line2: [MCX233]t
+            line3:
+            line4:
+- added Weather Check IC [MCX230] & [MCZ230]
+    - output is "on" when it is raining/snowing
+    - [MCZ230] is self-updating version.
+- added Stormy Weather Check IC [MCX231] & [MCZ231]
+    - output is "on" when the storm mode is on
+    - NOTE! The weather can be off and this can be on!
+        - meaning even if it's not raining/snowing the storm mode can be on
+        - storms will only happen when it's raining/snowing, but the mode
+            can be on.
+        - when the storm mode is on while it is NOT raining/snowing, nothing
+            happens.
+        - when storm mode is on while it IS raining/snowing then
+            there are chances that lightning will strike in the world.
+    - [MCZ231] is self-updating version.
+- added False Weather IC [MCX235]
+    - Makes players see rain/snow even when it is not raining/snowing.
+    - 3rd line = specific player or group. Can be left blank.
+        - If left blank, all players will be effected.
+        - specific player example:
+            line1:
+            line2: [MCX235]
+            line3: p:PlayerName
+            line4:
+        - No spaces allowed in in names
+        - specific hMod group example:
+            line1:
+            line2: [MCX235]
+            line3: g:GroupName
+            line4:
+- added Distance False Weather IC [MCX236] & [MCZ236]
+    - Makes players see false rain/snow when they enter the distance range, and
+        removes the false rain/snow when they leave the distance range.
+    - 3rd line = distance. Distance must be from 1 to 127
+    - 4th line = message to players in distance range. Can be left blank.
+        - It would be kind to let players know they're seeing fake rain/snow :P
+    - When using the manual version [MCX236], turning this IC "off" will stop
+        the fake rain/snow for all players that were affected.
+- added Hide Weather IC [MCX237]
+    - Hides the rain/snow from players.
+        - Snow will still cover the ground and rain will still put out fires,
+            but players will be unable to see the rain drops and snow flakes.
+    - 3rd line = exactly the same as [MCX235] False Weather IC mentioned above
+- added Distance Hide Weather IC [MCX238] & [MCZ238]
+    - Same as [MCX236] & [MCZ236] Distance False Weather IC, but hides the
+        weather.
+    - 3rd & 4th lines = same as [MCX236] & [MCZ236] Distance False Weather IC
+- added Holy Smite IC [MCX256]
+    - 3rd line = y-offset. Can be left blank.
+        - You can set the lightning to go higher or lower than the IC block
+    - 4th line = radius. Can be left blank. Max radius is 5.
+    - mode 1 = empty circle
+        - example:
+            line1:
+            line2: [MCX256]1
+            line3:
+            line4:
+        - This will cause the lightning to only hit around the IC block leaving
+            the center unharmed.
+- added y-offset to Lightning IC [MCX255]
+    - offset is placed on 3rd line like [MCX256] above.
+- added ability to spawn Charged Creepers to [MCX200]
+    - example:
+        line1:
+        line2: [MCX200]
+        line3: Creeper:1
+        line4:
+- added Midi file settings support
+    - Still more work needed for the music player ICs. Most of my time went
+        into weather controls.
+    - The settings currently let you
+        - pick which instruments to use for each midi track.
+        - default ticks per beat value
+        - pick specific tracks to play.
+    - There are more options, but they don't do anything currently.
+    - examples will be placed in the forums.
+- bugfix for short IC signs causing player kicks.
+    - thanks Riot for the report!
+- bugfix for [MCZxxx] self-updating ICs not being part of the
+    "enable-self-triggered-ics" setting.
+- bugfix for removing passwords
+
 2.0extra9:
 - updated to minecraft 1.5x
 - added Lightning IC [MCX255]
