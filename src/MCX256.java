@@ -25,14 +25,14 @@ import com.sk89q.craftbook.ic.*;
  *
  * @author sk89q
  */
-public class MCX255 extends BaseIC {
+public class MCX256 extends BaseIC {
     /**
      * Get the title of the IC.
      *
      * @return
      */
     public String getTitle() {
-        return "LIGHTNING";
+        return "HOLY SMITE";
     }
 
     /**
@@ -53,7 +53,7 @@ public class MCX255 extends BaseIC {
      * @return
      */
     public String validateEnvironment(Vector pos, SignText sign) {
-        if (sign.getLine3().length() != 0) {
+    	if (sign.getLine3().length() != 0) {
             try
             {
             	int y = Integer.parseInt(sign.getLine3());
@@ -67,7 +67,16 @@ public class MCX255 extends BaseIC {
         }
 
         if (sign.getLine4().length() != 0) {
-            return "Fourth line needs to be blank";
+        	try
+            {
+            	int radius = Integer.parseInt(sign.getLine4());
+            	if(radius < 1 || radius > 5)
+            		return "Fourth line needs to be a number from 1 to 5";
+            }
+            catch(NumberFormatException e)
+            {
+            	return "Fourth line needs to be a number or blank.";
+            }
         }
 
         return null;
@@ -97,12 +106,34 @@ public class MCX255 extends BaseIC {
         }
         else
         {
-        	y++;
+        	//y++;
         }
         
-        OWorld world = etc.getMCServer().e;
-        world.a(new OEntityLightningBolt(world, pos.getX(), y, pos.getZ()));
+        int radius = 5;
+        if(chip.getText().getLine4().length() > 0)
+        	radius = Integer.parseInt(chip.getText().getLine4());
+        
+        //thanks cuboid!
+		int xcenter = pos.getBlockX();
+		int zcenter = pos.getBlockZ();
+		int xmin = xcenter - radius;
+		int xmax = xcenter + radius;
+		int zmin = zcenter - radius;
+		int zmax = zcenter + radius;
 
-        chip.getOut(1).set(true);
+		boolean fill = chip.getMode() != '1';
+		OWorld world = etc.getMCServer().e;
+		
+		for(int x = xmin; x <= xmax; x++)
+		{
+			for(int z = zmin; z <= zmax; z++)
+			{
+				double diff = Math.sqrt(Math.pow(x-xcenter, 2.0D) + Math.pow(z-zcenter, 2.0D));
+				if(diff < radius+0.5 && ( fill || (!fill && diff > radius-0.5) ))
+				{
+					world.a(new OEntityLightningBolt(world, x, y, z));
+				}
+			}
+		}
     }
 }

@@ -158,6 +158,15 @@ public class RedstoneListener extends CraftBookDelegateListener
             internalRegisterIC("MC0260", new MC1260(false), ICType.ZISO);
             internalRegisterIC("MC0261", new MC1261(false), ICType.ZISO);
             internalRegisterIC("MC0262", new MC1262(false), ICType.ZISO);
+            
+            internalRegisterIC("MCZ116", new MCX116(), ICType.ZISO);
+            internalRegisterIC("MCZ117", new MCX117(), ICType.ZISO);
+            internalRegisterIC("MCZ120", new MCX120(), ICType.ZISO);
+            internalRegisterIC("MCZ121", new MCX121(), ICType.ZISO);
+            internalRegisterIC("MCZ230", new MCX230(), ICType.ZISO);
+            internalRegisterIC("MCZ231", new MCX231(), ICType.ZISO);
+            internalRegisterIC("MCZ236", new MCX236(), ICType.ZISO);
+            internalRegisterIC("MCZ238", new MCX238(), ICType.ZISO);
         }
         
         internalRegisterIC("MC1000", new MC1000(), ICType.SISO);
@@ -226,20 +235,25 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX208", new MCX208(), ICType.SISO);
         internalRegisterIC("MCX209", new MCX209(), ICType.SISO);
         internalRegisterIC("MCX210", new MCX210(), ICType.SISO);
+        internalRegisterIC("MCX230", new MCX230(), ICType.SISO);
+        internalRegisterIC("MCX231", new MCX231(), ICType.SISO);
+        internalRegisterIC("MCX233", new MCX233(), ICType.SISO);
+        internalRegisterIC("MCX235", new MCX235(), ICType.SISO);
+        internalRegisterIC("MCX236", new MCX236(), ICType.SISO);
+        internalRegisterIC("MCX237", new MCX237(), ICType.SISO);
+        internalRegisterIC("MCX238", new MCX238(), ICType.SISO);
         internalRegisterIC("MCX242", new MCX242(), ICType.SISO);
         internalRegisterIC("MCX243", new MCX243(), ICType.SISO);
         internalRegisterIC("MCX244", new MCX244(), ICType.SISO);
         internalRegisterIC("MCX245", new MCX245(), ICType.SISO);
         internalRegisterIC("MCX255", new MCX255(), ICType.SISO);
+        internalRegisterIC("MCX256", new MCX256(), ICType.SISO);
+        
+        internalRegisterIC("MCT233", new MCT233(), ICType._3ISO);
         
         internalRegisterIC("MCU113", new MCX113(), ICType.UISO);
         internalRegisterIC("MCU440", new MCX440(), ICType.UISO);
         internalRegisterIC("MCU700", new MCX700(), ICType.UISO);
-        
-        internalRegisterIC("MCZ116", new MCX116(), ICType.ZISO);
-        internalRegisterIC("MCZ117", new MCX117(), ICType.ZISO);
-        internalRegisterIC("MCZ120", new MCX120(), ICType.ZISO);
-        internalRegisterIC("MCZ121", new MCX121(), ICType.ZISO);
     }
 
     /**
@@ -583,7 +597,7 @@ public class RedstoneListener extends CraftBookDelegateListener
     public void onSignAdded(Sign sign)
     {
     	String line2 = sign.getText(1);
-        if(!line2.startsWith("[MC")) return;
+        if(!line2.startsWith("[MC") || line2.length() < 8) return;
         
         String id = line2.substring(1, 7).toUpperCase();
         RegisteredIC ic = icList.get(id);
@@ -606,7 +620,7 @@ public class RedstoneListener extends CraftBookDelegateListener
     	Sign sign = (Sign)etc.getServer().getComplexBlock(block);
     	
     	String line2 = sign.getText(1);
-    	if(!line2.startsWith("[MC"))
+    	if(!line2.startsWith("[MC") || line2.length() < 8)
         	return false;
     	
     	String id = line2.substring(1, 7).toUpperCase();

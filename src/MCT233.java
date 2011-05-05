@@ -17,22 +17,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.sk89q.craftbook.*;
+import com.sk89q.craftbook.SignText;
+import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.*;
 
 /**
- * Dispenser.
+ * Time control.
  *
  * @author sk89q
  */
-public class MCX255 extends BaseIC {
+public class MCT233 extends BaseIC {
     /**
      * Get the title of the IC.
      *
      * @return
      */
     public String getTitle() {
-        return "LIGHTNING";
+        return "WEATHER CONTROL";
     }
 
     /**
@@ -44,26 +45,9 @@ public class MCX255 extends BaseIC {
         return true;
     }
 
-    /**
-     * Validates the IC's environment. The position of the sign is given.
-     * Return a string in order to state an error message and deny
-     * creation, otherwise return null to allow.
-     *
-     * @param sign
-     * @return
-     */
     public String validateEnvironment(Vector pos, SignText sign) {
         if (sign.getLine3().length() != 0) {
-            try
-            {
-            	int y = Integer.parseInt(sign.getLine3());
-            	if(y < -126 || y > 127)
-            		return "Third line needs to be a number from -126 to 127";
-            }
-            catch(NumberFormatException e)
-            {
-            	return "Third line needs to be a number or blank.";
-            }
+        	return "Third line needs to be blank";
         }
 
         if (sign.getLine4().length() != 0) {
@@ -72,37 +56,32 @@ public class MCX255 extends BaseIC {
 
         return null;
     }
-
+    
     /**
      * Think.
      *
      * @param chip
      */
     public void think(ChipState chip) {
-        if (!chip.getIn(1).is()) {
-        	chip.getOut(1).set(false);
-            return;
-        }
-        
-        Vector pos = chip.getBlockPosition();
-        
-        int y = pos.getBlockY();
-        if(chip.getText().getLine3().length() > 0)
-        {
-        	y += Integer.parseInt(chip.getText().getLine3());
-        	if(y > 127)
-        		y = 127;
-        	else if(y < 1)
-        		y = 1; //make sure it lands on at least one block
-        }
-        else
-        {
-        	y++;
-        }
-        
-        OWorld world = etc.getMCServer().e;
-        world.a(new OEntityLightningBolt(world, pos.getX(), y, pos.getZ()));
-
-        chip.getOut(1).set(true);
+    	
+    	if (chip.getIn(1).isTriggered() && chip.getIn(1).is())
+    	{
+	    	int duration;
+	    	OWorldInfo worldInfo = etc.getMCServer().e.q();
+	    	
+	    	if(chip.getIn(2).is())
+	    		duration = 24000;
+	    	else
+	    		duration = 0;
+	    	
+	    	worldInfo.c(duration);
+	    	worldInfo.b(chip.getIn(2).is());
+	    	
+	    	if(!chip.getIn(3).is())
+	    		duration = 0;
+	    	
+	    	worldInfo.b(duration);
+    		worldInfo.a(chip.getIn(2).is() && chip.getIn(3).is());
+    	}
     }
 }

@@ -244,6 +244,7 @@ public class MCX121Pass
 		    				if(remove)
 		    				{
 		    					write = true;
+		    					i--;
 		    					continue;
 		    				}
 		    				

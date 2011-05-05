@@ -11,10 +11,12 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Track;
 
+import com.sk89q.craftbook.music.MidiDataObject;
 import com.sk89q.craftbook.music.MusicMidiTrack;
 import com.sk89q.craftbook.music.MusicNote;
 import com.sk89q.craftbook.music.MusicNoteKey;
 import com.sk89q.craftbook.music.parser.DefaultMusicParser;
+import com.sk89q.craftbook.music.parser.MidiDataParser1;
 
 
 
@@ -129,15 +131,6 @@ public class MusicPlayer
 		
 		midiMode = true;
 		
-		midiRate = rate;
-		rate = 0;
-		
-		if(midiRate < 1)
-			midiRate = 4;
-		
-		if(midiRate > MAX_RATE)
-			midiRate = MAX_RATE;
-		
 		sequence = null;
 		try
 		{
@@ -163,6 +156,27 @@ public class MusicPlayer
 		if(trackSize > MAX_MIDI_TRACKS)
 			trackSize = MAX_MIDI_TRACKS;
 		
+		MidiDataObject dataObject = loadMidiData(trackSize);
+		if(dataObject != null)
+		{
+			title = dataObject.TITLE;
+			author = dataObject.AUTHOR;
+		}
+		
+		midiRate = rate;
+		rate = 0;
+		
+		if(midiRate < 1)
+		{
+			if(dataObject == null || dataObject.RATE < 0)
+				midiRate = 4;
+			else if(dataObject != null)
+				midiRate = dataObject.RATE;
+		}
+		
+		if(midiRate > MAX_RATE)
+			midiRate = MAX_RATE;
+		
 		midiTracks = new MusicMidiTrack[trackSize];
 		
 		boolean allNull = true;
@@ -170,10 +184,16 @@ public class MusicPlayer
 		{
 			Track track = tracks[i+1];
 			
-			if(track.size() < 4)
+			if(track.size() < 4 || (dataObject != null && dataObject.INSTRUMENTS != null && dataObject.INSTRUMENTS[i] < 0) )
     			continue;
 			
 			midiTracks[i] = new MusicMidiTrack(track);
+			if(dataObject != null)
+			{
+				if(dataObject.INSTRUMENTS != null)
+					midiTracks[i].instrument = dataObject.INSTRUMENTS[i];
+			}
+			
 			allNull = false;
 		}
 		
@@ -182,6 +202,56 @@ public class MusicPlayer
 			sequence = null;
 			pause = true;
 		}
+	}
+	
+	private MidiDataObject loadMidiData(int maxTracks)
+	{
+		String[] name = SONG.split("\\.", 2);
+		File file = new File("cbmusic" + File.separator +
+				name[0] + ".mdata");
+		
+		if(!file.exists())
+			return null;
+		
+		FileInputStream fs = null;
+		BufferedReader br = null;
+		
+		MidiDataObject midiData = null;
+		
+		try
+		{
+			fs = new FileInputStream(file);
+	    	br = new BufferedReader(new InputStreamReader(fs));
+	    	
+	    	//type of music file
+	    	String fileFormat = br.readLine();
+	    	if(fileFormat.equalsIgnoreCase("fmt1"))
+	    	{
+	    		midiData = MidiDataParser1.parse(br, maxTracks);
+	    	}
+		}
+		catch(FileNotFoundException e)
+		{
+			return null;
+		}
+		catch(IOException e)
+		{
+			return null;
+		}
+		finally
+		{
+			try
+			{
+				if(br != null)
+					br.close();
+			}
+			catch(IOException e)
+			{
+				
+			}
+		}
+		
+		return midiData;
 	}
 	
 	private void loadTextSong(File file)
@@ -237,7 +307,7 @@ public class MusicPlayer
 	    	{
 	    		musicKeys = DefaultMusicParser.parse(br, MAX_BEAT_DURATION, MAX_TEXT_LINES);
 	    	}
-	    	if(fileFormat.equalsIgnoreCase("default2"))
+	    	else if(fileFormat.equalsIgnoreCase("default2"))
 	    	{
 	    		musicKeys = DefaultMusicParser.parse2(br, MAX_BEAT_DURATION, MAX_TEXT_LINES);
 	    	}
@@ -359,7 +429,8 @@ public class MusicPlayer
 			
 			for(int i = 0; i < midiTracks.length; i++)
 			{
-				midiTracks[i].reset();
+				if(midiTracks[i] != null)
+					midiTracks[i].reset();
 			}
 		}
 	}

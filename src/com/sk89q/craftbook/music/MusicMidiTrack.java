@@ -17,6 +17,8 @@ public class MusicMidiTrack
 	public int instrument = 0;
 	public int position = 0;
 	
+	public byte playMode = 0;
+	
 	public MusicMidiTrack(Track track)
 	{
 		TRACK = track;

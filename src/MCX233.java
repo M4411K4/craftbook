@@ -17,22 +17,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.sk89q.craftbook.*;
-import com.sk89q.craftbook.ic.*;
+import com.sk89q.craftbook.SignText;
+import com.sk89q.craftbook.Vector;
+import com.sk89q.craftbook.ic.BaseIC;
+import com.sk89q.craftbook.ic.ChipState;
 
 /**
- * Dispenser.
+ * Sets the server time to day or night, repeats the signal.
  *
- * @author sk89q
+ * @author Shaun (sturmeh)
  */
-public class MCX255 extends BaseIC {
+public class MCX233 extends BaseIC {
     /**
      * Get the title of the IC.
      *
      * @return
      */
     public String getTitle() {
-        return "LIGHTNING";
+        return "WEATHER CONTROL";
     }
 
     /**
@@ -53,56 +55,63 @@ public class MCX255 extends BaseIC {
      * @return
      */
     public String validateEnvironment(Vector pos, SignText sign) {
-        if (sign.getLine3().length() != 0) {
+        String id = sign.getLine3();
+
+        if (id.length() > 0)
+        {
             try
             {
-            	int y = Integer.parseInt(sign.getLine3());
-            	if(y < -126 || y > 127)
-            		return "Third line needs to be a number from -126 to 127";
+            	int duration = Integer.parseInt(id);
+            	if(duration < 1 || duration > 24000)
+            		return "Duration must be from 1 to 24000";
             }
             catch(NumberFormatException e)
             {
-            	return "Third line needs to be a number or blank.";
+            	return "The third line must be a number.";
             }
         }
-
+        
         if (sign.getLine4().length() != 0) {
             return "Fourth line needs to be blank";
         }
 
         return null;
     }
-
+    
     /**
      * Think.
-     *
+     * 
      * @param chip
      */
     public void think(ChipState chip) {
-        if (!chip.getIn(1).is()) {
-        	chip.getOut(1).set(false);
-            return;
-        }
+    	
+    	int duration;
+    	OWorldInfo worldInfo = etc.getMCServer().e.q();
+    	
+    	if(chip.getIn(1).is())
+    	{
+    		if(chip.getText().getLine3().length() > 0)
+    			duration = Integer.parseInt(chip.getText().getLine3());
+    		else
+    			duration = 24000;
+    		
+    		etc.getMCServer().f.a(new OPacket70Bed(1));
+    	}
+    	else
+    	{
+    		duration = 0;
+    		etc.getMCServer().f.a(new OPacket70Bed(2));
+    	}
+    	
+    	worldInfo.c(duration);
+    	worldInfo.b(chip.getIn(1).is());
+    	
+    	if(chip.getMode() != 't')
+    		duration = 0;
+    	
+    	worldInfo.b(duration);
+		worldInfo.a(chip.getIn(1).is() && chip.getMode() == 't');
         
-        Vector pos = chip.getBlockPosition();
-        
-        int y = pos.getBlockY();
-        if(chip.getText().getLine3().length() > 0)
-        {
-        	y += Integer.parseInt(chip.getText().getLine3());
-        	if(y > 127)
-        		y = 127;
-        	else if(y < 1)
-        		y = 1; //make sure it lands on at least one block
-        }
-        else
-        {
-        	y++;
-        }
-        
-        OWorld world = etc.getMCServer().e;
-        world.a(new OEntityLightningBolt(world, pos.getX(), y, pos.getZ()));
-
-        chip.getOut(1).set(true);
+        chip.getOut(1).set(chip.getIn(1).is());
     }
 }

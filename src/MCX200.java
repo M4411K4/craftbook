@@ -123,14 +123,14 @@ public class MCX200 extends BaseIC {
                             mob.spawn(mobRider);
                             
                             if(colorRider >= 0)
-                            	setSheep(mobRider.getEntity(), colorRider);
+                            	setMobColor(mobRider.getEntity(), colorRider);
                             
                         } else {
                             mob.spawn();
                         }
                         
                         if(color >= 0)
-                        	setSheep(mob.getEntity(), color);
+                        	setMobColor(mob.getEntity(), color);
                         
                         return;
                     }
@@ -143,7 +143,7 @@ public class MCX200 extends BaseIC {
     {
     	int color;
     	
-    	if(args.length < 2 || !args[0].equals("Sheep"))
+    	if(args.length < 2 || !isValidColorMob(args[0]) )
     		return -1;
     	
     	try
@@ -161,10 +161,24 @@ public class MCX200 extends BaseIC {
     	return color;
     }
     
-    private void setSheep(OEntityLiving entity, int color)
+    private void setMobColor(OEntityLiving entity, int color)
 	{
-		OEntitySheep sheep = (OEntitySheep)entity;
-		sheep.a_(color);
+    	if(entity instanceof OEntitySheep)
+    	{
+    		OEntitySheep sheep = (OEntitySheep)entity;
+    		sheep.a_(color);
+    	}
+    	else if(entity instanceof OEntityCreeper)
+    	{
+    		//no real need for this check, but putting it here to be 
+    		//strict so that it's easier to support more creeper types
+    		//if more are ever created
+    		if(color != 1)
+    			return;
+    		
+    		OEntityCreeper creeper = (OEntityCreeper)entity;
+    		creeper.W().b(17, (byte)1);
+    	}
 	}
     
     private boolean isValidMob(String mob)
@@ -175,5 +189,17 @@ public class MCX200 extends BaseIC {
     	OEntity entity = OEntityList.a(mob, etc.getMCServer().e);
     	
     	return (entity instanceof OEntityCreature) || (entity instanceof OIMob);
+    }
+    
+    private boolean isValidColorMob(String mob)
+    {
+    	if( mob.equals("Sheep")
+    		|| mob.equals("Creeper")
+    		)
+    	{
+    		return true;
+    	}
+    	
+    	return false;
     }
 }
