@@ -154,6 +154,18 @@ public enum ICType {
         	
         	basicThink(pt, changedRedstoneInput, signText, sign, sisoIC, r, mode, orderIn, orderOut, 1, 1, extra);
         }
+    },
+    
+    MISO("MISO", false, true) {
+    	void think(Vector pt, SignText signText, Sign sign, IC zisoIC, Object extra) {
+        	
+        	basicThink(pt, null, signText, sign, zisoIC, null, ' ', new int[]{0, 1, 2}, new int[]{0, 1, 2}, 0, 1, extra);
+        }
+        void think(Vector pt, Vector changedRedstoneInput, SignText signText,
+                Sign sign, IC sisoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
+        	
+        	basicThink(pt, changedRedstoneInput, signText, sign, sisoIC, r, mode, orderIn, orderOut, 3, 1, extra);
+        }
     };
 
     public final String name;
@@ -199,6 +211,8 @@ public enum ICType {
             return VIVO;
         else if (name.equals("uiso"))
             return UISO;
+        else if (name.equals("miso"))
+            return MISO;
         else
             return null;
     }

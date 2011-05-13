@@ -12,7 +12,7 @@ public class MusicMidiTrack
 	public final Track TRACK;
 	
 	private boolean finished = false;
-	private int octave = 24; //octave 2
+	private int octave = 2; //lowest octave
 	
 	public int instrument = 0;
 	public int position = 0;
@@ -68,7 +68,18 @@ public class MusicMidiTrack
 			
 			int note = message.getData1();
 			
-			note = (note - 6) % octave;
+			switch(playMode)
+			{
+				case 1:
+					note = getShiftedOctaveNote(note);
+					break;
+				case 2:
+					note = getCappedOctaveNote(note);
+					break;
+				default:
+					note = getCycledOctaveNote(note);
+			}
+			
 			if(note < 0)
 				continue;
 			
@@ -94,12 +105,58 @@ public class MusicMidiTrack
 		return octave;
 	}
 	
-	/*
-	 * shift 1 is start octave 3
-	 * shift 2 is start octave 2
-	 */
-	public void setOctaveShift(int shift)
+	public void setOctave(int octave)
 	{
-		octave = shift * 12;
+		this.octave = octave;
+	}
+	
+	/*
+	 * Any note lower than the lowest note become the lowest note.
+	 * Any note higher than the highest note become the highest note.
+	 */
+	private int getCappedOctaveNote(int note)
+	{
+		int min = 18 + 12 * octave;
+		int pitch = note - min;
+		
+		if(pitch < 0)
+			pitch = 0;
+		else if(pitch > 24)
+			pitch = 24;
+		
+		return pitch;
+	}
+	
+	/*
+	 * Shifts octaves lower than the min octave to the min octave and
+	 * octaves higher than the max octave to the max octave. Other octaves
+	 * inbetween are left alone.
+	 */
+	private int getShiftedOctaveNote(int note)
+	{
+		int min = 18 + 12 * octave;
+		int pitch = note - min;
+		
+		while(pitch < 0)
+		{
+			pitch += 12;
+		}
+		while(pitch > 24)
+		{
+			pitch -= 12;
+		}
+		
+		return pitch;
+	}
+	
+	/*
+	 * Cycles through the octaves. Sets pairs of octaves as the same high-low
+	 * octaves.
+	 * The code is easier to understand than me attempting to explain it if
+	 * you know what % does.
+	 */
+	private int getCycledOctaveNote(int note)
+	{
+		return (note - 6) % 24;
 	}
 }

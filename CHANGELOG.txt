@@ -1,3 +1,127 @@
+2.0extra9.2:
+- 2 new optional properties in craftbook.properties file
+- added ability to place noteblocks for music ICs on the side of the
+    IC block, above the IC block, or under the IC block.
+- added Radio Station IC [MCU701]
+    - plays music files that Radio ICs can connect and listen to
+        - The map chunk with this IC [MCU701] must be loaded.
+        - Radio ICs can not listen to it without the loaded map chunk
+        - To have the map chunk loaded, you will need a player nearby
+        - You can also put this IC [MCU701] at spawn since spawn is
+            always loaded.
+            - If you place at spawn and no player is around spawn, the
+                music will play very fast
+    - 3rd line = song file name (just like for [MCU700])
+    - 4th line = station name. This is the name Radio ICs will use to
+        listen to this station.
+    - example:
+          line1:
+          line2: [MCU701]
+          line3: filename
+          line4: stationname
+        -If using midi files, put a ".m" at the end of "filename" just like
+            for [MCU700]
+    - When playing playlists (more about playlists below)
+        - redstone input on the left of the IC sign = play previous song
+        - redstone input on the right of the IC sign = play next song
+- added Music Radio IC [MCU702]
+    - connects to Radio Station ICs to listen to what the Station is playing
+    - 3rd line = station name. The name of the station to connect to.
+    - redstone input on the left of the IC sign = get "now playing" messages
+        - These messages display the song's title and author (if provided).
+        - if the redstone input is on, the messages will be sent to nearby
+            players that can hear the music
+        - if the redstone input is off, there will be no song information
+            messages.
+- added playlist support to Music ICs
+    - a list of song files to play
+    - inside the "cbmusic" folder, create a new folder named "playlists"
+        ex: \cbmusic\playlists
+    - .txt files in the "playlists" folder will be considered playlists
+        - keep the .txt file names short enough to fit on a sign with ".p" at
+            the end. (13 character file names)
+    - inside a playlist .txt file, each song is on its own line
+    - songs are listed just like how you would type it on [MCU700]
+        -example:
+            song1.m
+            song2.m
+            song3.m:6
+            song4
+            song5.m
+        - where ":6" for song3 is the midi's speed (just like on [MCU700]) and
+            song4 plays a text file song instead of a midi.
+    - playlists also support messages to display to listeners inbetween songs
+        - format:
+            ad:message
+              -or-
+            ad:delay#:message
+        -example:
+            song1.m
+            song2.m
+            ad:Thanks for listening to M4411K4 radio!
+            song3.m
+            ad:20:Just a short break!
+            song4.m
+        - lines that start with "ad:" are considered messages to display
+        - The "20" in the "ad:20:Just a short break!" example is the delay time
+            in seconds.
+            - If the delay is left out, the delay will be 10 seconds.
+        - Messages also support line breaks <br>
+    - To play playlists, on the 3rd line of [MCU700] or [MCU701] type the file
+        name folowed by ".p" (without the quotes)
+        -example:
+            line1:
+            line2: [MCU701]
+            line3: playlist.p
+            line4: stationname
+- added Tune IC [MCU705]
+    - plays a short tune that's written on the IC sign
+    - format:
+        instrument#pitch#octave#pitch#octave#pitch#octave# etc...
+        - example:
+            0F3a2
+        - where 0 is harp, F is F#, 3 is octave 3, a is normal note a, and 
+            2 is octave 2
+    - pitch#octave# can also be replaced with a delay number
+        -example:
+            0F3-9a2
+        - where - means delay and 9 is for 9 beats to skip
+    - you can also change instruments during a tune
+        -example:
+            0F3-9a21d2E3
+        -where the 1 after 'a2' means to switch to bass drum. The notes after
+            it will then use the bass drum instrument
+    - tunes can be typed on the 3rd and 4th line of the IC sign
+    - 3rd line and 4th lines are combined
+    - To change the beat's speed, put the speed# followed by ':' in FRONT of the
+        tune, which is different from [MCU700]
+        -example
+            3:0F3-0a2
+- added admin music commands:
+    - permissions should only be given to Admins
+    - these commands are meant to help with any server lag that may be caused
+        by playing music
+    - type /cbmusic to see the commands in game
+        - to stop all playing music
+            /cbmusic stopall
+        - to stop only music that loops
+            /cbmusic stoploops
+        - to completely disable all music ICs from playing
+            /cbmusic disable
+        - to enable or reset music ICs. This will have music ICs playing again
+          after a disable
+            /cbmusic enable
+        - to reset music ICs (works the same as /cbmusic enable)
+            /cbmusic restart
+- added new text song format "tune1" which uses the Tune IC [MCU705]'s format
+- added ability to dispense carts by powering the [Dispenser] sign instead of
+    the Chest
+    - thanks Jahmaican for the suggestion!
+- bugfix, the first tracks of midi files are now included.
+- bugfix for [MCX236], [MCZ236], [MCX238] & [MCZ238] Distance Fake Weather and
+    Distance Hide Weather ICs having conflicts between manual and self-updating
+    versions
+
 2.0extra9.1:
 - For weather ICs, please remember not all biomes have weather.
 - added Weather Control IC [MCT233]

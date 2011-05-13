@@ -256,6 +256,90 @@ public class DefaultMusicParser
 		return musicKeys;
 	}
 	
+	public static ArrayList<MusicNoteKey> parseTune1(String tune)
+	{
+		if(tune == null)
+			return null;
+		
+		ArrayList<MusicNoteKey> musicKeys = new ArrayList<MusicNoteKey>();
+		
+		int instrument = -1;
+		int position = 0;
+		for(int i = 0; i < tune.length(); i++)
+		{
+			char first = tune.charAt(i);
+			if(first >= '0' && first <= '9')
+			{
+				//instrument?
+				instrument = getTypeFromChar(first);
+			}
+			else if(i+1 < tune.length())
+			{
+				//note?
+				if(instrument == -1)
+					return null;
+				
+				int pitch = getPitchFromChar(first);
+				boolean skip = false;
+				if(pitch == -1)
+				{
+					switch(first)
+					{
+						case '-':
+						case ' ':
+							skip = true;
+							break;
+						default:
+							return null;
+					}
+				}
+				
+				int octave;
+				try
+				{
+					octave = Integer.parseInt(Character.toString(tune.charAt(i+1)));
+				}
+				catch(NumberFormatException e)
+				{
+					octave = 2;
+				}
+				
+				if(skip)
+				{
+					if(octave == 0)
+						octave = 10;
+					
+					position += octave;
+				}
+				else
+				{
+					MusicNoteKey key = new MusicNoteKey(position);
+					position++;
+					
+					if(octave < 2)
+						octave = 2;
+					
+					pitch += (octave - 2) * 12;
+					
+					if(pitch < 0)
+						pitch = 0;
+					else if(pitch > 24)
+						pitch = 24;
+					
+					key.addNote(instrument, (byte)pitch);
+					musicKeys.add(key);
+				}
+				
+				i++;
+			}
+		}
+		
+		if(musicKeys.size() == 0)
+			return null;
+		
+		return musicKeys;
+	}
+	
 	public static int getType(String stype)
 	{
 		int type = -1;
@@ -339,5 +423,72 @@ public class DefaultMusicParser
 		}
 		
 		return type;
+	}
+	
+	public static int getTypeFromChar(char type)
+	{
+		int instrument = -1;
+		switch(type)
+		{
+			case '9':
+			case '8':
+			case '7':
+			case '6':
+			case '5':
+			case '0':
+				instrument = 0;
+				break;
+			case '1':
+				instrument = 1;
+				break;
+			case '2':
+				instrument = 2;
+				break;
+			case '3':
+				instrument = 3;
+				break;
+			case '4':
+				instrument = 4;
+				break;
+		}
+		
+		return instrument;
+	}
+	
+	public static int getPitchFromChar(char charPitch)
+	{
+		int pitch = 0;
+		switch(charPitch)
+		{
+			case 'f':
+				pitch++;
+			case 'e':
+				pitch++;
+			case 'D':
+				pitch++;
+			case 'd':
+				pitch++;
+			case 'C':
+				pitch++;
+			case 'c':
+				pitch++;
+			case 'b':
+				pitch++;
+			case 'A':
+				pitch++;
+			case 'a':
+				pitch++;
+			case 'G':
+				pitch++;
+			case 'g':
+				pitch++;
+			case 'F':
+				break;
+			default:
+				pitch = -1;
+				break;
+		}
+		
+		return pitch;
 	}
 }

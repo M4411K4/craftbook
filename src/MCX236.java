@@ -100,13 +100,13 @@ public class MCX236 extends BaseIC {
 	    		{
 	    			if(exists == null)
 	    			{
-	    				players.put(player, true);
+	    				players.put(player, chip.inputAmount() == 0);
 	    				player.getEntity().a.b(new OPacket70Bed(1));
 	    				if(chip.getText().getLine4().length() > 0)
 	    					player.sendMessage(chip.getText().getLine4());
 	    			}
 	    		}
-	    		else if(exists != null)
+	    		else if(exists != null && exists)
 	    		{
 	    			players.remove(player);
 	    			if(!etc.getMCServer().e.q().l())

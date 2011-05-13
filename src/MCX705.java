@@ -22,16 +22,14 @@
 
 import java.util.Map;
 
-import com.sk89q.craftbook.BlockType;
 import com.sk89q.craftbook.HistoryHashMap;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
-import com.sk89q.craftbook.ic.BaseIC;
 import com.sk89q.craftbook.ic.ChipState;
 
-public class MCX700 extends BaseIC {
+public class MCX705 extends MCX700 {
 	
-	private final String TITLE = "MELODY";
+	private final String TITLE = "TUNE";
 	
 	/**
      * Data store.
@@ -66,31 +64,17 @@ public class MCX700 extends BaseIC {
      * @return
      */
     public String validateEnvironment(Vector pos, SignText sign) {
-        if (sign.getLine3().length() == 0)
+    	String tune = sign.getLine3() + sign.getLine4();
+        if (tune.length() == 0)
         {
-            return "Specify song file name on line 3.";
+            return "Specify tune on line 3.";
         }
         
-        String[] params = sign.getLine3().split(":", 3);
+        String[] params = tune.split(":", 2);
         
         if(params[0].length() == 0)
         {
-        	return "Specify song file name on line 3.";
-        }
-        
-        String[] file = params[0].split("\\.", 2);
-        if(file[0].length() == 0)
-        {
-        	return "Specify song file name on line 3.";
-        }
-        
-        if(!CopyManager.isValidName(file[0])
-        	|| (file.length > 1
-        		&& !file[1].equalsIgnoreCase("m")
-        		&& !file[1].equalsIgnoreCase("p")
-        		) )
-        {
-        	return "Not a valid song file name.";
+        	return "Specify tune on line 3.";
         }
         
         int tickRate;
@@ -102,7 +86,7 @@ public class MCX700 extends BaseIC {
         {
         	try
         	{
-        		tickRate = Integer.parseInt(params[1]);
+        		tickRate = Integer.parseInt(params[0]);
         	}
         	catch(NumberFormatException e)
         	{
@@ -130,34 +114,39 @@ public class MCX700 extends BaseIC {
     	
     	if(chip.inputAmount() == 0)
     	{
-    		chip.getOut(1).set(tick(music, chip.getText().getLine4()));
+    		String id = chip.getText().getLine1().substring(5, chip.getText().getLine1().length());
+    		chip.getOut(1).set(tick(music, id));
     	}
     	else
     	{
     		chip.getOut(1).set(false);
     		
     		long curtime = (long)Math.floor(System.currentTimeMillis() / 1000);
-    		if(!canPlay(chip, ""+curtime, chip.getText().getLine4()))
+    		String time = ""+curtime;
+    		if(time.length() > 10)
+    			time = time.substring(time.length() - 10, time.length());
+    		
+    		String prevTime = chip.getText().getLine1().substring(5, chip.getText().getLine1().length());
+    		
+    		if(!canPlay(chip, time, prevTime))
     			return;
     		
     		RedstoneListener listener = (RedstoneListener) chip.getExtra();
     		
-    		chip.getText().setLine1("%"+TITLE);
-    		chip.getText().setLine4(""+curtime);
-    		
+    		chip.getText().setLine1("%"+TITLE+time);
     		chip.getText().supressUpdate();
     		
     		Vector noteblockPos = findNoteBlock(chip);
     		
-    		MusicPlayer player = new MusicPlayer(chip.getText().getLine3(),
+    		MusicPlayer player = new MusicPlayer(chip.getText().getLine3() + chip.getText().getLine4(),
 												noteblockPos.getBlockX(),
 												noteblockPos.getBlockY(),
 												noteblockPos.getBlockZ(),
-												listener.properties,
-												(byte) 0,
-												chip.getMode() == 'r');
+												null,
+												(byte) 1,
+												false);
     		
-    		music.put(""+curtime, player);
+    		music.put(time, player);
     		
     		player.loadSong();
     		
@@ -165,78 +154,14 @@ public class MCX700 extends BaseIC {
     	}
     }
     
-    protected boolean tick(Map<String,MusicPlayer> music, String id)
-    {
-    	if(id.isEmpty())
-    		return false;
-    	
-    	MusicPlayer player = music.get(id);
-    	if(player != null)
-    	{
-    		player.tick();
-    		return player.isPlaying();
-    	}
-    	
-    	return false;
-    }
-    
-    protected boolean canPlay(ChipState chip, String curTime, String prevTime)
-    {
-    	if(!chip.getIn(1).is())
-		{
-			//turn off
-			turnOff(chip);
-			return false;
-		}
-		
-		if(!chip.getIn(1).is() || !chip.getIn(1).isTriggered() || chip.getText().getLine1().charAt(0) == '%')
-			return false;
-		
-		if(prevTime.isEmpty())
-			return true;
-		
-		long cur = Integer.parseInt(curTime);
-		long prev = Integer.parseInt(prevTime);
-		
-		if(cur - prev < 5)
-			return false; //quick on/off protection
-		
-		return true;
-    }
-    
     protected void turnOff(ChipState chip)
     {
-    	if(chip.getText().getLine4().isEmpty())
+    	String id = chip.getText().getLine1().substring(5, chip.getText().getLine1().length());
+    	if(id.isEmpty())
     		return;
     	
-    	music.remove(chip.getText().getLine4());
-    	chip.getText().setLine1("^"+TITLE);
+    	music.remove(id);
+    	chip.getText().setLine1("^"+TITLE+id);
 		chip.getText().supressUpdate();
-    }
-    
-    protected Vector findNoteBlock(ChipState chip)
-    {
-    	Vector noteblock = Util.getWallSignBack(chip.getPosition(), 2);
-    	
-    	if(CraftBook.getBlockID(noteblock) == BlockType.NOTE_BLOCK)
-    		return noteblock;
-    	
-    	Vector other = chip.getBlockPosition().add(0, 1, 0);
-    	if(CraftBook.getBlockID(other) == BlockType.NOTE_BLOCK)
-    		return other;
-    	
-    	other = Util.getWallSignSide(chip.getBlockPosition(), 1);
-    	if(CraftBook.getBlockID(other) == BlockType.NOTE_BLOCK)
-    		return other;
-    	
-    	other = Util.getWallSignSide(chip.getBlockPosition(), -1);
-    	if(CraftBook.getBlockID(other) == BlockType.NOTE_BLOCK)
-    		return other;
-    	
-    	other = chip.getBlockPosition().add(0, -1, 0);
-    	if(CraftBook.getBlockID(other) == BlockType.NOTE_BLOCK)
-    		return other;
-    	
-    	return noteblock;
     }
 }

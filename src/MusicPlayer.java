@@ -1,360 +1,200 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Map;
 
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Track;
-
-import com.sk89q.craftbook.music.MidiDataObject;
-import com.sk89q.craftbook.music.MusicMidiTrack;
+import com.sk89q.craftbook.HistoryHashMap;
+import com.sk89q.craftbook.music.IMusicPlayer;
 import com.sk89q.craftbook.music.MusicNote;
-import com.sk89q.craftbook.music.MusicNoteKey;
-import com.sk89q.craftbook.music.parser.DefaultMusicParser;
-import com.sk89q.craftbook.music.parser.MidiDataParser1;
+import com.sk89q.craftbook.music.Playlist;
+import com.sk89q.craftbook.music.RadioObject;
+import com.sk89q.craftbook.music.media.ExternalMedia;
+import com.sk89q.craftbook.music.media.Media;
+import com.sk89q.craftbook.music.media.MidiMedia;
+import com.sk89q.craftbook.music.media.SimpleTuneMedia;
+import com.sk89q.craftbook.music.media.TextSongMedia;
 
 
 
-public class MusicPlayer
+public class MusicPlayer implements IMusicPlayer
 {
-	private final String SONG;
 	private final boolean LOOP;
 	private final int MAX_BEAT_DURATION;
 	private final int MAX_TEXT_LINES;
+	private final int MAX_PLAYLIST_TRACKS;
 	private final int MAX_MIDI_TRACKS;
 	private final int MAX_RATE = 10;
+	private final int MAX_MISSING = 10;
+	private final String NOW_PLAYING;
 	
 	private final int x;
 	private final int y;
 	private final int z;
 	
-	private String title;
-	private String author;
-	private int rate;
-	private int midiRate;
-	private int midiResolution;
-	
-	private int currentNote = 0;
 	private int currentTick = 0;
-	private int currentTrackPos = 0;
+	private int skipProtection = 0;
 	
 	public boolean pause = false;
 	
-	private boolean midiMode = false;
+	private Media playingMedia;
+	private Playlist playlist;
 	
-	private ArrayList<MusicNoteKey> musicKeys;
-	private Sequence sequence;
-	private MusicMidiTrack[] midiTracks;
+	private Map<String,RadioObject> radios;
 	
-	public MusicPlayer(String song, int x, int y, int z, PropertiesFile properties)
+	public MusicPlayer(String data, int x, int y, int z, PropertiesFile properties, byte type, boolean loop)
 	{
-		this(song, x, y, z, properties, -1, false);
+		this(data, x, y, z, properties, type, loop, false);
 	}
 	
-	public MusicPlayer(String song, int x, int y, int z, PropertiesFile properties, int rate, boolean loop)
+	public MusicPlayer(String data, int x, int y, int z, PropertiesFile properties, byte type, boolean loop, boolean isStation)
 	{
-		this.SONG = song;
-		this.rate = rate;
 		this.LOOP = loop;
-		
-		currentTick = rate;
 		
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		
+		if(isStation)
+			radios = new HistoryHashMap<String,RadioObject>(100);
+		else
+			radios = null;
+		
 		int duration = 500;
-		if(properties.containsKey("music-max-beat-duration"))
-		{
-			duration = properties.getInt("music-max-beat-duration", duration);
-			if(duration < 0)
-				duration = 0;
-		}
-		MAX_BEAT_DURATION = duration;
-		
 		int linemax = 100;
-		if(properties.containsKey("music-max-text-lines"))
-		{
-			linemax = properties.getInt("music-max-text-lines", linemax);
-			if(linemax < 0)
-				linemax = 0;
-		}
-		MAX_TEXT_LINES = linemax;
-		
+		int playlistMax = 100;
 		int trackmax = 10;
-		if(properties.containsKey("music-max-midi-tracks"))
+		String nowPlaying = "";
+		
+		if(properties != null)
 		{
-			trackmax = properties.getInt("music-max-midi-tracks", trackmax);
-			if(trackmax < 0)
-				trackmax = 0;
-		}
-		MAX_MIDI_TRACKS = trackmax;
-	}
-	
-	public void loadSong()
-	{
-		currentNote = 0;
-		currentTrackPos = 0;
-		
-		File file;
-		
-		String[] name = SONG.split("\\.", 2);
-		
-		if(name[0].length() == 0 || !CopyManager.isValidName(name[0]))
-			return;
-		
-		if(name.length > 1 && name[1].equalsIgnoreCase("m"))
-		{
-			file = new File("cbmusic" + File.separator +
-							name[0] + ".mid");
+			if(properties.containsKey("music-max-beat-duration"))
+			{
+				duration = properties.getInt("music-max-beat-duration", duration);
+				if(duration < 0)
+					duration = 0;
+			}
 			
-			loadMidiSong(file);
+			if(properties.containsKey("music-max-text-lines"))
+			{
+				linemax = properties.getInt("music-max-text-lines", linemax);
+				if(linemax < 0)
+					linemax = 0;
+			}
+			
+			if(properties.containsKey("music-max-playlist-tracks"))
+			{
+				playlistMax = properties.getInt("music-max-playlist-tracks", playlistMax);
+				if(playlistMax < 0)
+					playlistMax = 0;
+			}
+			
+			if(properties.containsKey("music-max-midi-tracks"))
+			{
+				trackmax = properties.getInt("music-max-midi-tracks", trackmax);
+				if(trackmax < 0)
+					trackmax = 0;
+			}
+			if(isStation)
+			{
+				nowPlaying = "now playing";
+				if(properties.containsKey("music-text-now-playing"))
+				{
+					nowPlaying = properties.getString("music-text-now-playing", nowPlaying);
+				}
+			}
 		}
 		else
 		{
-			file = new File("cbmusic" + File.separator +
-							SONG + ".txt");
-			
-			loadTextSong(file);
+			type = 1;
+		}
+		
+		MAX_BEAT_DURATION = duration;
+		MAX_TEXT_LINES = linemax;
+		MAX_PLAYLIST_TRACKS = playlistMax;
+		MAX_MIDI_TRACKS = trackmax;
+		NOW_PLAYING = nowPlaying;
+		
+		if(type == 0)
+		{
+			//external media
+			playingMedia = parseExternalData(data, true);
+			if(playingMedia == null && playlist != null)
+			{
+				playingMedia = playlist.getCurrentMedia();
+			}
+		}
+		else
+		{
+			playingMedia = new SimpleTuneMedia(this, data);
 		}
 	}
 	
-	private void loadMidiSong(File file)
+	public ExternalMedia parseExternalData(String data)
 	{
-		if (!file.exists())
-			return;
-		
-		midiMode = true;
-		
-		sequence = null;
-		try
-		{
-			sequence = MidiSystem.getSequence(file);
-		}
-		catch(InvalidMidiDataException e)
-		{
-			
-		}
-		catch(IOException e)
-		{
-			
-		}
-		
-		Track[] tracks = sequence.getTracks();
-		
-		if(sequence == null || tracks == null)
-			return;
-		
-		midiResolution = sequence.getResolution() / 24;
-		
-		int trackSize = tracks.length - 1; //we skip the first track
-		if(trackSize > MAX_MIDI_TRACKS)
-			trackSize = MAX_MIDI_TRACKS;
-		
-		MidiDataObject dataObject = loadMidiData(trackSize);
-		if(dataObject != null)
-		{
-			title = dataObject.TITLE;
-			author = dataObject.AUTHOR;
-		}
-		
-		midiRate = rate;
-		rate = 0;
-		
-		if(midiRate < 1)
-		{
-			if(dataObject == null || dataObject.RATE < 0)
-				midiRate = 4;
-			else if(dataObject != null)
-				midiRate = dataObject.RATE;
-		}
-		
-		if(midiRate > MAX_RATE)
-			midiRate = MAX_RATE;
-		
-		midiTracks = new MusicMidiTrack[trackSize];
-		
-		boolean allNull = true;
-		for(int i = 0; i < trackSize; i++)
-		{
-			Track track = tracks[i+1];
-			
-			if(track.size() < 4 || (dataObject != null && dataObject.INSTRUMENTS != null && dataObject.INSTRUMENTS[i] < 0) )
-    			continue;
-			
-			midiTracks[i] = new MusicMidiTrack(track);
-			if(dataObject != null)
-			{
-				if(dataObject.INSTRUMENTS != null)
-					midiTracks[i].instrument = dataObject.INSTRUMENTS[i];
-			}
-			
-			allNull = false;
-		}
-		
-		if(allNull)
-		{
-			sequence = null;
-			pause = true;
-		}
+		return parseExternalData(data, false);
 	}
 	
-	private MidiDataObject loadMidiData(int maxTracks)
+	private ExternalMedia parseExternalData(String data, boolean includePlaylist)
 	{
-		String[] name = SONG.split("\\.", 2);
-		File file = new File("cbmusic" + File.separator +
-				name[0] + ".mdata");
+		String[] args = data.split(":", 2);
+		String[] song = args[0].split("\\.", 2);
 		
-		if(!file.exists())
+		ExternalMedia media = null;
+		
+		if(song.length > 1)
+		{
+			if(song[1].equalsIgnoreCase("m"))
+				media = new MidiMedia(this, song[0]);
+			else if(includePlaylist && song[1].equalsIgnoreCase("p"))
+			{
+				playlist = new Playlist(this, song[0]);
+				media = null;
+			}
+		}
+		else
+		{
+			media = new TextSongMedia(this, song[0]);
+		}
+		
+		if(media == null)
 			return null;
 		
-		FileInputStream fs = null;
-		BufferedReader br = null;
-		
-		MidiDataObject midiData = null;
-		
-		try
+		int rate = -1;
+		if(args.length > 1)
 		{
-			fs = new FileInputStream(file);
-	    	br = new BufferedReader(new InputStreamReader(fs));
-	    	
-	    	//type of music file
-	    	String fileFormat = br.readLine();
-	    	if(fileFormat.equalsIgnoreCase("fmt1"))
-	    	{
-	    		midiData = MidiDataParser1.parse(br, maxTracks);
-	    	}
-		}
-		catch(FileNotFoundException e)
-		{
-			return null;
-		}
-		catch(IOException e)
-		{
-			return null;
-		}
-		finally
-		{
-			try
-			{
-				if(br != null)
-					br.close();
-			}
-			catch(IOException e)
-			{
-				
-			}
+			rate = getLimitedRate(args[1]);
 		}
 		
-		return midiData;
-	}
-	
-	private void loadTextSong(File file)
-	{
-		if (!file.exists())
-			return;
+		media.setRate(rate);
 		
-		midiMode = false;
+		currentTick = media.getRate();
 		
-		FileInputStream fs = null;
-		BufferedReader br = null;
-		
-		try
-		{
-	    	fs = new FileInputStream(file);
-	    	br = new BufferedReader(new InputStreamReader(fs));
-	    	
-	    	//type of music file
-	    	String fileFormat = br.readLine();
-	    	
-	    	//song title
-	    	title = br.readLine();
-	    	
-	    	//song composer
-	    	author = br.readLine();
-	    	
-	    	if(rate < 1)
-	    	{
-	    		try
-	    		{
-	    			rate = Integer.parseInt(br.readLine());
-	    		}
-	    		catch(NumberFormatException e)
-	    		{
-	    			rate = -1;
-	    		}
-	    		
-	    		if(rate < 1)
-	    		{
-	    			rate = 5;
-	    		}
-	    	}
-	    	else
-	    	{
-	    		//skip line 4
-	    		br.readLine();
-	    	}
-	    	
-	    	if(rate > MAX_RATE)
-	    		rate = MAX_RATE;
-	    	
-	    	if(fileFormat.equalsIgnoreCase("default"))
-	    	{
-	    		musicKeys = DefaultMusicParser.parse(br, MAX_BEAT_DURATION, MAX_TEXT_LINES);
-	    	}
-	    	else if(fileFormat.equalsIgnoreCase("default2"))
-	    	{
-	    		musicKeys = DefaultMusicParser.parse2(br, MAX_BEAT_DURATION, MAX_TEXT_LINES);
-	    	}
-	    	else
-	    	{
-	    		//not a recognized music file type
-	    		musicKeys = null;
-				pause = true;
-	    	}
-		}
-		catch(FileNotFoundException e)
-		{
-			musicKeys = null;
-			pause = true;
-		}
-		catch(IOException e)
-		{
-			musicKeys = null;
-			pause = true;
-		}
-		finally
-		{
-			try
-			{
-				if(br != null)
-					br.close();
-			}
-			catch(IOException e)
-			{
-				
-			}
-		}
+		return media;
 	}
 	
 	public void tick()
 	{
-		if(pause || (!midiMode && musicKeys == null) || (midiMode && sequence == null) )
+		if(!isPlaying())
 			return;
 		
-		if(currentTick >= rate)
+		if(currentTick >= playingMedia.getRate())
 		{
-			if(midiMode)
-				playNextMidiNote();
-			else
-				playNextNote();
-			
 			currentTick = 0;
+			if(!playingMedia.playNextNote())
+			{
+				if(playlist != null)
+				{
+					playNext();
+				}
+				else if(LOOP)
+				{
+					playingMedia.reset();
+					sendInfoToRadios();
+				}
+				else
+				{
+					stop();
+				}
+				return;
+			}
 		}
 		else
 		{
@@ -362,104 +202,282 @@ public class MusicPlayer
 		}
 	}
 	
-	/*
-	 * Plays next note on the list.
-	 * Assumes noteblock is still at current location.
-	 */
-	public void playNextNote()
-	{
-		if(currentTrackPos >= musicKeys.size())
-		{
-			if(!LOOP)
-			{
-				pause = true;
-				return;
-			}
-			
-			currentNote = 0;
-			currentTrackPos = 0;
-		}
-		
-		if(currentNote == musicKeys.get(currentTrackPos).getKey())
-		{
-			ArrayList<MusicNote> notes = musicKeys.get(currentTrackPos).getNotes();
-			
-			playNotes(notes);
-			
-			currentTrackPos++;
-		}
-		
-		
-		currentNote++;
-	}
-	
-	public void playNextMidiNote()
-	{
-		boolean allFinished = true;
-		
-		double tick = currentNote * midiResolution;// * 0.987291095374788;
-		
-		for(int i = 0; i < midiTracks.length; i++)
-		{
-			MusicMidiTrack track = midiTracks[i];
-			if(track == null || track.isFinished())
-				continue;
-			
-			allFinished = false;
-			
-			ArrayList<MusicNote> notes = track.nextTick(tick);
-			
-			if(notes == null)
-				continue;
-			
-			playNotes(notes);
-		}
-		
-		currentNote += midiRate;
-		
-		if(allFinished)
-		{
-			if(!LOOP)
-			{
-				pause = true;
-				return;
-			}
-			
-			currentNote = 0;
-			
-			for(int i = 0; i < midiTracks.length; i++)
-			{
-				if(midiTracks[i] != null)
-					midiTracks[i].reset();
-			}
-		}
-	}
-	
-	private void playNotes(ArrayList<MusicNote> notes)
+	public void playNotes(ArrayList<MusicNote> notes)
 	{
 		for(MusicNote note : notes)
 		{
 			etc.getMCServer().f.a(x, y, z, 64.0D, new OPacket54PlayNoteBlock(x, y, z, note.type, note.pitch));
+			
+			if(radios != null)
+			{
+				for(RadioObject radio : radios.values())
+				{
+					etc.getMCServer().f.a(radio.X, radio.Y, radio.Z, 64.0D,
+							new OPacket54PlayNoteBlock(radio.X, radio.Y, radio.Z, note.type, note.pitch));
+				}
+			}
 		}
 	}
 	
-	public boolean isLoaded()
+	public void sendMessage(String message)
 	{
-		return musicKeys != null;
+		sendMessageTo(message, x, y, z);
+	}
+	
+	private void sendMessageTo(String message, int x, int y, int z)
+	{
+		for(Player player: etc.getServer().getPlayerList())
+		{
+			Location pLoc = player.getLocation();
+			double diffX = x - pLoc.x;
+			double diffY = y - pLoc.y;
+			double diffZ = z - pLoc.z;
+			
+			if(diffX * diffX + diffY * diffY + diffZ * diffZ < 4096.0D)
+			{
+				String[] lines = message.split("<br>", 5);
+				for(String line : lines)
+				{
+					player.sendMessage(line);
+				}
+			}
+		}
+	}
+	
+	private void sendInfoToRadios()
+	{
+		if(radios == null || playingMedia == null || !(playingMedia instanceof ExternalMedia))
+			return;
+		
+		ExternalMedia media = (ExternalMedia) playingMedia;
+		String message = media.getInfoMessage();
+		
+		for(RadioObject radio : radios.values())
+		{
+			if(radio.sendMessages || media.isForcedMessage())
+				sendMessageTo(message, radio.X, radio.Y, radio.Z);
+		}
+	}
+	
+	public void playNext()
+	{
+		if(playlist == null)
+			return;
+		
+		if(skipProtection > MAX_MISSING)
+		{
+			turnOff();
+			return;
+		}
+		
+		if(playingMedia != null)
+			playingMedia.reset();
+		
+		playingMedia = playlist.getNext();
+		if(playingMedia == null)
+		{
+			if(LOOP)
+				playingMedia = playlist.jumpTo(0);
+			
+			if(playingMedia == null)
+			{
+				turnOff();
+				return;
+			}
+		}
+		
+		if(playingMedia instanceof ExternalMedia)
+		{
+			if( !((ExternalMedia)playingMedia).loadSong())
+			{
+				skipProtection++;
+				playNext();
+				return;
+			}
+			skipProtection = 0;
+			sendInfoToRadios();
+		}
+	}
+	
+	public void playPrevious()
+	{
+		if(playlist == null)
+			return;
+		
+		if(skipProtection > MAX_MISSING)
+		{
+			turnOff();
+			return;
+		}
+		
+		if(playingMedia != null)
+			playingMedia.reset();
+		
+		playingMedia = playlist.getPrevious();
+		if(playingMedia == null)
+		{
+			if(LOOP)
+				playingMedia = playlist.jumpTo(playlist.getSize()-1);
+			
+			if(playingMedia == null)
+			{
+				turnOff();
+				return;
+			}
+		}
+		
+		if(playingMedia instanceof ExternalMedia)
+		{
+			if( !((ExternalMedia)playingMedia).loadSong())
+			{
+				skipProtection++;
+				playPrevious();
+				return;
+			}
+			skipProtection = 0;
+			sendInfoToRadios();
+		}
+	}
+	
+	//this is really "pause"
+	public void stop()
+	{
+		pause = true;
+	}
+	
+	public void turnOff()
+	{
+		stop();
+		
+		if(radios != null)
+		{
+			for(RadioObject radio : radios.values())
+			{
+				ComplexBlock block = etc.getServer().getComplexBlock(radio.SIGN_X, radio.SIGN_Y, radio.SIGN_Z);
+		    	if(!(block instanceof Sign))
+		    		return;
+		    	
+		    	Sign sign = (Sign) block;
+		    	String title = MCX702.getOffState(sign.getText(0));
+		    	sign.setText(0, title);
+			}
+			radios.clear();
+		}
+		
+		playingMedia = null;
+		playlist = null;
+	}
+	
+	public void loadSong()
+	{
+		if(playingMedia == null || !(playingMedia instanceof ExternalMedia))
+			return;
+		
+		ExternalMedia media = (ExternalMedia) playingMedia;
+		if(!media.loadSong())
+		{
+			byte error;
+			if(media instanceof MidiMedia && (error = ((MidiMedia) media).getErrorType()) != 0)
+			{
+				if(error == 1)
+					sendMessage(Colors.Rose+"> Unsupported MIDI");
+				else if(error == 2)
+					sendMessage(Colors.Rose+"> Error reading MIDI");
+			}
+			return;
+		}
+		
+		//sendInfoToRadios();
 	}
 	
 	public boolean isPlaying()
 	{
-		return isLoaded() && !pause;
+		return !pause && playingMedia != null && !playingMedia.isFinished();
 	}
 	
-	public String getTitle()
+	public void addRadio(String key, RadioObject radio)
 	{
-		return title;
+		if(radios == null || radio == null)
+			return;
+		
+		radios.put(key, radio);
+		
+		if(isPlaying() && playingMedia instanceof ExternalMedia)
+		{
+			ExternalMedia media = (ExternalMedia) playingMedia;
+			
+			if(radio.sendMessages || media.isForcedMessage())
+				sendMessageTo(media.getInfoMessage(), radio.X, radio.Y, radio.Z);
+		}
 	}
 	
-	public String getAuthor()
+	public RadioObject getRadio(String key)
 	{
-		return author;
+		if(radios == null)
+			return null;
+		
+		return radios.get(key);
+	}
+	
+	public void removeRadio(String key)
+	{
+		if(radios == null)
+			return;
+		
+		radios.remove(key);
+	}
+	
+	public int getMaxRate()
+	{
+		return MAX_RATE;
+	}
+	
+	public int getLimitedRate(String sRate)
+	{
+		int rate = -1;
+		try
+		{
+			rate = Integer.parseInt(sRate);
+			if(rate > MAX_RATE)
+				rate = MAX_RATE;
+			else if(rate < 1)
+				rate = -1;
+		}
+		catch(NumberFormatException e)
+		{
+			rate = -1;
+		}
+		
+		return rate;
+	}
+	
+	public int getMaxMidiTracks()
+	{
+		return MAX_MIDI_TRACKS;
+	}
+	
+	public int getMaxBeatDuration()
+	{
+		return MAX_BEAT_DURATION;
+	}
+	
+	public int getMaxTextLines()
+	{
+		return MAX_TEXT_LINES;
+	}
+	
+	public int getMaxPlaylistTracks()
+	{
+		return MAX_PLAYLIST_TRACKS;
+	}
+	
+	public String getNowPlaying()
+	{
+		return NOW_PLAYING;
+	}
+	
+	public boolean loops()
+	{
+		return LOOP;
 	}
 }

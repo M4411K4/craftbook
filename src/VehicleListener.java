@@ -238,13 +238,33 @@ public class VehicleListener extends CraftBookDelegateListener {
         int type = CraftBook.getBlockID(pt);
         
         // Minecart dispenser
-        if (minecartDispensers && type == BlockType.CHEST
-                && (CraftBook.getBlockID(pt.add(0, -2, 0)) == BlockType.SIGN_POST
-                    || CraftBook.getBlockID(pt.add(0, -1, 0)) == BlockType.SIGN_POST)) {
+        if (minecartDispensers && (
+            (type == BlockType.CHEST
+             && (CraftBook.getBlockID(pt.add(0, -2, 0)) == BlockType.SIGN_POST
+              || CraftBook.getBlockID(pt.add(0, -1, 0)) == BlockType.SIGN_POST)
+             )
+             || (type == BlockType.SIGN_POST && Util.doesSignSay(pt, 1, "[Dispenser]"))
+             )
+           )
+        {
             
             // Rising edge-triggered only
             if (!isOn) {
                 return;
+            }
+            
+            if(type == BlockType.SIGN_POST)
+            {
+            	pt = pt.add(0, 1, 0);
+            	if(CraftBook.getBlockID(pt) != BlockType.CHEST)
+            	{
+            		pt = pt.add(0, 1, 0);
+            		if(CraftBook.getBlockID(pt) != BlockType.CHEST)
+            		{
+            			//no chest?
+            			return;
+            		}
+            	}
             }
             
             Vector signPos = pt.add(0, -2, 0);

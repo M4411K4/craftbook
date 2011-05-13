@@ -1,0 +1,172 @@
+package com.sk89q.craftbook.music;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+
+import com.sk89q.craftbook.music.media.ChatAdMedia;
+import com.sk89q.craftbook.music.media.ExternalMedia;
+import com.sk89q.craftbook.music.media.Media;
+
+public class Playlist
+{
+	protected final IMusicPlayer MUSIC_PLAYER;
+	
+	private final String NAME;
+	
+	private ArrayList<Media> mediaList = new ArrayList<Media>();
+	private int position = 0;
+	
+	public Playlist(IMusicPlayer musicPlayer)
+	{
+		MUSIC_PLAYER = musicPlayer;
+		NAME = "";
+	}
+	
+	public Playlist(IMusicPlayer musicPlayer, String name)
+	{
+		MUSIC_PLAYER = musicPlayer;
+		NAME = name;
+		loadPlaylist();
+	}
+	
+	private void loadPlaylist()
+	{
+		position = 0;
+		if(NAME.length() == 0)
+			return;
+		
+		File file = new File("cbmusic" + File.separator
+							+ "playlists" + File.separator
+							+ NAME + ".txt");
+		
+		if(!file.exists())
+			return;
+		
+		FileInputStream fs = null;
+		BufferedReader br = null;
+		
+		try
+		{
+	    	fs = new FileInputStream(file);
+	    	br = new BufferedReader(new InputStreamReader(fs));
+	    	
+	    	for(int i = 0; i < MUSIC_PLAYER.getMaxPlaylistTracks(); i++)
+	    	{
+	    		String line = br.readLine();
+	    		if(line == null || line.isEmpty())
+	    			break;
+	    		
+	    		ExternalMedia media;
+	    		
+	    		if(line.length() > 4 && line.substring(0, 3).equalsIgnoreCase("ad:"))
+	    		{
+	    			String[] args = line.split(":", 3);
+	    			int delay = 10;
+	    			String ad;
+	    			if(args.length > 2)
+	    			{
+	    				try
+	    				{
+	    					delay = Integer.parseInt(args[1]);
+	    				}
+	    				catch(NumberFormatException e)
+	    				{
+	    					
+	    				}
+	    				ad = args[2];
+	    			}
+	    			else
+	    			{
+	    				ad = args[1];
+	    			}
+	    			
+	    			media = new ChatAdMedia(MUSIC_PLAYER, ad, delay);
+	    		}
+	    		else
+	    		{
+	    			media = MUSIC_PLAYER.parseExternalData(line);
+	    		}
+		    	
+		    	addMedia(media);
+	    	}
+		}
+		catch(FileNotFoundException e)
+		{
+			return;
+		}
+		catch(IOException e)
+		{
+			return;
+		}
+		finally
+		{
+			try
+			{
+				if(br != null)
+					br.close();
+			}
+			catch(IOException e)
+			{
+				
+			}
+		}
+	}
+	
+	public void addMedia(Media media)
+	{
+		if(media == null)
+			return;
+		
+		mediaList.add(media);
+	}
+	
+	public Media getCurrentMedia()
+	{
+		return mediaList.get(position);
+	}
+	
+	public Media getNext()
+	{
+		if(position + 1 >= mediaList.size())
+			return null;
+		
+		position++;
+		
+		return getCurrentMedia();
+	}
+	
+	public Media getPrevious()
+	{
+		if(position - 1 < 0)
+			return null;
+		
+		position--;
+		
+		return getCurrentMedia();
+	}
+	
+	public Media jumpTo(int index)
+	{
+		if(index < 0 || index >= mediaList.size())
+			return null;
+		
+		position = index;
+		
+		return getCurrentMedia();
+	}
+	
+	public int getCurrentPosition()
+	{
+		return position;
+	}
+	
+	public int getSize()
+	{
+		return mediaList.size();
+	}
+}

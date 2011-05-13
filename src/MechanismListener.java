@@ -1284,6 +1284,107 @@ public class MechanismListener extends CraftBookDelegateListener {
         	
         	return true;
         }
+        else if(split[0].equalsIgnoreCase("/cbmusic") && player.canUseCommand("/cbmusic"))
+        {
+        	if(split.length > 1)
+        	{
+	        	if(split[1].equalsIgnoreCase("stopall") || split[1].equalsIgnoreCase("stop"))
+	    		{
+	        		for(MusicPlayer mplayer : MCX700.music.values())
+	        		{
+	        			mplayer.turnOff();
+	        		}
+	        		
+	        		for(MusicPlayer mplayer : MCX701.music.values())
+	        		{
+	        			mplayer.turnOff();
+	        		}
+	        		
+	        		for(MusicPlayer mplayer : MCX705.music.values())
+	        		{
+	        			mplayer.turnOff();
+	        		}
+	        		
+	        		player.sendMessage(Colors.Gold + "All music ICs stopped.");
+	    		}
+	        	else if(split[1].equalsIgnoreCase("stoploop") || split[1].equalsIgnoreCase("stoploops")
+	        			|| split[1].equalsIgnoreCase("stoprepeat") || split[1].equalsIgnoreCase("stoprepeats"))
+	    		{
+	        		for(MusicPlayer mplayer : MCX700.music.values())
+	        		{
+	        			if(mplayer.loops())
+	        				mplayer.turnOff();
+	        		}
+	        		
+	        		for(MusicPlayer mplayer : MCX701.music.values())
+	        		{
+	        			if(mplayer.loops())
+	        				mplayer.turnOff();
+	        		}
+	        		
+	        		for(MusicPlayer mplayer : MCX705.music.values())
+	        		{
+	        			if(mplayer.loops())
+	        				mplayer.turnOff();
+	        		}
+	        		
+	        		player.sendMessage(Colors.Gold + "All looping music stopped.");
+	    		}
+	        	else if(split[1].equalsIgnoreCase("disable"))
+	    		{
+	        		if(MCX700.music != null)
+	        		{
+	        			MCX700.music.clear();
+	        			MCX700.music = null;
+	        		}
+	        		if(MCX701.music != null)
+	        		{
+	        			MCX701.music.clear();
+	        			MCX701.music = null;
+	        		}
+	        		if(MCX705.music != null)
+	        		{
+	        			MCX705.music.clear();
+	        			MCX705.music = null;
+	        		}
+	        		
+	        		player.sendMessage(Colors.Rose + "Music DISABLED. To allow music again: "+Colors.White+"/cbmusic enable");
+	    		}
+	        	else if(split[1].equalsIgnoreCase("enable") || split[1].equalsIgnoreCase("restart"))
+	    		{
+	        		if(MCX700.music != null)
+	        			MCX700.music.clear();
+	        		else
+	        			MCX700.music = new HistoryHashMap<String,MusicPlayer>(100);
+	        		
+	        		if(MCX701.music != null)
+	        			MCX701.music.clear();
+	        		else
+	        			MCX701.music = new HistoryHashMap<String,MusicPlayer>(50);
+	        		
+	        		if(MCX705.music != null)
+	        			MCX705.music.clear();
+	        		else
+	        			MCX705.music = new HistoryHashMap<String,MusicPlayer>(100);
+	        		
+	        		player.sendMessage(Colors.Gold + "Music restarted.");
+	    		}
+	        	else
+	        	{
+	        		player.sendMessage(Colors.Rose + "Unknown /cbmusic Command. For Help type: "+Colors.White+"/cbmusic");
+	        	}
+        	}
+        	else
+        	{
+        		player.sendMessage(Colors.Gold + "Usage: Stops, disables, or enables Music ICs");
+        		player.sendMessage(Colors.Gold + "  /cbmusic stopall"+Colors.White+" -Stops all Music");
+        		player.sendMessage(Colors.Gold + "  /cbmusic stoploops"+Colors.White+" -Stops all looping Music");
+        		player.sendMessage(Colors.Gold + "  /cbmusic disable"+Colors.White+" -Disables Music");
+        		player.sendMessage(Colors.Gold + "  /cbmusic enable"+Colors.White+" -Enables Music");
+        		player.sendMessage(Colors.Gold + "  /cbmusic restart"+Colors.White+" -Restarts Music");
+        	}
+        	return true;
+        }
         else if(usePageWriter && split[0].equalsIgnoreCase("/cbpage") && player.canUseCommand("/cbpage"))
         {
         	PageWriter.handleCommand(player, split, pageMaxCharacters, maxPages);
