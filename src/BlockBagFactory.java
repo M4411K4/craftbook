@@ -29,5 +29,5 @@ public interface BlockBagFactory {
      * Creates a BlockSource instance for the passed vector, or null if no
      * block bag is valid for that position.
      */
-    BlockBag createBlockSource(Vector pos);
+    BlockBag createBlockSource(int worldType, Vector pos);
 }

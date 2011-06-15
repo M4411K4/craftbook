@@ -46,7 +46,7 @@ public class MCX235 extends BaseIC {
         return true;
     }
 
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
     	if (sign.getLine3().length() != 0 &&
     			( sign.getLine3().charAt(1) != ':'
     				|| sign.getLine3().contains(" ")
@@ -88,7 +88,7 @@ public class MCX235 extends BaseIC {
     	OPacket70Bed packet;
     	if(chip.getIn(1).is())
     		packet = new OPacket70Bed(1);
-    	else if(etc.getMCServer().e.q().l())
+    	else if(CraftBook.getWorld(chip.getWorldType()).isRaining())
     		return;
     	else
     		packet = new OPacket70Bed(2);

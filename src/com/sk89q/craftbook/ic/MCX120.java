@@ -64,7 +64,7 @@ public class MCX120 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {

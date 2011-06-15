@@ -77,9 +77,9 @@ public class CompoundBlockBag extends BlockBag {
      * @param pos
      * @return
      */
-    public void addSingleSourcePosition(Vector pos) {
+    public void addSingleSourcePosition(int worldType, Vector pos) {
         for (BlockBag b : sources)
-            b.addSingleSourcePosition(pos);
+            b.addSingleSourcePosition(worldType, pos);
     }
 
     /**
@@ -88,9 +88,9 @@ public class CompoundBlockBag extends BlockBag {
      * @param pos
      * @return
      */
-    public void addSourcePosition(Vector pos) {
+    public void addSourcePosition(int worldType, Vector pos) {
         for (BlockBag b : sources)
-            b.addSourcePosition(pos);
+            b.addSourcePosition(worldType, pos);
     }
 
     /**

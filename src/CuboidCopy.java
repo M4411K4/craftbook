@@ -31,6 +31,7 @@ import com.sk89q.worldedit.DoubleArrayList;
  */
 public class CuboidCopy {
     private Vector origin;
+    private int worldType;
     private int width;
     private int height;
     private int length;
@@ -45,8 +46,9 @@ public class CuboidCopy {
      * @param origin
      * @param size
      */
-    public CuboidCopy(Vector origin, Vector size) {
+    public CuboidCopy(int worldType, Vector origin, Vector size) {
         this.origin = origin;
+        this.worldType = worldType;
         width = size.getBlockX();
         height = size.getBlockY();
         length = size.getBlockZ();
@@ -70,7 +72,8 @@ public class CuboidCopy {
     public void save(File dest) throws IOException {
         FileOutputStream out = new FileOutputStream(dest);
         DataOutputStream writer = new DataOutputStream(out);
-        writer.writeByte(1);
+        writer.writeByte(2);
+        writer.writeInt(worldType);
         writer.writeInt(origin.getBlockX());
         writer.writeInt(origin.getBlockY());
         writer.writeInt(origin.getBlockZ());
@@ -105,14 +108,19 @@ public class CuboidCopy {
         FileInputStream in = new FileInputStream(file);
         DataInputStream reader = new DataInputStream(in);
 
+        int worldType;
         int x, y, z;
         int width, height, length;
         byte[] blocks;
         byte[] data;
 
         try {
-            @SuppressWarnings("unused")
+            //@SuppressWarnings("unused")
             byte version = reader.readByte();
+            if(version == 2)
+            	worldType = reader.readInt();
+            else
+            	worldType = 0;
             x = reader.readInt();
             y = reader.readInt();
             z = reader.readInt();
@@ -138,6 +146,7 @@ public class CuboidCopy {
         
         CuboidCopy copy = new CuboidCopy();
         copy.origin = new Vector(x, y, z);
+        copy.worldType = worldType;
         copy.width = width;
         copy.height = height;
         copy.length = length;
@@ -164,12 +173,13 @@ public class CuboidCopy {
      * Make the copy from world.
      */
     public void copy() {
+    	World world = CraftBook.getWorld(worldType);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 for (int z = 0; z < length; z++) {
                     int index = y * width * length + z * width + x;
-                    blocks[index] = (byte)CraftBook.getBlockID(origin.add(x, y, z));
-                    data[index] = (byte)CraftBook.getBlockData(origin.add(x, y, z));
+                    blocks[index] = (byte)CraftBook.getBlockID(world, origin.add(x, y, z));
+                    data[index] = (byte)CraftBook.getBlockData(world, origin.add(x, y, z));
                 }
             }
         }
@@ -186,14 +196,16 @@ public class CuboidCopy {
         DoubleArrayList<Vector,byte[]> queueLast =
             new DoubleArrayList<Vector,byte[]>(false);
 
+        World world = CraftBook.getWorld(worldType);
+        
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 for (int z = 0; z < length; z++) {
                     int index = y * width * length + z * width + x;
                     Vector pt = origin.add(x, y, z);
                     
-                    if (BlockType.shouldPlaceLast(CraftBook.getBlockID(pt))) {
-                        CraftBook.setBlockID(pt, 0);
+                    if (BlockType.shouldPlaceLast(CraftBook.getBlockID(world, pt))) {
+                        CraftBook.setBlockID(world, pt, 0);
                     }
                     
                     if (BlockType.shouldPlaceLast(blocks[index])) {
@@ -208,9 +220,9 @@ public class CuboidCopy {
         for (Map.Entry<Vector,byte[]> entry : queueAfter) {
             byte[] v = entry.getValue();
             try {
-                bag.setBlockID(entry.getKey(), v[0]);
+                bag.setBlockID(worldType, entry.getKey(), v[0]);
                 if (BlockType.usesData(v[0])) {
-                    CraftBook.setBlockData(entry.getKey(), v[1]);
+                    CraftBook.setBlockData(world, entry.getKey(), v[1]);
                 }
             } catch (OutOfBlocksException e) {
                 // Eat error
@@ -220,9 +232,9 @@ public class CuboidCopy {
         for (Map.Entry<Vector,byte[]> entry : queueLast) {
             byte[] v = entry.getValue();
             try {
-                bag.setBlockID(entry.getKey(), v[0]);
+                bag.setBlockID(worldType, entry.getKey(), v[0]);
                 if (BlockType.usesData(v[0])) {
-                    CraftBook.setBlockData(entry.getKey(), v[1]);
+                    CraftBook.setBlockData(world, entry.getKey(), v[1]);
                 }
             } catch (OutOfBlocksException e) {
                 // Eat error
@@ -237,13 +249,14 @@ public class CuboidCopy {
      */
     public void clear(BlockBag bag) throws BlockSourceException {
         List<Vector> queued = new ArrayList<Vector>();
+        World world = CraftBook.getWorld(worldType);
         
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 for (int z = 0; z < length; z++) {
                     Vector pt = origin.add(x, y, z);
-                    if (BlockType.shouldPlaceLast(CraftBook.getBlockID(pt))) {
-                        bag.setBlockID(pt, 0);
+                    if (BlockType.shouldPlaceLast(CraftBook.getBlockID(world, pt))) {
+                        bag.setBlockID(worldType, pt, 0);
                     } else {
                         // Can't destroy these blocks yet
                         queued.add(pt);
@@ -253,7 +266,7 @@ public class CuboidCopy {
         }
 
         for (Vector pt : queued) {
-            bag.setBlockID(pt, 0);
+            bag.setBlockID(worldType, pt, 0);
         }
 
         bag.flushChanges();
@@ -279,7 +292,7 @@ public class CuboidCopy {
      */
     public boolean shouldClear() {
         Vector v = origin.add(testOffset);
-        return CraftBook.getBlockID(v) != 0;
+        return CraftBook.getBlockID(worldType, v) != 0;
     }
 
     /**

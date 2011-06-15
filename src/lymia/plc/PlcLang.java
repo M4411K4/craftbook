@@ -34,5 +34,5 @@ public interface PlcLang extends StateHolder {
     String getName();
     boolean[] tick(ChipState chip, String program) throws PlcException;
     void checkSyntax(String program) throws PlcException;
-    String validateEnvironment(Vector v, SignText t, String code);
+    String validateEnvironment(int worldType, Vector v, SignText t, String code);
 }

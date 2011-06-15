@@ -45,8 +45,8 @@ public class ToggleArea extends SignOrientedMechanism {
      * @param signText
      * @param copyManager
      */
-    public ToggleArea(Vector pt, CopyManager copyManager) {
-        super(pt);
+    public ToggleArea(int worldType, Vector pt, CopyManager copyManager) {
+        super(worldType, pt);
         
         this.copyManager = copyManager;
         
@@ -60,8 +60,8 @@ public class ToggleArea extends SignOrientedMechanism {
      * @param signText
      * @param copyManager
      */
-    private ToggleArea(Vector pt, SignText signText) {
-        super(pt, signText);
+    private ToggleArea(int worldType, Vector pt, SignText signText) {
+        super(worldType, pt, signText);
         
         isNewArea = getSignIdentifier().equalsIgnoreCase("[Area]");
     }
@@ -291,7 +291,7 @@ public class ToggleArea extends SignOrientedMechanism {
     public static boolean validateEnvironment(CraftBookPlayer player,
             Vector pt, SignText signText) {
         
-        ToggleArea area = new ToggleArea(pt, signText);
+        ToggleArea area = new ToggleArea(player.getWorldType(), pt, signText);
 
         String activeID = area.getSignActiveStateID();
         String inactiveID = area.getSignInactiveStateID();

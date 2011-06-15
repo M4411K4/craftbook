@@ -320,7 +320,7 @@ public class ItemArrayUtil {
      */
     private static int getStackMax(Item item)
     {
-    	return OItem.c[item.getItemId()].b();
+    	return OItem.c[item.getItemId()].c();
     }
     
     /*

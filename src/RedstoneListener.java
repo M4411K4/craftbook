@@ -53,8 +53,9 @@ public class RedstoneListener extends CraftBookDelegateListener
     private Map<String,RegisteredIC> icList = 
             new HashMap<String,RegisteredIC>(32);
 
-    private Set<BlockVector> instantICs = 
-            new HashSet<BlockVector>(32);
+    //[TODO]: create an array of instantICs. One for each world type.
+    private Set<WorldBlockVector> instantICs = 
+            new HashSet<WorldBlockVector>(32);
 
     private HashMap<String,PlcLang> plcLanguageList = 
             new HashMap<String,PlcLang>();
@@ -130,14 +131,18 @@ public class RedstoneListener extends CraftBookDelegateListener
         
         try {
             Server s = etc.getServer();
-            for(Tuple2<Integer,Integer> chunkCoord:ChunkFinder.getLoadedChunks(s.getMCServer().e)) {
-                int xs = (chunkCoord.a+1)<<4;
-                int ys = (chunkCoord.b+1)<<4;
-                for(int x=chunkCoord.a<<4;x<xs;x++) 
-                    for(int y=0;y<128;y++) 
-                        for(int z=chunkCoord.b<<4;z<ys;z++) 
-                            if(s.getBlockIdAt(x, y, z)==BlockType.WALL_SIGN)
-                                onSignAdded(x,y,z);
+            for(int i = 0; i < s.getMCServer().e.length; i++)
+            {
+	            for(Tuple2<Integer,Integer> chunkCoord:ChunkFinder.getLoadedChunks(s.getMCServer().e[i])) {
+	            	World world = new World(s.getMCServer().e[i]);
+	                int xs = (chunkCoord.a+1)<<4;
+	                int ys = (chunkCoord.b+1)<<4;
+	                for(int x=chunkCoord.a<<4;x<xs;x++) 
+	                    for(int y=0;y<128;y++) 
+	                        for(int z=chunkCoord.b<<4;z<ys;z++) 
+	                            if(world.getBlockIdAt(x, y, z)==BlockType.WALL_SIGN)
+	                                onSignAdded(world, x,y,z);
+	            }
             }
         } catch(Throwable t) {
             System.err.println("Chunk finder failed: "+t.getClass());
@@ -246,10 +251,12 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX243", new MCX243(), ICType.SISO);
         internalRegisterIC("MCX244", new MCX244(), ICType.SISO);
         internalRegisterIC("MCX245", new MCX245(), ICType.SISO);
+        internalRegisterIC("MCX246", new MCX246(), ICType.SISO);
         internalRegisterIC("MCX255", new MCX255(), ICType.SISO);
         internalRegisterIC("MCX256", new MCX256(), ICType.SISO);
         
         internalRegisterIC("MCT233", new MCT233(), ICType._3ISO);
+        internalRegisterIC("MCT246", new MCT246(), ICType._3ISO);
         
         internalRegisterIC("MCU113", new MCX113(), ICType.UISO);
         internalRegisterIC("MCU440", new MCX440(), ICType.UISO);
@@ -267,7 +274,9 @@ public class RedstoneListener extends CraftBookDelegateListener
      * @return
      */
     public boolean onSignChange(Player player, Sign sign) {
-        int type = CraftBook.getBlockID(
+    	World world = player.getWorld();
+    	
+        int type = CraftBook.getBlockID(world,
                 sign.getX(), sign.getY(), sign.getZ());
         
         String line2 = sign.getText(1);
@@ -283,7 +292,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                     && !player.canUseCommand("/makeic")) {
                 player.sendMessage(Colors.Rose
                         + "You don't have permission to make ICs.");
-                CraftBook.dropSign(sign.getX(), sign.getY(), sign.getZ());
+                CraftBook.dropSign(world, sign.getX(), sign.getY(), sign.getZ());
                 return true;
             }
 
@@ -295,7 +304,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                 if (ic.isPlc) {
                     if (!redstonePLCs) {
                         player.sendMessage(Colors.Rose + "PLCs are not enabled.");
-                        CraftBook.dropSign(sign.getX(), sign.getY(), sign.getZ());
+                        CraftBook.dropSign(world, sign.getX(), sign.getY(), sign.getZ());
                         return false;
                     }
                 }
@@ -303,7 +312,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                 if (!canCreateIC(player, id, ic)) {
                     player.sendMessage(Colors.Rose
                             + "You don't have permission to make " + id + ".");
-                    CraftBook.dropSign(sign.getX(), sign.getY(), sign.getZ());
+                    CraftBook.dropSign(world, sign.getX(), sign.getY(), sign.getZ());
                     return true;
                 } else {
                 	
@@ -336,8 +345,10 @@ public class RedstoneListener extends CraftBookDelegateListener
                         sign.getText(0), sign.getText(1), sign.getText(2),
                         sign.getText(3));
 
+                    int worldType = world.getType().getType();
+                    
                     // Maybe the IC is setup incorrectly
-                    String envError = ic.ic.validateEnvironment(pos, signText);
+                    String envError = ic.ic.validateEnvironment(worldType, pos, signText);
 
                     if (signText.isChanged()) {
                         sign.setText(0, signText.getLine1());
@@ -349,7 +360,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                     if (envError != null) {
                         player.sendMessage(Colors.Rose
                                 + "Error: " + envError);
-                        CraftBook.dropSign(sign.getX(), sign.getY(), sign.getZ());
+                        CraftBook.dropSign(world, sign.getX(), sign.getY(), sign.getZ());
                         return true;
                     } else {
                         sign.setText(0, ic.ic.getTitle());
@@ -357,7 +368,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                     }
                     
                     if(enableSelfTriggeredICs && (ic.type.isSelfTriggered || ic.type.updateOnce) ) {
-                        instantICs.add(pos.toBlockVector());
+                        instantICs.add(new WorldBlockVector(worldType, pos));
                     }
                     
                     sign.update();
@@ -388,7 +399,7 @@ public class RedstoneListener extends CraftBookDelegateListener
     	if(!enableSelfTriggeredICs || !updateSelfTriggeredICList || sign.getBlock().getType() != BlockType.WALL_SIGN)
     		return;
     	
-    	onSignAdded(sign);
+    	onSignAdded(player.getWorld().getType().getType(), sign);
     }
 
     /**
@@ -400,35 +411,35 @@ public class RedstoneListener extends CraftBookDelegateListener
      * @param z
      * @param isOn
      */
-    public void onDirectWireInput(final Vector pt, boolean isOn, final Vector changed) {
-        int type = CraftBook.getBlockID(pt);
+    public void onDirectWireInput(World world, final Vector pt, boolean isOn, final Vector changed) {
+        int type = CraftBook.getBlockID(world, pt);
         
         // Redstone pumpkins
         if (redstonePumpkins
                 && (type == BlockType.PUMPKIN || type == BlockType.JACKOLANTERN)) {
-            Boolean useOn = Redstone.testAnyInput(pt);
+            Boolean useOn = Redstone.testAnyInput(world, pt);
 
-            int data = CraftBook.getBlockData(pt);
+            int data = CraftBook.getBlockData(world, pt);
             if (useOn != null && useOn) {
-                CraftBook.setBlockID(pt, BlockType.JACKOLANTERN);
+                CraftBook.setBlockID(world, pt, BlockType.JACKOLANTERN);
             } else if (useOn != null) {
-                CraftBook.setBlockID(pt, BlockType.PUMPKIN);
+                CraftBook.setBlockID(world, pt, BlockType.PUMPKIN);
             }
-            CraftBook.setBlockData(pt, data);
+            CraftBook.setBlockData(world, pt, data);
         // Redstone netherstone
         } else if (redstoneNetherstone
                 && (type == BlockType.NETHERSTONE)) {
-            Boolean useOn = Redstone.testAnyInput(pt);
+            Boolean useOn = Redstone.testAnyInput(world, pt);
             Vector above = pt.add(0, 1, 0);
 
-            if (useOn != null && useOn && CraftBook.getBlockID(above) == 0) {
-                CraftBook.setBlockID(above, BlockType.FIRE);
-            } else if (useOn != null && !useOn && CraftBook.getBlockID(above) == BlockType.FIRE) {
-                CraftBook.setBlockID(above, 0);
+            if (useOn != null && useOn && CraftBook.getBlockID(world, above) == 0) {
+                CraftBook.setBlockID(world, above, BlockType.FIRE);
+            } else if (useOn != null && !useOn && CraftBook.getBlockID(world, above) == BlockType.FIRE) {
+                CraftBook.setBlockID(world, above, 0);
             }
         } else if (type == BlockType.WALL_SIGN
                 || type == BlockType.SIGN_POST) {
-            ComplexBlock cblock = etc.getServer().getComplexBlock(
+            ComplexBlock cblock = world.getComplexBlock(
                     pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
 
             if (!(cblock instanceof Sign)) {
@@ -498,22 +509,27 @@ public class RedstoneListener extends CraftBookDelegateListener
                 else
                 	def = orders[1];
                 
+                
+                final int worldType = world.getType().getType();
+                
                 final RedstoneListener thisListener = this;
                 
-                craftBook.getDelay().delayAction(
-                        new TickDelayer.Action(pt.toBlockVector(), 2) {
+                final int worldIndex = CraftBook.getWorldIndex(worldType);
+                
+                craftBook.getDelay(worldIndex).delayAction(
+                        new TickDelayer.Action(world, pt.toBlockVector(), 2) {
                     @Override
                     public void run() {
                     	
                     	//not too happy about putting in the "extra" param to get the blockbag access cuz it's a hack.
                     	//hopefully I can change it later on.
                     	if(id.equals("MCX207") || id.equals("MCX208") || id.equals("MCX209") || id.equals("MCX210"))
-                    		ic.think(pt, changed, signText, sign, craftBook.getDelay(), mode, abc, def, listener.getBlockBag(pt));
+                    		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, listener.getBlockBag(worldType, pt));
                     	else if(id.equals("MCU440") || id.equals("MCU700") || id.equals("MCU701")
                     			|| id.equals("MCU702") || id.equals("MCU705"))
-                    		ic.think(pt, changed, signText, sign, craftBook.getDelay(), mode, abc, def, thisListener);
+                    		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, thisListener);
                         else
-                        	ic.think(pt, changed, signText, sign, craftBook.getDelay(), mode, abc, def, null);
+                        	ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, null);
 
                         if (signText.isChanged()) {
                             sign.setText(0, signText.getLine1());
@@ -534,72 +550,85 @@ public class RedstoneListener extends CraftBookDelegateListener
     public void onTick() {
         if(!enableSelfTriggeredICs) return;
         
-        //XXX HACK: Do this in a more proper way later.
-        if(etc.getServer().getTime()%2!=0) return;
-        
-        BlockVector[] bv = this.instantICs.toArray(new BlockVector[0]);
-        for(BlockVector pt:bv) {
-            Sign sign = (Sign)etc.getServer().getComplexBlock(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
-            if(sign==null) {
-                this.instantICs.remove(pt);
-                continue;
-            }
-            String line2 = sign.getText(1);
-            if(!line2.startsWith("[MC")) {
-                this.instantICs.remove(pt);
-                continue;
-            }
-            
-            String id = line2.substring(1, 7).toUpperCase();
-            RegisteredIC ic = icList.get(id);
-            if (ic == null) {
-                sign.setText(1, Colors.Red + line2);
-                sign.update();
-                this.instantICs.remove(pt);
-                continue;
-            }
-            
-            if(ic.type.updateOnce)
-            {
-            	if(sign.getText(0).charAt(0) != '%')
-            	{
-            		this.instantICs.remove(pt);
-            		
-            		if(sign.getText(0).charAt(0) == '^')
-                		continue;
-            	}
-            }
-            else if(!ic.type.isSelfTriggered) {
-                this.instantICs.remove(pt);
-                continue;
-            }
-
-            SignText signText = new SignText(sign.getText(0),
-                    sign.getText(1), sign.getText(2), sign.getText(3));
-            
-            ic.think(pt, signText, sign, null);
-            
-            if (signText.isChanged()) {
-                sign.setText(0, signText.getLine1());
-                sign.setText(1, signText.getLine2());
-                sign.setText(2, signText.getLine3());
-                sign.setText(3, signText.getLine4());
-                
-                if (signText.shouldUpdate()) {
-                    sign.update();
-                }
-            }
+        //[TODO]: change when canary gets a "getWorldList" method
+        OWorldServer[] worlds = etc.getMCServer().e;
+        for(int i = 0; i < worlds.length; i++)
+        {
+        	World world = new World(worlds[i]);
+        	
+	        //XXX HACK: Do this in a more proper way later.
+	        if(world.getTime()%2!=0) continue;
+	        
+	        int worldType = world.getType().getType();
+	        
+	        WorldBlockVector[] bv = this.instantICs.toArray(new WorldBlockVector[0]);
+	        
+	        for(WorldBlockVector pt:bv) {
+	        	if(pt.getWorldType() != worldType)
+	        		continue;
+	        	
+	            Sign sign = (Sign)world.getComplexBlock(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
+	            if(sign==null) {
+	                this.instantICs.remove(pt);
+	                continue;
+	            }
+	            String line2 = sign.getText(1);
+	            if(!line2.startsWith("[MC")) {
+	                this.instantICs.remove(pt);
+	                continue;
+	            }
+	            
+	            String id = line2.substring(1, 7).toUpperCase();
+	            RegisteredIC ic = icList.get(id);
+	            if (ic == null) {
+	                sign.setText(1, Colors.Red + line2);
+	                sign.update();
+	                this.instantICs.remove(pt);
+	                continue;
+	            }
+	            
+	            if(ic.type.updateOnce)
+	            {
+	            	if(sign.getText(0).charAt(0) != '%')
+	            	{
+	            		this.instantICs.remove(pt);
+	            		
+	            		if(sign.getText(0).charAt(0) == '^')
+	                		continue;
+	            	}
+	            }
+	            else if(!ic.type.isSelfTriggered) {
+	                this.instantICs.remove(pt);
+	                continue;
+	            }
+	
+	            SignText signText = new SignText(sign.getText(0),
+	                    sign.getText(1), sign.getText(2), sign.getText(3));
+	            
+	            ic.think(worldType, pt, signText, sign, null);
+	            
+	            if (signText.isChanged()) {
+	                sign.setText(0, signText.getLine1());
+	                sign.setText(1, signText.getLine2());
+	                sign.setText(2, signText.getLine3());
+	                sign.setText(3, signText.getLine4());
+	                
+	                if (signText.shouldUpdate()) {
+	                    sign.update();
+	                }
+	            }
+	        }
         }
     }
-    public void onSignAdded(int x, int y, int z) {
+    public void onSignAdded(World world, int x, int y, int z) {
         if(!enableSelfTriggeredICs) return;
             
-        Sign sign = (Sign)etc.getServer().getComplexBlock(x,y,z);
+        Sign sign = (Sign)world.getComplexBlock(x,y,z);
         
-        onSignAdded(sign);
+        onSignAdded(world.getType().getType(), sign);
     }
     
-    public void onSignAdded(Sign sign)
+    public void onSignAdded(int worldType, Sign sign)
     {
     	String line2 = sign.getText(1);
         if(!line2.startsWith("[MC") || line2.length() < 8) return;
@@ -614,15 +643,17 @@ public class RedstoneListener extends CraftBookDelegateListener
 
         if(!ic.type.isSelfTriggered && !ic.type.updateOnce) return;
         
-        instantICs.add(new BlockVector(sign.getX(),sign.getY(),sign.getZ()));
+        instantICs.add(new WorldBlockVector(worldType, sign.getX(),sign.getY(),sign.getZ()));
     }
     
     public boolean onBlockBreak(Player player, Block block)
     {
-    	if(block.getType() != Block.Type.WallSign.getType())
+    	if(player == null || block == null || block.getType() != Block.Type.WallSign.getType())
     		return false;
     	
-    	Sign sign = (Sign)etc.getServer().getComplexBlock(block);
+    	World world = player.getWorld();
+    	
+    	Sign sign = (Sign)world.getComplexBlock(block);
     	
     	String line2 = sign.getText(1);
     	if(!line2.startsWith("[MC") || line2.length() < 8)
@@ -639,7 +670,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         SignText signText = new SignText(sign.getText(0), line2, sign.getText(2), sign.getText(3));
         Vector pos = new Vector(block.getX(), block.getY(), block.getZ());
         
-        String message = ic.ic.clear(pos, signText);
+        String message = ic.ic.clear(world.getType().getType(), pos, signText);
         if(message != null)
         {
         	//player.sendMessage(Colors.Rose + message);
@@ -917,9 +948,9 @@ public class RedstoneListener extends CraftBookDelegateListener
          * @param sign
          * @param r
          */
-        void think(Vector pt, Vector changedRedstoneInput, SignText signText,
+        void think(int worldType, Vector pt, Vector changedRedstoneInput, SignText signText,
                 Sign sign, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
-            type.think(pt, changedRedstoneInput, signText, sign, ic, r, mode, orderIn, orderOut, extra);
+            type.think(worldType, pt, changedRedstoneInput, signText, sign, ic, r, mode, orderIn, orderOut, extra);
         }
 
         /**
@@ -930,8 +961,8 @@ public class RedstoneListener extends CraftBookDelegateListener
          * @param signText
          * @param sign
          */
-        void think(Vector pt, SignText signText, Sign sign, Object extra) {
-            type.think(pt, signText, sign, ic, extra);
+        void think(int worldType, Vector pt, SignText signText, Sign sign, Object extra) {
+            type.think(worldType, pt, signText, sign, ic, extra);
         }
     }
     

@@ -30,6 +30,7 @@ public abstract class SignOrientedMechanism {
      * Sign position.
      */
     protected Vector pt;
+    protected int worldType;
     /**
      * Sign text.
      */
@@ -40,9 +41,10 @@ public abstract class SignOrientedMechanism {
      * 
      * @param pt
      */
-    public SignOrientedMechanism(Vector pt) {
-        signText = CraftBook.getSignText(pt);
+    public SignOrientedMechanism(int worldType, Vector pt) {
+        signText = CraftBook.getSignText(worldType, pt);
         this.pt = pt;
+        this.worldType = worldType;
     }
     
     /**
@@ -50,7 +52,7 @@ public abstract class SignOrientedMechanism {
      * 
      * @param pt
      */
-    public SignOrientedMechanism(Vector pt, SignText signText) {
+    public SignOrientedMechanism(int worldType, Vector pt, SignText signText) {
         this.signText = signText;
     }
     

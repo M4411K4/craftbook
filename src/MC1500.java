@@ -33,7 +33,7 @@ public class MC1500 extends BaseIC {
      * @return
      */
     public String getTitle() {
-        return "IS PLAYER ONLINE";
+        return "PLAYER ONLINE?";
     }
     
     /**
@@ -45,7 +45,7 @@ public class MC1500 extends BaseIC {
      * @return
      */
     
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0 || id.contains(" ")) {

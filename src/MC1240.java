@@ -54,7 +54,7 @@ public class MC1240 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String speedSpreadLine = sign.getLine3();
         String vertVelLine = sign.getLine4();
 
@@ -134,10 +134,11 @@ public class MC1240 extends BaseIC {
         Vector backDir = chip.getBlockPosition().subtract(
                 chip.getPosition());
         Vector firePos = chip.getBlockPosition().add(backDir);
-        OEntityArrow arrow = new OEntityArrow(etc.getMCServer().e);
+        OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
+        OEntityArrow arrow = new OEntityArrow(oworld);
         arrow.c(firePos.getBlockX() + 0.5, firePos.getBlockY() + 0.5,
                 firePos.getBlockZ() + 0.5, 0, 0);
-        etc.getMCServer().e.b(arrow);
+        oworld.b(arrow);
         arrow.a(backDir.getBlockX(), vertVel, backDir.getBlockZ(),
                 speed, spread);
     }

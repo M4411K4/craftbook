@@ -63,7 +63,7 @@ public class DummyBlockSource extends BlockBag {
      * @param pos
      * @return
      */
-    public void addSourcePosition(Vector pos) {
+    public void addSourcePosition(int worldType, Vector pos) {
     }
     
     /**
@@ -72,7 +72,7 @@ public class DummyBlockSource extends BlockBag {
      * @param pos
      * @return
      */
-    public void addSingleSourcePosition(Vector pos) {
+    public void addSingleSourcePosition(int worldType, Vector pos) {
     }
 
     /**
@@ -88,7 +88,7 @@ public class DummyBlockSource extends BlockBag {
      * @author sk89q
      */
     public static class UnlimitedBlackHoleFactory implements BlockBagFactory {
-        public BlockBag createBlockSource(Vector v) {
+        public BlockBag createBlockSource(int worldType, Vector v) {
             return new DummyBlockSource();
         }
     }
@@ -99,7 +99,7 @@ public class DummyBlockSource extends BlockBag {
      * @author sk89q
      */
     public static class BlackHoleFactory implements BlockBagFactory {
-        public BlockBag createBlockSource(Vector v) {
+        public BlockBag createBlockSource(int worldType, Vector v) {
             return new DummyBlockSource(false, true);
         }
     }
@@ -110,7 +110,7 @@ public class DummyBlockSource extends BlockBag {
      * @author sk89q
      */
     public static class UnlimitedSourceFactory implements BlockBagFactory {
-        public BlockBag createBlockSource(Vector v) {
+        public BlockBag createBlockSource(int worldType, Vector v) {
             return new DummyBlockSource(true, false);
         }
     }

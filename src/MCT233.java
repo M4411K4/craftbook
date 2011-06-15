@@ -45,7 +45,7 @@ public class MCT233 extends BaseIC {
         return true;
     }
 
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         if (sign.getLine3().length() != 0) {
         	return "Third line needs to be blank";
         }
@@ -66,22 +66,33 @@ public class MCT233 extends BaseIC {
     	
     	if (chip.getIn(1).isTriggered() && chip.getIn(1).is())
     	{
+    		World world = CraftBook.getWorld(chip.getWorldType());
+    		
 	    	int duration;
-	    	OWorldInfo worldInfo = etc.getMCServer().e.q();
 	    	
 	    	if(chip.getIn(2).is())
+	    	{
 	    		duration = 24000;
+	    		
+	    		if(!world.isRaining())
+	    			etc.getMCServer().f.a(new OPacket70Bed(1));
+	    	}
 	    	else
+	    	{
 	    		duration = 0;
+	    		
+	    		if(world.isRaining())
+	    			etc.getMCServer().f.a(new OPacket70Bed(2));
+	    	}
 	    	
-	    	worldInfo.c(duration);
-	    	worldInfo.b(chip.getIn(2).is());
+	    	world.setRainTime(duration);
+	    	world.setRaining(chip.getIn(2).is());
 	    	
 	    	if(!chip.getIn(3).is())
 	    		duration = 0;
 	    	
-	    	worldInfo.b(duration);
-    		worldInfo.a(chip.getIn(2).is() && chip.getIn(3).is());
+	    	world.setThunderTime(duration);
+	    	world.setThundering(chip.getIn(3).is());
     	}
     }
 }

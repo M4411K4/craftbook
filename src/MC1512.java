@@ -45,7 +45,7 @@ public class MC1512 extends BaseIC {
      * @return
      */
     
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
         if (sign.getLine4().equals("")) {
             return "Please put a distance on the third line.";

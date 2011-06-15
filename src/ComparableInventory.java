@@ -29,6 +29,10 @@ public class ComparableInventory implements PointBasedEntity {
      * Chest location.
      */
     private BlockVector pos;
+    
+    //the world
+    private int worldType;
+    
     /**
      * Chest.
      */
@@ -40,8 +44,9 @@ public class ComparableInventory implements PointBasedEntity {
      * @param pos
      * @param block
      */
-    public ComparableInventory(Vector pos, Inventory inventory) {
+    public ComparableInventory(int worldType, Vector pos, Inventory inventory) {
         this.pos = pos.toBlockVector();
+        this.worldType = worldType;
         this.inventory = inventory;
     }
 
@@ -50,6 +55,11 @@ public class ComparableInventory implements PointBasedEntity {
      */
     public BlockVector getPosition() {
         return pos;
+    }
+    
+    public int getWorldType()
+    {
+    	return worldType;
     }
 
     /**
@@ -68,7 +78,7 @@ public class ComparableInventory implements PointBasedEntity {
     @Override
     public boolean equals(Object other) {
         if (other instanceof ComparableInventory) {
-            return ((ComparableInventory)other).pos.equals(pos);
+            return ((ComparableInventory)other).pos.equals(pos) && ((ComparableInventory)other).worldType == worldType;
         } else {
             return false;
         }

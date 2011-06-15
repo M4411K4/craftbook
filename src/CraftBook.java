@@ -18,6 +18,8 @@
 */
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import com.sk89q.craftbook.*;
@@ -47,7 +49,7 @@ public class CraftBook extends Plugin {
      * Tick delayer instance used to delay some events until the next tick.
      * It is used mostly for redstone-related events.
      */
-    private final TickDelayer delay = new TickDelayer();
+    private final TickDelayer[] delays = new TickDelayer[]{new TickDelayer(), new TickDelayer(), new TickDelayer()};
 
     /**
      * Used to fake the data value at a point. For the redstone hook, because
@@ -55,12 +57,7 @@ public class CraftBook extends Plugin {
      * value is faked by CraftBook. As all calls to get a block's data are
      * routed through CraftBook already, this makes this hack feasible.
      */
-    private static BlockVector fakeDataPos;
-    
-    /**
-     * Used to fake the data value at a point. See fakedataPos.
-     */
-    private static int fakeDataVal;
+    private static Map<Integer, FakeData> fakeData = new HashMap<Integer, FakeData>();
     
     /**
      * CraftBook version, fetched from the .jar's manifest. Used to print the
@@ -140,7 +137,9 @@ public class CraftBook extends Plugin {
         registerHook(vehicle, "VEHICLE_COLLISION", PluginListener.Priority.MEDIUM);
         listener.registerDelegate(vehicle);
         
-        TickPatch.addTask(TickPatch.wrapRunnable(this, delay));
+        //for(int i = 0; i < delays.length; i++)
+        	//TickPatch.addTask(TickPatch.wrapRunnable(this, delays[i], i), i);
+        TickPatch.addTask(TickPatch.wrapRunnable(this, delays[0], 0), 0);
         
         pathToState.mkdirs();
         stateManager.load(pathToState);
@@ -240,77 +239,157 @@ public class CraftBook extends Plugin {
         return version;
     }
     
-    public TickDelayer getDelay() {
-        return delay;
+    public TickDelayer getDelay(int worldIndex) {
+    	if(worldIndex < 0 || worldIndex >= delays.length)
+    		return null;
+    	
+    	//[TODO]: change if ever needed multi-world delay lists
+    	worldIndex = 0;
+    	
+        return delays[worldIndex];
     }
     
     public StateManager getStateManager() {
         return stateManager;
     }
 
-    protected static int getBlockID(int x, int y, int z) {
-        return etc.getServer().getBlockIdAt(x, y, z);
+    protected static int getBlockID(int worldType, int x, int y, int z) {
+        return getBlockID(getWorld(worldType), x, y, z);
     }
 
-    protected static int getBlockID(Vector pt) {
-        return etc.getServer().getBlockIdAt(pt.getBlockX(),
-                pt.getBlockY(), pt.getBlockZ());
-    }
-
-    protected static int getBlockData(int x, int y, int z) {
-        if (fakeDataPos != null
-                && fakeDataPos.toBlockVector().equals(new BlockVector(x, y, z))) {
-            return fakeDataVal;
-        }
-        return etc.getServer().getBlockData(x, y, z);
-    }
-
-    protected static int getBlockData(Vector pt) {
-        if (fakeDataPos != null
-                && fakeDataPos.equals(pt.toBlockVector())) {
-            return fakeDataVal;
-        }
-        return etc.getServer().getBlockData(pt.getBlockX(),
-                pt.getBlockY(), pt.getBlockZ());
-    }
-
-    protected static boolean setBlockID(int x, int y, int z, int type) {
-        if (y < 127 && BlockType.isBottomDependentBlock(getBlockID(x, y + 1, z))) {
-            etc.getServer().setBlockAt(0, x, y + 1, z);
-        }
-        return etc.getServer().setBlockAt(type, x, y, z);
-    }
-
-    protected static boolean setBlockID(Vector pt, int type) {
-        return setBlockID(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), type);
-    }
-
-    protected static boolean setBlockData(int x, int y, int z, int data) {
-        return etc.getServer().setBlockData(x, y, z, data);
-    }
-
-    protected static boolean setBlockData(Vector pt, int data) {
-        return setBlockData(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), data);
+    protected static int getBlockID(int worldType, Vector pt) {
+        return getBlockID(getWorld(worldType), pt);
     }
     
-    protected static boolean setBlockIdAndData(int x, int y, int z, int id, int data)
+    protected static int getBlockID(World world, int x, int y, int z) {
+    	return world.getBlockIdAt(x, y, z);
+    }
+    
+    protected static int getBlockID(World world, Vector pt) {
+        return world.getBlockIdAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
+    }
+
+    protected static int getBlockData(int worldType, int x, int y, int z) {
+    	return getBlockData(getWorld(worldType), worldType, new BlockVector(x, y, z));
+    }
+
+    protected static int getBlockData(int worldType, Vector pt) {
+    	return getBlockData(getWorld(worldType), worldType, pt.toBlockVector());
+    }
+    
+    protected static int getBlockData(World world, int x, int y, int z) {
+    	return getBlockData(world, world.getType().getType(), new BlockVector(x, y, z));
+    }
+
+    protected static int getBlockData(World world, Vector pt) {
+    	return getBlockData(world, world.getType().getType(), pt.toBlockVector());
+    }
+    
+    protected static int getBlockData(World world, int worldType, BlockVector bVec)
+    {
+    	FakeData fdata = fakeData.get(worldType);
+        if (fdata != null && fdata.pos.equals(bVec))
+        {
+            return fdata.val;
+        }
+        return world.getBlockData(bVec.getBlockX(), bVec.getBlockY(), bVec.getBlockZ());
+    }
+
+    protected static boolean setBlockID(int worldType, int x, int y, int z, int type) {
+    	return setBlockID(getWorld(worldType), x, y, z, type);
+    }
+
+    protected static boolean setBlockID(int worldType, Vector pt, int type) {
+        return setBlockID(worldType, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), type);
+    }
+    
+    protected static boolean setBlockID(World world, Vector pt, int type) {
+        return setBlockID(world, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), type);
+    }
+    
+    protected static boolean setBlockID(World world, int x, int y, int z, int type) {
+        if (y < 127 && BlockType.isBottomDependentBlock(getBlockID(world, x, y + 1, z))) {
+            world.setBlockAt(0, x, y + 1, z);
+        }
+        return world.setBlockAt(type, x, y, z);
+    }
+
+    protected static boolean setBlockData(int worldType, int x, int y, int z, int data) {
+        return setBlockData(getWorld(worldType), x, y, z, data);
+    }
+
+    protected static boolean setBlockData(int worldType, Vector pt, int data) {
+        return setBlockData(worldType, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), data);
+    }
+    
+    protected static boolean setBlockData(World world, Vector pt, int data) {
+        return setBlockData(world, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), data);
+    }
+    
+    protected static boolean setBlockData(World world, int x, int y, int z, int data) {
+        return world.setBlockData(x, y, z, data);
+    }
+    
+    protected static boolean setBlockIdAndData(int worldType, int x, int y, int z, int id, int data)
+    {
+    	return setBlockIdAndData(getWorld(worldType), x, y, z, id, data);
+    }
+
+    protected static boolean setBlockIdAndData(int worldType, Vector pt, int id, int data) {
+        return setBlockIdAndData(worldType, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), id, data);
+    }
+    
+    protected static boolean setBlockIdAndData(World world, Vector pt, int id, int data) {
+        return setBlockIdAndData(world, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), id, data);
+    }
+    
+    protected static boolean setBlockIdAndData(World world, int x, int y, int z, int id, int data)
     {
     	if(data == 0)
-    		return setBlockID(x, y, z, id);
+    		return setBlockID(world, x, y, z, id);
     	
-    	boolean result = setBlockID(x, y, z, id);
-    	setBlockData(x, y, z, data);
+    	boolean result = setBlockID(world, x, y, z, id);
+    	setBlockData(world, x, y, z, data);
     	
         return result;
     }
-
-    protected static boolean setBlockIdAndData(Vector pt, int id, int data) {
-        return setBlockIdAndData(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), id, data);
+    
+    protected static OWorld getOWorld(int worldType) {
+        return etc.getMCServer().a(worldType);
     }
     
-    protected static SignText getSignText(Vector pt) {
-        ComplexBlock cblock = etc.getServer().getComplexBlock(pt.getBlockX(),
-                pt.getBlockY(), pt.getBlockZ());
+    protected static OWorldServer getOWorldServer(int worldType) {
+    	OWorld world = getOWorld(worldType);
+    	if(world instanceof OWorldServer)
+    		return (OWorldServer)world;
+    	return null;
+    }
+    
+    /*
+     * @return Returns Minecraft's index for the OWorldServer array.
+     * This is based on the Minecraft method:
+     * MinecraftServer.a(int)
+     * Note: may change with future updates due to obfuscation.
+     */
+    protected static int getWorldIndex(int worldType)
+    {
+    	if(worldType == -1)
+    		return 1;
+    	
+    	return 0;
+    }
+    
+    //[TODO]: change this when canary gets a "getWorld" method
+    protected static World getWorld(int worldType) {
+        return new World(etc.getMCServer().a(worldType));
+    }
+    
+    protected static SignText getSignText(int worldType, Vector pt) {
+        return getSignText(getWorld(worldType), pt);
+    }
+    
+    protected static SignText getSignText(World world, Vector pt) {
+        ComplexBlock cblock = world.getComplexBlock(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
         if (cblock instanceof Sign) {
             return new SignTextImpl((Sign)cblock);
         }
@@ -318,30 +397,50 @@ public class CraftBook extends Plugin {
         return null;
     }
 
-    public static void dropSign(int x, int y, int z) {
-        etc.getServer().setBlockAt(0, x, y, z);
-        etc.getServer().dropItem(x, y, z, 323);
+    public static void dropSign(int worldType, Vector pt) {
+        dropSign(worldType, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
+    }
+    
+    public static void dropSign(int worldType, int x, int y, int z) {
+        dropSign(getWorld(worldType), x, y, z);
+    }
+    
+    public static void dropSign(World world, Vector pt) {
+        dropSign(world, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
+    }
+    
+    public static void dropSign(World world, int x, int y, int z) {
+    	world.setBlockAt(0, x, y, z);
+    	world.dropItem(x, y, z, 323);
     }
 
-    public static void dropSign(Vector pt) {
-        int x = pt.getBlockX();
-        int y = pt.getBlockY();
-        int z = pt.getBlockZ();
-        etc.getServer().setBlockAt(0, x, y, z);
-        etc.getServer().dropItem(x, y, z, 323);
+    protected static void fakeBlockData(int worldType, int x, int y, int z, int data) {
+    	fakeData.put(worldType, new FakeData(new BlockVector(x, y, z), data));
     }
 
-    protected static void fakeBlockData(int x, int y, int z, int data) {
-        fakeDataPos = new BlockVector(x, y, z);
-        fakeDataVal = data;
+    protected static void fakeBlockData(int worldType, Vector pt, int data) {
+    	fakeData.put(worldType, new FakeData(pt.toBlockVector(), data));
     }
 
-    protected static void fakeBlockData(Vector pt, int data) {
-        fakeDataPos = pt.toBlockVector();
-        fakeDataVal = data;
+    protected static void clearFakeBlockData(int worldType) {
+        fakeData.remove(worldType);
     }
-
-    protected static void clearFakeBlockData() {
-        fakeDataPos = null;
+    
+    public static class FakeData
+    {
+    	public BlockVector pos;
+    	
+    	/**
+         * Used to fake the data value at a point. See fakedataPos.
+         */
+    	public int val;
+    	
+    	public FakeData(){}
+    	
+    	public FakeData(BlockVector pos, int val)
+    	{
+    		this.pos = pos;
+    		this.val = val;
+    	}
     }
 }

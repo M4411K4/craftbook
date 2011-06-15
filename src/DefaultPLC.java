@@ -56,9 +56,9 @@ public class DefaultPLC extends PlcBase {
      * @param sign
      * @return
      */
-    protected String validateEnviromentEx(Vector v, SignText t) {
+    protected String validateEnviromentEx(int worldType, Vector v, SignText t) {
         try {
-            return getLanguage().validateEnvironment(v, t, getCode(v));
+            return getLanguage().validateEnvironment(worldType, v, t, getCode(worldType, v));
         } catch (PlcException e) {
             return e.toString();
         }
@@ -69,8 +69,10 @@ public class DefaultPLC extends PlcBase {
      * 
      * @param v
      */
-    protected String getCode(Vector v) throws PlcException {
-        Server s = etc.getServer();
+    protected String getCode(int worldType, Vector v) throws PlcException {
+        //Server s = etc.getServer();
+    	World world = CraftBook.getWorld(worldType);
+    	
         StringBuilder b = new StringBuilder();
         int x = v.getBlockX();
         int z = v.getBlockZ();
@@ -78,13 +80,13 @@ public class DefaultPLC extends PlcBase {
         int y0 = v.getBlockY();
         int z0 = z;
         for (int y = 0; y < 128; y++)
-            if (CraftBook.getBlockID(x, y, z) == BlockType.WALL_SIGN) {
-                if (((Sign) s.getComplexBlock(x, y, z)).getText(1)
+            if (CraftBook.getBlockID(world, x, y, z) == BlockType.WALL_SIGN) {
+                if (((Sign) world.getComplexBlock(x, y, z)).getText(1)
                         .equalsIgnoreCase("[CODE BLOCK]"))
                     for (y--; y >= 0; y--)
                         if (!(x == x0 && y == y0 && z == z0)
-                                && CraftBook.getBlockID(x, y, z) == BlockType.WALL_SIGN) {
-                            Sign n = (Sign) s.getComplexBlock(x, y, z);
+                                && CraftBook.getBlockID(world, x, y, z) == BlockType.WALL_SIGN) {
+                            Sign n = (Sign) world.getComplexBlock(x, y, z);
                             b.append(n.getText(0) + "\n");
                             b.append(n.getText(1) + "\n");
                             b.append(n.getText(2) + "\n");

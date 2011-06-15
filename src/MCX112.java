@@ -52,7 +52,7 @@ public class MCX112 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -79,10 +79,11 @@ public class MCX112 extends BaseIC {
             {
             	dest = new Location(dest.x+0.5, dest.y, dest.z+0.5, dest.rotX, dest.rotY);
             	Vector pos;
+            	World world = CraftBook.getWorld(chip.getWorldType());
             	
             	if(chip.getMode() == 'p' || chip.getMode() == 'P')
             	{
-            		pos = Util.getWallSignBack(chip.getPosition(), -2);
+            		pos = Util.getWallSignBack(world, chip.getPosition(), -2);
             		
             		double newY = pos.getY() + 2;
             		
@@ -97,7 +98,7 @@ public class MCX112 extends BaseIC {
                 int x = pos.getBlockX();
                 int z = pos.getBlockZ();
                 
-                int y = getSafeY(pos);
+                int y = getSafeY(world, pos);
                 
                 for(Player player: etc.getServer().getPlayerList())
                 {
@@ -109,7 +110,7 @@ public class MCX112 extends BaseIC {
                 			(pVec.getBlockZ() == z || pVec.getBlockZ() == z + 1 || pVec.getBlockZ() == z - 1)
                 		)
                 	{
-                        dest.y = getSafeY(new Vector(dest.x, dest.y, dest.z)) + 0.2;
+                        dest.y = getSafeY(world, new Vector(dest.x, dest.y, dest.z)) + 0.2;
                         
                         String msg = chip.getText().getLine4();
                 		if(msg.length() == 0)
@@ -121,19 +122,19 @@ public class MCX112 extends BaseIC {
                 		if(chip.getMode() == 'P')
                 		{
                 			//force plate off
-	                		int bdata = CraftBook.getBlockID(pVec);
+	                		int bdata = CraftBook.getBlockID(world, pVec);
 	                		if(bdata == BlockType.STONE_PRESSURE_PLATE || bdata == BlockType.WOODEN_PRESSURE_PLATE)
 	                		{
-	                			OWorld world = player.getEntity().aH;
+	                			OWorld oworld = player.getEntity().aL;
 	                			
 	                			int bx = pVec.getBlockX();
 	                			int by = pVec.getBlockY();
 	                			int bz = pVec.getBlockZ();
 	                			
-	                			world.c(bx, by, bz, 0);
-	                            world.h(bx, by, bz, bdata);
-	                            world.h(bx, by - 1, bz, bdata);
-	                            world.b(bx, by, bz, bx, by, bz);
+	                			oworld.c(bx, by, bz, 0);
+	                			oworld.h(bx, by, bz, bdata);
+	                			oworld.h(bx, by - 1, bz, bdata);
+	                			oworld.b(bx, by, bz, bx, by, bz);
 	                		}
                 		}
                 		
@@ -149,7 +150,7 @@ public class MCX112 extends BaseIC {
         }
     }
     
-    private int getSafeY(Vector pos)
+    private int getSafeY(World world, Vector pos)
     {
     	int maxY = Math.min(128, pos.getBlockY() + 10);
         int x = pos.getBlockX();
@@ -157,8 +158,8 @@ public class MCX112 extends BaseIC {
     	
     	for (int y = pos.getBlockY() + 1; y <= maxY; y++)
 		{
-            if (BlockType.canPassThrough(CraftBook.getBlockID(x, y, z)) &&
-            	y < 128 && BlockType.canPassThrough(CraftBook.getBlockID(x, y+1, z))	
+            if (BlockType.canPassThrough(CraftBook.getBlockID(world, x, y, z)) &&
+            	y < 128 && BlockType.canPassThrough(CraftBook.getBlockID(world, x, y+1, z))	
             	)
             {
             	return y;

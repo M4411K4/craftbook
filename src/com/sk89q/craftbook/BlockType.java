@@ -58,6 +58,8 @@ public final class BlockType {
     public static final int POWERED_RAIL = 27;
     public static final int DETECTOR_RAIL = 28;
     public static final int WEB = 30;
+    public static final int TALL_GRASS = 31;
+    public static final int DEAD_SHRUBS = 32;
     public static final int CLOTH = 35;
     public static final int YELLOW_FLOWER = 37;
     public static final int RED_FLOWER = 38;
@@ -117,6 +119,7 @@ public final class BlockType {
     public static final int CAKE_BLOCK = 92;
     public static final int REDSTONE_REPEATER_OFF = 93;
     public static final int REDSTONE_REPEATER_ON = 94;
+    public static final int TRAPDOOR = 96;
 
     /**
      * Stores a list of dropped blocks for blocks.
@@ -151,6 +154,8 @@ public final class BlockType {
         blockDrops.put(27, 27);
         blockDrops.put(28, 28);
         blockDrops.put(30, 30);
+        blockDrops.put(31, 31);
+        blockDrops.put(32, 32);
         blockDrops.put(35, 35);
         blockDrops.put(37, 37);
         blockDrops.put(38, 38);
@@ -204,6 +209,7 @@ public final class BlockType {
         blockDrops.put(92, 354);
         blockDrops.put(93, 356);
         blockDrops.put(94, 356);
+        blockDrops.put(96, 96);
     }
 
     /**
@@ -218,6 +224,8 @@ public final class BlockType {
                 || id == RED_FLOWER
                 || id == BROWN_MUSHROOM
                 || id == RED_MUSHROOM
+                || id == TALL_GRASS
+                || id == DEAD_SHRUBS
                 || id == TORCH
                 || id == REDSTONE_WIRE
                 || id == CROPS
@@ -248,12 +256,15 @@ public final class BlockType {
                 || id == RED_FLOWER
                 || id == BROWN_MUSHROOM
                 || id == RED_MUSHROOM
+                || id == TALL_GRASS
+                || id == DEAD_SHRUBS
                 || id == TORCH
                 || id == FIRE
                 || id == REDSTONE_WIRE
                 || id == CROPS
                 || id == SIGN_POST
                 || id == WOODEN_DOOR
+                || id == TRAPDOOR
                 || id == LADDER
                 || id == MINECART_TRACKS
                 || id == POWERED_RAIL
@@ -288,6 +299,8 @@ public final class BlockType {
                 || id == RED_FLOWER
                 || id == BROWN_MUSHROOM
                 || id == RED_MUSHROOM
+                || id == TALL_GRASS
+                || id == DEAD_SHRUBS
                 || id == TORCH
                 || id == FIRE
                 || id == REDSTONE_WIRE
@@ -329,6 +342,7 @@ public final class BlockType {
                 || id == REDSTONE_WIRE
                 || id == CROPS
                 || id == SOIL
+                || id == TALL_GRASS
                 || id == SIGN_POST
                 || id == WOODEN_DOOR
                 || id == LADDER
@@ -340,6 +354,7 @@ public final class BlockType {
                 || id == LEVER
                 || id == STONE_PRESSURE_PLATE
                 || id == IRON_DOOR
+                || id == TRAPDOOR
                 || id == WOODEN_PRESSURE_PLATE
                 || id == REDSTONE_TORCH_OFF
                 || id == REDSTONE_TORCH_ON
@@ -393,7 +408,8 @@ public final class BlockType {
                 || id == STONE_BUTTON
                 || id == REDSTONE_WIRE
                 || id == WOODEN_DOOR
-                || id == IRON_DOOR;
+                || id == IRON_DOOR
+                || id == TRAPDOOR;
     }
     
     /**
@@ -406,7 +422,9 @@ public final class BlockType {
         return id == CLOTH
                 || id == DOUBLE_STEP
                 || id == STEP
-                || id == LOG;
+                || id == LOG
+                || id == SAPLING
+                || id == TALL_GRASS;
     }
 
     /**

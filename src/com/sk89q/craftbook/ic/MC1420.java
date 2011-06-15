@@ -47,7 +47,7 @@ public class MC1420 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         if (sign.getLine3().length() == 0) {
             return "Specify a clock number on the third line.";
         }

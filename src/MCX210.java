@@ -54,9 +54,11 @@ public class MCX210 extends MCX209 {
 			type[2] = 0;
         
         BlockBag bag = (BlockBag) chip.getExtra();
-        bag.addSourcePosition(chip.getPosition());
+        bag.addSourcePosition(chip.getWorldType(), chip.getPosition());
         
-        int data = CraftBook.getBlockData(chip.getPosition());
+        World world = CraftBook.getWorld(chip.getWorldType());
+        
+        int data = CraftBook.getBlockData(world, chip.getPosition());
         
         int wStart = values[0] / 2;
         
@@ -94,6 +96,6 @@ public class MCX210 extends MCX209 {
         	endX = startX + 1;
         }
         
-        setBlocks(startX, endX, startY, endY, startZ, endZ, chip.getIn(1).is(), type, bag);
+        setBlocks(world, startX, endX, startY, endY, startZ, endZ, chip.getIn(1).is(), type, bag);
     }
 }

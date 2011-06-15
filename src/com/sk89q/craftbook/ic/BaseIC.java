@@ -51,7 +51,7 @@ public abstract class BaseIC implements IC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         return null;
     }
     
@@ -69,7 +69,7 @@ public abstract class BaseIC implements IC {
      * @param sign
      * @return
      */
-    public String clear(Vector pos, SignText sign)
+    public String clear(int worldType, Vector pos, SignText sign)
     {
     	return null;
     }

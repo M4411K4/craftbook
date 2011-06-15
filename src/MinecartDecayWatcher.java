@@ -78,10 +78,12 @@ public class MinecartDecayWatcher {
     private void performCheck() {
         long now = System.currentTimeMillis();
         
-        for (BaseEntity ent : etc.getServer().getEntityList()) {
-            if (ent instanceof Minecart) {
-                Minecart minecart = (Minecart)ent;
-                
+        //[TODO]: change this when canary gets a "getWorldList()" method.
+        for(OWorldServer oworld : etc.getMCServer().e)
+        {
+        	World world = new World(oworld);
+        	
+	        for (Minecart minecart : world.getMinecartList()) {
                 if (minecart.getPassenger() != null) {
                     // We don't need to update the hash map because a player
                     // existing the minecart will update the hash map,
@@ -97,7 +99,7 @@ public class MinecartDecayWatcher {
                         forgetMinecart(minecart);
                     }
                 }
-            }
+	        }
         }
     }
     

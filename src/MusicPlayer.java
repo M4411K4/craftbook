@@ -28,6 +28,7 @@ public class MusicPlayer implements IMusicPlayer
 	private final int x;
 	private final int y;
 	private final int z;
+	private final int worldType;
 	
 	private int currentTick = 0;
 	private int skipProtection = 0;
@@ -39,18 +40,19 @@ public class MusicPlayer implements IMusicPlayer
 	
 	private Map<String,RadioObject> radios;
 	
-	public MusicPlayer(String data, int x, int y, int z, PropertiesFile properties, byte type, boolean loop)
+	public MusicPlayer(String data, int worldType, int x, int y, int z, PropertiesFile properties, byte type, boolean loop)
 	{
-		this(data, x, y, z, properties, type, loop, false);
+		this(data, worldType, x, y, z, properties, type, loop, false);
 	}
 	
-	public MusicPlayer(String data, int x, int y, int z, PropertiesFile properties, byte type, boolean loop, boolean isStation)
+	public MusicPlayer(String data, int worldType, int x, int y, int z, PropertiesFile properties, byte type, boolean loop, boolean isStation)
 	{
 		this.LOOP = loop;
 		
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		this.worldType = worldType;
 		
 		if(isStation)
 			radios = new HistoryHashMap<String,RadioObject>(100);
@@ -206,13 +208,13 @@ public class MusicPlayer implements IMusicPlayer
 	{
 		for(MusicNote note : notes)
 		{
-			etc.getMCServer().f.a(x, y, z, 64.0D, new OPacket54PlayNoteBlock(x, y, z, note.type, note.pitch));
+			etc.getMCServer().f.a(x, y, z, 64.0D, worldType, new OPacket54PlayNoteBlock(x, y, z, note.type, note.pitch));
 			
 			if(radios != null)
 			{
 				for(RadioObject radio : radios.values())
 				{
-					etc.getMCServer().f.a(radio.X, radio.Y, radio.Z, 64.0D,
+					etc.getMCServer().f.a(radio.X, radio.Y, radio.Z, 64.0D, worldType,
 							new OPacket54PlayNoteBlock(radio.X, radio.Y, radio.Z, note.type, note.pitch));
 				}
 			}
@@ -226,8 +228,13 @@ public class MusicPlayer implements IMusicPlayer
 	
 	private void sendMessageTo(String message, int x, int y, int z)
 	{
+		World world = CraftBook.getWorld(worldType);
+		World.Type type = world.getType();
 		for(Player player: etc.getServer().getPlayerList())
 		{
+			if(player.getWorld().getType() != type)
+				continue;
+			
 			Location pLoc = player.getLocation();
 			double diffX = x - pLoc.x;
 			double diffY = y - pLoc.y;
@@ -351,9 +358,10 @@ public class MusicPlayer implements IMusicPlayer
 		
 		if(radios != null)
 		{
+			World world = CraftBook.getWorld(worldType);
 			for(RadioObject radio : radios.values())
 			{
-				ComplexBlock block = etc.getServer().getComplexBlock(radio.SIGN_X, radio.SIGN_Y, radio.SIGN_Z);
+				ComplexBlock block = world.getComplexBlock(radio.SIGN_X, radio.SIGN_Y, radio.SIGN_Z);
 		    	if(!(block instanceof Sign))
 		    		return;
 		    	

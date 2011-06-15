@@ -62,8 +62,8 @@ public class MCX202 extends MCX201 {
             return;
         }
         
-        NearbyChestBlockBag source = new NearbyChestBlockBag(chip.getPosition());
-        source.addSourcePosition(chip.getPosition());
+        NearbyChestBlockBag source = new NearbyChestBlockBag(chip.getWorldType(), chip.getPosition());
+        source.addSourcePosition(chip.getWorldType(), chip.getPosition());
         
         String id = chip.getText().getLine3();
         
@@ -77,6 +77,7 @@ public class MCX202 extends MCX201 {
 
         int item = getItem(id);
 
+        World world = CraftBook.getWorld(chip.getWorldType());
         if (item > 0 && !(item >= 21 && item <= 34) && item != 36) {
             Vector pos = chip.getBlockPosition();
             int maxY = Math.min(128, pos.getBlockY() + 10);
@@ -84,7 +85,7 @@ public class MCX202 extends MCX201 {
             int z = pos.getBlockZ();
 
             for (int y = pos.getBlockY() + 1; y <= maxY; y++) {
-                if (BlockType.canPassThrough(CraftBook.getBlockID(x, y, z))) {
+                if (BlockType.canPassThrough(CraftBook.getBlockID(world, x, y, z))) {
                     int n = 0;
                     for(n=0;n<quantity;n++)
                         try {
@@ -95,9 +96,9 @@ public class MCX202 extends MCX201 {
                     if(n!=0)
                     {
                     	if(color >= 0)
-                    		dropColorItem(x, y, z, item, n, color);
+                    		dropColorItem(CraftBook.getOWorld(chip.getWorldType()), x, y, z, item, n, color);
                     	else
-                    		etc.getServer().dropItem(x, y, z, item, n);
+                    		world.dropItem(x, y, z, item, n);
                     }
                     return;
                 }

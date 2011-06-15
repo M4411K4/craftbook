@@ -52,7 +52,7 @@ public class MCX255 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         if (sign.getLine3().length() != 0) {
             try
             {
@@ -100,7 +100,7 @@ public class MCX255 extends BaseIC {
         	y++;
         }
         
-        OWorld world = etc.getMCServer().e;
+        OWorld world = CraftBook.getOWorld(chip.getWorldType());
         world.a(new OEntityLightningBolt(world, pos.getX(), y, pos.getZ()));
 
         chip.getOut(1).set(true);

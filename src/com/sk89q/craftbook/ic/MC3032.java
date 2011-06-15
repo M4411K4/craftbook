@@ -34,7 +34,7 @@ public class MC3032 extends BaseIC {
      * @return
      */
     public String getTitle() {
-        return "JK EDGE FLIP FLOP";
+        return "JKEDGE FLIPFLOP";
     }
 
     /**

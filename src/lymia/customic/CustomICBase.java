@@ -37,10 +37,10 @@ class CustomICBase extends PlcBase {
         return name;
     }
     
-    protected String getCode(Vector v) throws PlcException {
+    protected String getCode(int worldType, Vector v) throws PlcException {
         return code;
     }
-    protected String validateEnviromentEx(Vector v, SignText t) {
+    protected String validateEnviromentEx(int worldType, Vector v, SignText t) {
         return null;
     }
 }

@@ -55,7 +55,7 @@ public class MCX440 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         if (sign.getLine3().length() == 0)
         {
             return "Specify counter configuration on line 3.";
@@ -251,7 +251,7 @@ public class MCX440 extends BaseIC {
     		
     		chip.getOut(1).set(chip.getMode() == '+');
     		
-    		listener.onSignAdded(chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    		listener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     	}
     }
 }

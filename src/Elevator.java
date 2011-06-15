@@ -31,24 +31,26 @@ public class Elevator {
      * @param pt
      * @param up
      */
-    public static boolean hasLinkedLift(Vector pt, boolean up) {
+    public static boolean hasLinkedLift(int worldType, Vector pt, boolean up) {
         int x = pt.getBlockX();
         int y = pt.getBlockY();
         int z = pt.getBlockZ();
 
+        World world = CraftBook.getWorld(worldType);
+        
         if (up) {
             // Need to traverse up to find the next sign to teleport to
             for (int y1 = y + 1; y1 <= 127; y1++) {
-                if (CraftBook.getBlockID(x, y1, z) == BlockType.WALL_SIGN
-                        && getSign(new Vector(x, y1, z), up) != null) {
+                if (CraftBook.getBlockID(world, x, y1, z) == BlockType.WALL_SIGN
+                        && getSign(world, new Vector(x, y1, z), up) != null) {
                     return true;
                 }
             }
         } else {
             // Need to traverse downwards to find a sign below
             for (int y1 = y - 1; y1 >= 1; y1--) {
-                if (CraftBook.getBlockID(x, y1, z) == BlockType.WALL_SIGN
-                        && getSign(new Vector(x, y1, z), up) != null) {
+                if (CraftBook.getBlockID(world, x, y1, z) == BlockType.WALL_SIGN
+                        && getSign(world, new Vector(x, y1, z), up) != null) {
                     return true;
                 }
             }
@@ -68,11 +70,13 @@ public class Elevator {
         int x = pt.getBlockX();
         int y = pt.getBlockY();
         int z = pt.getBlockZ();
+        
+        World world = player.getWorld();
 
         if (up) {
             // Need to traverse up to find the next sign to teleport to
             for (int y1 = y + 1; y1 <= 127; y1++) {
-                if (CraftBook.getBlockID(x, y1, z) == BlockType.WALL_SIGN
+                if (CraftBook.getBlockID(world, x, y1, z) == BlockType.WALL_SIGN
                         && checkLift(player, new Vector(x, y1, z), up)) {
                     return;
                 }
@@ -80,7 +84,7 @@ public class Elevator {
         } else {
             // Need to traverse downwards to find a sign below
             for (int y1 = y - 1; y1 >= 1; y1--) {
-                if (CraftBook.getBlockID(x, y1, z) == BlockType.WALL_SIGN
+                if (CraftBook.getBlockID(world, x, y1, z) == BlockType.WALL_SIGN
                         && checkLift(player, new Vector(x, y1, z), up)) {
                     return;
                 }
@@ -96,12 +100,12 @@ public class Elevator {
      * @param up
      * @return
      */
-    private static Sign getSign(Vector pt, boolean up) {
+    private static Sign getSign(World world, Vector pt, boolean up) {
         int x = pt.getBlockX();
         int y1 = pt.getBlockY();
         int z = pt.getBlockZ();
 
-        ComplexBlock cBlock = etc.getServer().getComplexBlock(x, y1, z);
+        ComplexBlock cBlock = world.getComplexBlock(x, y1, z);
 
         // This should not happen, but we need to check regardless
         if (!(cBlock instanceof Sign)) {
@@ -133,7 +137,9 @@ public class Elevator {
         int y1 = pt.getBlockY();
         //int z = pt.getBlockZ();
 
-        Sign sign = getSign(pt, up);
+        World world = player.getWorld();
+        
+        Sign sign = getSign(world, pt, up);
 
         // Found our stop?
         if (sign != null) {
@@ -148,12 +154,12 @@ public class Elevator {
             int foundFree = 0;
             boolean foundGround = false;
             
-            int startingY = BlockType.canPassThrough(CraftBook.getBlockID(plyX, y1 + 1, plyZ))
+            int startingY = BlockType.canPassThrough(CraftBook.getBlockID(world, plyX, y1 + 1, plyZ))
                 ? y1 + 1 : y1;
 
             // Step downwards until we find a spot to stand
             for (y2 = startingY; y2 >= y1 - 5; y2--) {
-                int id = CraftBook.getBlockID(plyX, y2, plyZ);
+                int id = CraftBook.getBlockID(world, plyX, y2, plyZ);
 
                 // We have to find a block that the player won't fall through
                 if (!BlockType.canPassThrough(id)) {

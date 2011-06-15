@@ -48,10 +48,11 @@ public class MCX243 extends MC1241 {
             Vector backDir = chip.getBlockPosition().subtract(
                     chip.getPosition());
             Vector firePos = chip.getBlockPosition().add(backDir);
-            OEntitySnowball arrow = new OEntitySnowball(etc.getMCServer().e);
+            OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
+            OEntitySnowball arrow = new OEntitySnowball(oworld);
             arrow.c(firePos.getBlockX() + 0.5, firePos.getBlockY() + 0.5,
                     firePos.getBlockZ() + 0.5, 0, 0);
-            etc.getMCServer().e.b(arrow);
+            oworld.b(arrow);
             arrow.a(backDir.getBlockX(), vertVel, backDir.getBlockZ(),
                     speed, spread);
         }

@@ -54,7 +54,7 @@ public class MCX233 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() > 0)
@@ -85,8 +85,8 @@ public class MCX233 extends BaseIC {
      */
     public void think(ChipState chip) {
     	
+    	World world = CraftBook.getWorld(chip.getWorldType());
     	int duration;
-    	OWorldInfo worldInfo = etc.getMCServer().e.q();
     	
     	if(chip.getIn(1).is())
     	{
@@ -103,14 +103,14 @@ public class MCX233 extends BaseIC {
     		etc.getMCServer().f.a(new OPacket70Bed(2));
     	}
     	
-    	worldInfo.c(duration);
-    	worldInfo.b(chip.getIn(1).is());
+    	world.setRainTime(duration);
+    	world.setRaining(chip.getIn(1).is());
     	
     	if(chip.getMode() != 't')
     		duration = 0;
     	
-    	worldInfo.b(duration);
-		worldInfo.a(chip.getIn(1).is() && chip.getMode() == 't');
+    	world.setThunderTime(duration);
+    	world.setThundering(chip.getIn(1).is() && chip.getMode() == 't');
         
         chip.getOut(1).set(chip.getIn(1).is());
     }

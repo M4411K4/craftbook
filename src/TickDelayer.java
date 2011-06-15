@@ -49,12 +49,13 @@ public class TickDelayer implements Runnable {
      * Run thread.
      */
     public void run() {
-        long currentTick = etc.getServer().getTime();
+        //long currentTick = etc.getServer().getTime();
         
         ArrayList<Action> actionQueue = new ArrayList<Action>();
         
         for (Iterator<Action> it = delayedActions.iterator(); it.hasNext(); ) {
             Action action = it.next();
+            long currentTick = action.getWorld().getTime();
             if (action.getRunAt() <= currentTick) {
                 it.remove();
                 actionQueue.add(action);
@@ -80,6 +81,7 @@ public class TickDelayer implements Runnable {
          * Stores the point associated with this delayed action.
          */
         private BlockVector pt;
+        private World world;
         /**
          * Tick to perform the action at.
          */
@@ -91,15 +93,25 @@ public class TickDelayer implements Runnable {
          * @param pt
          * @param tickDelay
          */
-        public Action(BlockVector pt, long tickDelay) {
+        public Action(World world, BlockVector pt, long tickDelay) {
             this.pt = pt;
-            runAt = etc.getServer().getTime() + tickDelay;
+            this.world = world;
+            runAt = world.getTime() + tickDelay;
         }
         
         /**
          * Run the action.
          */
         public abstract void run();
+        
+        /**
+         * Get the world.
+         * 
+         * @return
+         */
+        public World getWorld() {
+            return world;
+        }
         
         /**
          * Get the tick to run at.

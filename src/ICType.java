@@ -34,107 +34,110 @@ public enum ICType {
      * Zero input, single output
      */
     ZISO("ZISO", true) {
-        void think(Vector pt, SignText signText, Sign sign, IC zisoIC, Object extra) {
+        void think(int worldType, Vector pt, SignText signText, Sign sign, IC zisoIC, Object extra) {
         	
-        	basicThink(pt, null, signText, sign, zisoIC, null, ' ', new int[]{0, 1, 2}, new int[]{0, 1, 2}, 0, 1, extra);
+        	basicThink(worldType, pt, null, signText, sign, zisoIC, null, ' ', new int[]{0, 1, 2}, new int[]{0, 1, 2}, 0, 1, extra);
         }
     },
     /**
      * Single input, single output
      */
     SISO("SISO") {
-        void think(Vector pt, Vector changedRedstoneInput, SignText signText,
+        void think(int worldType, Vector pt, Vector changedRedstoneInput, SignText signText,
                 Sign sign, IC sisoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
         	
-        	basicThink(pt, changedRedstoneInput, signText, sign, sisoIC, r, mode, orderIn, orderOut, 1, 1, extra);
+        	basicThink(worldType, pt, changedRedstoneInput, signText, sign, sisoIC, r, mode, orderIn, orderOut, 1, 1, extra);
         }
     },
     /**
      * Single input, triple output
      */
     SI3O("SI3O") {
-        void think(Vector pt, Vector changedRedstoneInput, SignText signText,
+        void think(int worldType, Vector pt, Vector changedRedstoneInput, SignText signText,
                 Sign sign, IC si3oIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
             
-        	basicThink(pt, changedRedstoneInput, signText, sign, si3oIC, r, mode, orderIn, orderOut, 1, 3, extra);
+        	basicThink(worldType, pt, changedRedstoneInput, signText, sign, si3oIC, r, mode, orderIn, orderOut, 1, 3, extra);
         }
     },
     /**
      * Triple input, single output
      */
     _3ISO("3ISO") {
-        void think(Vector pt, Vector changedRedstoneInput, SignText signText,
+        void think(int worldType, Vector pt, Vector changedRedstoneInput, SignText signText,
                 Sign sign, IC _3isoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
             
-        	basicThink(pt, changedRedstoneInput, signText, sign, _3isoIC, r, mode, orderIn, orderOut, 3, 1, extra);
+        	basicThink(worldType, pt, changedRedstoneInput, signText, sign, _3isoIC, r, mode, orderIn, orderOut, 3, 1, extra);
         }
     },
     /**
      * Triple input, triple output
      */
     _3I3O("3I3O") {
-        void think(Vector pt, Vector changedRedstoneInput, SignText signText,
+        void think(int worldType, Vector pt, Vector changedRedstoneInput, SignText signText,
                 Sign sign, IC _3i3oIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
             
-        	basicThink(pt, changedRedstoneInput, signText, sign, _3i3oIC, r, mode, orderIn, orderOut, 3, 3, extra);
+        	basicThink(worldType, pt, changedRedstoneInput, signText, sign, _3i3oIC, r, mode, orderIn, orderOut, 3, 3, extra);
         }
     },
     /**
      * Variable input, variable output
      */
     VIVO("VIVO") {
-        void think(Vector pt, Vector changedRedstoneInput, SignText signText,
+        void think(int worldType, Vector pt, Vector changedRedstoneInput, SignText signText,
                 Sign sign, IC vivoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
-            Vector backVec = Util.getWallSignBack(pt, 1);
+        	
+        	World world = CraftBook.getWorld(worldType);
+        	
+            Vector backVec = Util.getWallSignBack(world, pt, 1);
             Vector backShift = backVec.subtract(pt);
 
-            Vector out0 = Util.getWallSignBack(pt, 2);
-            Vector out1 = Util.getWallSignSide(pt, 1).add(backShift);
-            Vector out2 = Util.getWallSignSide(pt, -1).add(backShift);
+            Vector out0 = Util.getWallSignBack(world, pt, 2);
+            Vector out1 = Util.getWallSignSide(world, pt, 1).add(backShift);
+            Vector out2 = Util.getWallSignSide(world, pt, -1).add(backShift);
 
-            Vector in0 = Util.getWallSignBack(pt, -1);
-            Vector in1 = Util.getWallSignSide(pt, 1);
-            Vector in2 = Util.getWallSignSide(pt, -1);
-
-            boolean hasOut1 = CraftBook.getBlockID(out1) == BlockType.LEVER;
-            boolean hasOut2 = CraftBook.getBlockID(out2) == BlockType.LEVER;
+            Vector in0 = Util.getWallSignBack(world, pt, -1);
+            Vector in1 = Util.getWallSignSide(world, pt, 1);
+            Vector in2 = Util.getWallSignSide(world, pt, -1);
+            
+            boolean hasOut1 = CraftBook.getBlockID(world, out1) == BlockType.LEVER;
+            boolean hasOut2 = CraftBook.getBlockID(world, out2) == BlockType.LEVER;
 
             Signal[] in = new Signal[3];
             Signal[] out = new Signal[3];
 
-            out[0] = new Signal(Redstone.getOutput(out0));
-            in[0] = new Signal(Redstone.isHighBinary(in0, true),
+            out[0] = new Signal(Redstone.getOutput(worldType, out0));
+            in[0] = new Signal(Redstone.isHighBinary(worldType, in0, true),
                     changedRedstoneInput.equals(in0));
 
             if (hasOut1) {
-                out[1] = new Signal(Redstone.getOutput(out1));
+                out[1] = new Signal(Redstone.getOutput(worldType, out1));
                 in[1] = new Signal(false);
             } else {
                 out[1] = new Signal(false);
-                in[1] = new Signal(Redstone.isHighBinary(in1, true),
+                in[1] = new Signal(Redstone.isHighBinary(worldType, in1, true),
                         changedRedstoneInput.equals(in1));
             }
 
             if (hasOut2) {
-                out[2] = new Signal(Redstone.getOutput(out2));
+                out[2] = new Signal(Redstone.getOutput(worldType, out2));
                 in[2] = new Signal(false);
             } else {
                 out[2] = new Signal(false);
-                in[2] = new Signal(Redstone.isHighBinary(in2, true),
+                in[2] = new Signal(Redstone.isHighBinary(worldType, in2, true),
                         changedRedstoneInput.equals(in2));
             }
 
-            ChipState chip = new ChipState(pt, backVec.toBlockVector(), in, out, signText, etc.getServer().getTime());
+            ChipState chip = new ChipState(worldType, pt, backVec.toBlockVector(), in, out, signText, world.getTime());
 
             // The most important part...
             vivoIC.think(chip);
 
             if (chip.isModified()) {
-                Redstone.setOutput(out0, chip.getOut(1).is());
+                Redstone.setOutput(worldType, out0, chip.getOut(1).is());
                 if (hasOut1)
-                    Redstone.setOutput(out1, chip.getOut(2).is());
+                    Redstone.setOutput(worldType, out1, chip.getOut(2).is());
                 if (hasOut2)
-                    Redstone.setOutput(out2, chip.getOut(3).is());
+                    Redstone.setOutput(worldType, out2, chip.getOut(3).is());
             }
 
             if (chip.hasErrored()) {
@@ -145,26 +148,26 @@ public enum ICType {
     },
     
     UISO("UISO", false, true) {
-    	void think(Vector pt, SignText signText, Sign sign, IC zisoIC, Object extra) {
+    	void think(int worldType, Vector pt, SignText signText, Sign sign, IC zisoIC, Object extra) {
         	
-        	basicThink(pt, null, signText, sign, zisoIC, null, ' ', new int[]{0, 1, 2}, new int[]{0, 1, 2}, 0, 1, extra);
+        	basicThink(worldType, pt, null, signText, sign, zisoIC, null, ' ', new int[]{0, 1, 2}, new int[]{0, 1, 2}, 0, 1, extra);
         }
-        void think(Vector pt, Vector changedRedstoneInput, SignText signText,
+        void think(int worldType, Vector pt, Vector changedRedstoneInput, SignText signText,
                 Sign sign, IC sisoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
         	
-        	basicThink(pt, changedRedstoneInput, signText, sign, sisoIC, r, mode, orderIn, orderOut, 1, 1, extra);
+        	basicThink(worldType, pt, changedRedstoneInput, signText, sign, sisoIC, r, mode, orderIn, orderOut, 1, 1, extra);
         }
     },
     
     MISO("MISO", false, true) {
-    	void think(Vector pt, SignText signText, Sign sign, IC zisoIC, Object extra) {
+    	void think(int worldType, Vector pt, SignText signText, Sign sign, IC zisoIC, Object extra) {
         	
-        	basicThink(pt, null, signText, sign, zisoIC, null, ' ', new int[]{0, 1, 2}, new int[]{0, 1, 2}, 0, 1, extra);
+        	basicThink(worldType, pt, null, signText, sign, zisoIC, null, ' ', new int[]{0, 1, 2}, new int[]{0, 1, 2}, 0, 1, extra);
         }
-        void think(Vector pt, Vector changedRedstoneInput, SignText signText,
+        void think(int worldType, Vector pt, Vector changedRedstoneInput, SignText signText,
                 Sign sign, IC sisoIC, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
         	
-        	basicThink(pt, changedRedstoneInput, signText, sign, sisoIC, r, mode, orderIn, orderOut, 3, 1, extra);
+        	basicThink(worldType, pt, changedRedstoneInput, signText, sign, sisoIC, r, mode, orderIn, orderOut, 3, 1, extra);
         }
     };
 
@@ -190,10 +193,10 @@ public enum ICType {
         this.updateOnce = updateOnce;
     }
 
-    void think(Vector v, Vector c, SignText t, Sign s, IC i, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
+    void think(int worldType, Vector v, Vector c, SignText t, Sign s, IC i, TickDelayer r, char mode, int[] orderIn, int[] orderOut, Object extra) {
     }
 
-    void think(Vector v, SignText t, Sign s, IC i, Object extra) {
+    void think(int worldType, Vector v, SignText t, Sign s, IC i, Object extra) {
     }
 
     public static ICType forName(String name) {
@@ -217,11 +220,13 @@ public enum ICType {
             return null;
     }
     
-    private static void basicThink(Vector pt, Vector changedRedstoneInput, SignText signText,
+    private static void basicThink(int worldType, Vector pt, Vector changedRedstoneInput, SignText signText,
             Sign sign, IC ic, TickDelayer r, char mode, int[] orderIn, int[] orderOut, int inputs, int outputs, Object extra)
     {
     	
-    	Vector backVec = Util.getWallSignBack(pt, 1);
+    	World world = CraftBook.getWorld(worldType);
+    	
+    	Vector backVec = Util.getWallSignBack(world, pt, 1);
     	
     	Vector[] inVec = null;
     	Vector[] outVec = new Vector[outputs];
@@ -229,9 +234,9 @@ public enum ICType {
     	if(inputs > 0)
     	{
     		inVec = new Vector[3];
-    		inVec[orderIn[0]] = Util.getWallSignBack(pt, -1);
-    		inVec[orderIn[1]] = Util.getWallSignSide(pt, 1);
-    		inVec[orderIn[2]] = Util.getWallSignSide(pt, -1);
+    		inVec[orderIn[0]] = Util.getWallSignBack(world, pt, -1);
+    		inVec[orderIn[1]] = Util.getWallSignSide(world, pt, 1);
+    		inVec[orderIn[2]] = Util.getWallSignSide(world, pt, -1);
     	}
     	
     	if(outputs == 3)
@@ -239,29 +244,29 @@ public enum ICType {
     		Vector backShift;
     		if(inputs == 3)
     		{
-    			backShift = Util.getWallSignBack(pt, 2).subtract(pt);
-    			outVec[orderOut[0]] = Util.getWallSignBack(pt, 3);
+    			backShift = Util.getWallSignBack(world, pt, 2).subtract(pt);
+    			outVec[orderOut[0]] = Util.getWallSignBack(world, pt, 3);
     		}
     		else
     		{
     			backShift = backVec.subtract(pt);
-        		outVec[orderOut[0]] = Util.getWallSignBack(pt, 2);
+        		outVec[orderOut[0]] = Util.getWallSignBack(world, pt, 2);
     		}
-    		outVec[orderOut[1]] = Util.getWallSignSide(pt, 1).add(backShift);
-    		outVec[orderOut[2]] = Util.getWallSignSide(pt, -1).add(backShift);
+    		outVec[orderOut[1]] = Util.getWallSignSide(world, pt, 1).add(backShift);
+    		outVec[orderOut[2]] = Util.getWallSignSide(world, pt, -1).add(backShift);
     	}
     	else
     	{
-    		outVec[0] = Util.getWallSignBack(pt, 2);
+    		outVec[0] = Util.getWallSignBack(world, pt, 2);
     	}
 
     	Signal[] in = new Signal[inputs];
     	
     	if(inputs == 1)
     	{
-    		in[0] = new Signal(Redstone.isHighBinary(inVec[0], true) ||
-					Redstone.isHighBinary(inVec[1], true) ||
-					Redstone.isHighBinary(inVec[2], true),
+    		in[0] = new Signal(Redstone.isHighBinary(worldType, inVec[0], true) ||
+					Redstone.isHighBinary(worldType, inVec[1], true) ||
+					Redstone.isHighBinary(worldType, inVec[2], true),
 					changedRedstoneInput.equals(inVec[0]) ||
 					changedRedstoneInput.equals(inVec[1]) ||
 					changedRedstoneInput.equals(inVec[2])
@@ -272,7 +277,7 @@ public enum ICType {
     	{
     		for(int i = 0; i < inputs; i++)
     		{
-    			in[i] = new Signal(Redstone.isHighBinary(inVec[i], true),
+    			in[i] = new Signal(Redstone.isHighBinary(worldType, inVec[i], true),
     			    	changedRedstoneInput.equals(inVec[i]));
     		}
     	}
@@ -280,11 +285,11 @@ public enum ICType {
     	Signal[] out = new Signal[outputs];
     	for(int i = 0; i < outputs; i++)
 		{
-    		out[i] = new Signal(Redstone.getOutput(outVec[i]));
+    		out[i] = new Signal(Redstone.getOutput(world, outVec[i]));
 		}
     	
     	
-    	ChipState chip = new ChipState(pt, backVec.toBlockVector(), in, out, signText, mode, etc.getServer().getTime(), extra);
+    	ChipState chip = new ChipState(worldType, pt, backVec.toBlockVector(), in, out, signText, mode, world.getTime(), extra);
 
     	// The most important part...
     	ic.think(chip);
@@ -293,7 +298,7 @@ public enum ICType {
     	{
     		for(int i = 0; i < outputs; i++)
     		{
-        		Redstone.setOutput(outVec[i], chip.getOut(i+1).is());
+        		Redstone.setOutput(worldType, outVec[i], chip.getOut(i+1).is());
     		}
     	}
     	

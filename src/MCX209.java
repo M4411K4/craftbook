@@ -52,7 +52,7 @@ public class MCX209 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign)
+    public String validateEnvironment(int worldType, Vector pos, SignText sign)
     {
     	int[] type = getType(sign.getLine3());
         
@@ -212,9 +212,11 @@ public class MCX209 extends BaseIC {
 			type[2] = 0;
         
         BlockBag bag = (BlockBag) chip.getExtra();
-        bag.addSourcePosition(chip.getPosition());
+        bag.addSourcePosition(chip.getWorldType(), chip.getPosition());
         
-        int data = CraftBook.getBlockData(chip.getPosition());
+        World world = CraftBook.getWorld(chip.getWorldType());
+        
+        int data = CraftBook.getBlockData(world, chip.getPosition());
         
         int wStart = values[0] / 2;
         
@@ -258,11 +260,11 @@ public class MCX209 extends BaseIC {
         
         int y = (int)chip.getPosition().getY() + values[2];
         
-        setBlocks(startX, endX, y, y+1, startZ, endZ, chip.getIn(1).is(), type, bag);
+        setBlocks(world, startX, endX, y, y+1, startZ, endZ, chip.getIn(1).is(), type, bag);
     }
     
     
-    protected void setBlocks(int startX, int endX, int startY, int endY, int startZ, int endZ,
+    protected void setBlocks(World world, int startX, int endX, int startY, int endY, int startZ, int endZ,
     		boolean set, int[] type, BlockBag bag)
     {
     	for(int x = startX; x < endX; x++)
@@ -271,7 +273,7 @@ public class MCX209 extends BaseIC {
     		{
 	        	for(int z = startZ; z < endZ; z++)
 	        	{
-	        		int bType = CraftBook.getBlockID(x, y, z);
+	        		int bType = CraftBook.getBlockID(world, x, y, z);
 	        		
 	        		
 	    			try
@@ -290,12 +292,12 @@ public class MCX209 extends BaseIC {
 	    				}
 	    				else
 	    				{
-	    					int bData = CraftBook.getBlockData(x, y , z);
+	    					int bData = CraftBook.getBlockData(world, x, y , z);
 	    					
 	    					//clear
 	    					if(bType == type[1] && (!BlockType.isColorTypeBlock(bType) || bData == type[2]))
 	    					{
-	    						bag.setBlockID(x, y, z, 0);
+	    						bag.setBlockID(world, x, y, z, 0);
 	    					}
 	    					else if(type[0] == 0 && bType != 0)
 	    					{

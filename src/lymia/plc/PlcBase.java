@@ -36,7 +36,7 @@ public abstract class PlcBase extends BaseIC {
         
         String code;
         try {
-            code = getCode(chip.getPosition());
+            code = getCode(chip.getWorldType(), chip.getPosition());
         } catch (PlcException e) {
             t.setLine2("§c"+t.getLine2());
             t.setLine3("!ERROR!");
@@ -82,22 +82,22 @@ public abstract class PlcBase extends BaseIC {
         t.supressUpdate();
     }
     
-    public String validateEnvironment(Vector v, SignText t) {
+    public String validateEnvironment(int worldType, Vector v, SignText t) {
         if(!t.getLine3().isEmpty()) return "line 3 is not empty";
         
         String code;
         try {
-            code = getCode(v);
+            code = getCode(worldType, v);
         } catch (PlcException e) {
             return "Code block not found.";
         }
         
         t.setLine3("HASH:"+Integer.toHexString(code.hashCode()));
         
-        return validateEnviromentEx(v,t);
+        return validateEnviromentEx(worldType, v,t);
     }
     
-    protected abstract String validateEnviromentEx(Vector v, SignText t);
-    protected abstract String getCode(Vector v) throws PlcException;
+    protected abstract String validateEnviromentEx(int worldType, Vector v, SignText t);
+    protected abstract String getCode(int worldType, Vector v) throws PlcException;
     protected PlcLang getLanguage() {return language;}
 }

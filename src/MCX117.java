@@ -51,7 +51,8 @@ public class MCX117 extends MCX116 {
     	
     	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
     	{
-    		Player player = playerAbove(chip.getBlockPosition(), chip.getText().getLine3());
+    		World world = CraftBook.getWorld(chip.getWorldType());
+    		Player player = playerAbove(world, chip.getBlockPosition(), chip.getText().getLine3());
     		
     		if(player == null)
     		{
@@ -59,7 +60,7 @@ public class MCX117 extends MCX116 {
     		}
     		else
     		{
-    			explodeTNT(player.getX(), player.getY(), player.getZ());
+    			explodeTNT(player.getEntity().aL, player.getX(), player.getY(), player.getZ());
     			
     			chip.getOut(1).set(true);
     		}
@@ -73,10 +74,10 @@ public class MCX117 extends MCX116 {
      * @param y
      * @param z
      */
-    protected void explodeTNT(double x, double y, double z) {
+    protected void explodeTNT(OWorld oworld, double x, double y, double z) {
         // Make TNT explode
-    	OEntityTNTPrimed tnt = new OEntityTNTPrimed(etc.getMCServer().e);
+    	OEntityTNTPrimed tnt = new OEntityTNTPrimed(oworld);
         tnt.a(x, y, z);
-        tnt.p_();
+        tnt.o_();
     }
 }

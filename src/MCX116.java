@@ -52,7 +52,7 @@ public class MCX116 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3().toLowerCase();
 
         if (id.length() != 0)
@@ -79,18 +79,19 @@ public class MCX116 extends BaseIC {
     	
     	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
     	{
-    		chip.getOut(1).set(playerAbove(chip.getBlockPosition(), chip.getText().getLine3()) != null);
+    		World world = CraftBook.getWorld(chip.getWorldType());
+    		chip.getOut(1).set(playerAbove(world, chip.getBlockPosition(), chip.getText().getLine3()) != null);
     	}
     }
     
-    protected Player playerAbove(Vector pos, String id)
+    protected Player playerAbove(World world, Vector pos, String id)
     {
     	id = id.toLowerCase();
     	
     	int x = pos.getBlockX();
         int z = pos.getBlockZ();
         
-        int y = getSafeY(pos);
+        int y = getSafeY(world, pos);
     	
     	for(Player player: etc.getServer().getPlayerList())
         {
@@ -125,7 +126,7 @@ public class MCX116 extends BaseIC {
     	return null;
     }
     
-    private int getSafeY(Vector pos)
+    private int getSafeY(World world, Vector pos)
     {
     	int maxY = Math.min(128, pos.getBlockY() + 10);
         int x = pos.getBlockX();
@@ -133,8 +134,8 @@ public class MCX116 extends BaseIC {
     	
     	for (int y = pos.getBlockY() + 1; y <= maxY; y++)
 		{
-            if (BlockType.canPassThrough(CraftBook.getBlockID(x, y, z)) &&
-            	y < 128 && BlockType.canPassThrough(CraftBook.getBlockID(x, y+1, z))	
+            if (BlockType.canPassThrough(CraftBook.getBlockID(world, x, y, z)) &&
+            	y < 128 && BlockType.canPassThrough(CraftBook.getBlockID(world, x, y+1, z))	
             	)
             {
             	return y;

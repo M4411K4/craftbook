@@ -52,7 +52,7 @@ public class MC1201 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -113,9 +113,10 @@ public class MC1201 extends BaseIC {
             int x = pos.getBlockX();
             int z = pos.getBlockZ();
 
+            World world = CraftBook.getWorld(chip.getWorldType());
             for (int y = pos.getBlockY() + 1; y <= maxY; y++) {
-                if (BlockType.canPassThrough(CraftBook.getBlockID(x, y, z))) {
-                    etc.getServer().dropItem(x, y, z, item, quantity);
+                if (BlockType.canPassThrough(CraftBook.getBlockID(world, x, y, z))) {
+                    world.dropItem(x, y, z, item, quantity);
                     return;
                 }
             }

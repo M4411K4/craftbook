@@ -52,7 +52,7 @@ public class MCX200 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
         String rider = sign.getLine4();
 
@@ -75,9 +75,9 @@ public class MCX200 extends BaseIC {
         else if(colorRider == -2)
         	return "Not a valid color value: " + args2[1] + ".";
         
-        if (!isValidMob(id)) {
+        if (!Mob.isValid(id)) {
             return "Not a valid mob type: " + id + ".";
-        } else if (rider.length() != 0 && !isValidMob(rider)) {
+        } else if (rider.length() != 0 && !Mob.isValid(rider)) {
             return "Not a valid rider type: " + rider + ".";
         }
 
@@ -105,7 +105,7 @@ public class MCX200 extends BaseIC {
             if(colorRider >= 0)
             	rider = args2[0];
             
-            if (isValidMob(id)) {
+            if (Mob.isValid(id)) {
                 Vector pos = chip.getBlockPosition();
                 int maxY = Math.min(128, pos.getBlockY() + 10);
                 int x = pos.getBlockX();
@@ -113,12 +113,12 @@ public class MCX200 extends BaseIC {
 
                 for (int y = pos.getBlockY() + 1; y <= maxY; y++)
                 {
-                	int blockId = CraftBook.getBlockID(x, y, z);
+                	int blockId = CraftBook.getBlockID(chip.getWorldType(), x, y, z);
                     if (BlockType.canPassThrough(blockId) || BlockType.isWater(blockId))
                     {
                         Location loc = new Location(x, y, z);
                         Mob mob = new Mob(id, loc);
-                        if (rider.length() != 0 && isValidMob(rider)) {
+                        if (rider.length() != 0 && Mob.isValid(rider)) {
                         	Mob mobRider = new Mob(rider);
                             mob.spawn(mobRider);
                             
@@ -177,24 +177,26 @@ public class MCX200 extends BaseIC {
     			return;
     		
     		OEntityCreeper creeper = (OEntityCreeper)entity;
-    		creeper.W().b(17, (byte)1);
+    		creeper.Z().b(17, (byte)1);
+    	}
+    	else if(entity instanceof OEntityWolf)
+    	{
+    		//since a tamed wolf requires a player, I'm just allowing
+    		//the option to create angry wolves and sitting wolves.
+    		//neutral wolves have no color value (or are technically 0)
+    		if(color != 2 && color != 1)
+    			return;
+    		
+    		OEntityWolf wolf = (OEntityWolf)entity;
+    		wolf.Z().b(16, (byte)color);
     	}
 	}
-    
-    private boolean isValidMob(String mob)
-    {
-    	if (mob == null)
-    		return false;
-    	
-    	OEntity entity = OEntityList.a(mob, etc.getMCServer().e);
-    	
-    	return (entity instanceof OEntityCreature) || (entity instanceof OIMob);
-    }
     
     private boolean isValidColorMob(String mob)
     {
     	if( mob.equals("Sheep")
     		|| mob.equals("Creeper")
+    		|| mob.equals("Wolf")
     		)
     	{
     		return true;

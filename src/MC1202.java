@@ -52,7 +52,7 @@ public class MC1202 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -96,8 +96,8 @@ public class MC1202 extends BaseIC {
             return;
         }
         
-        NearbyChestBlockBag source = new NearbyChestBlockBag(chip.getPosition());
-        source.addSourcePosition(chip.getPosition());
+        NearbyChestBlockBag source = new NearbyChestBlockBag(chip.getWorldType(), chip.getPosition());
+        source.addSourcePosition(chip.getWorldType(), chip.getPosition());
         
         String id = chip.getText().getLine3();
         int quantity = 1;
@@ -116,8 +116,9 @@ public class MC1202 extends BaseIC {
             int x = pos.getBlockX();
             int z = pos.getBlockZ();
 
+            World world = CraftBook.getWorld(chip.getWorldType());
             for (int y = pos.getBlockY() + 1; y <= maxY; y++) {
-                if (BlockType.canPassThrough(CraftBook.getBlockID(x, y, z))) {
+                if (BlockType.canPassThrough(CraftBook.getBlockID(world, x, y, z))) {
                     int n = 0;
                     for(n=0;n<quantity;n++)
                         try {
@@ -125,7 +126,7 @@ public class MC1202 extends BaseIC {
                         } catch (BlockSourceException e) {
                             break;
                         }
-                    if(n!=0) etc.getServer().dropItem(x, y, z, item, n);
+                    if(n!=0) world.dropItem(x, y, z, item, n);
                     return;
                 }
             }

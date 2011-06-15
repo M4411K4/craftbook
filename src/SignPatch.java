@@ -68,8 +68,11 @@ public class SignPatch extends OBlockSign {
      */
     @Deprecated
     public void b(OWorld world, int x, int y, int z) {
+    	if(!(world instanceof OWorldServer))
+    		return;
+    	
         ExtensionListener[] tasks = LISTENERS.toArray(new ExtensionListener[0]);
-        for(int i=0;i<tasks.length;i++) tasks[i].onSignAdded(x,y,z);
+        for(int i=0;i<tasks.length;i++) tasks[i].onSignAdded(new World((OWorldServer)world), x,y,z);
         super.b(world,x,y,z);
     }
     
@@ -101,21 +104,21 @@ public class SignPatch extends OBlockSign {
         return new ExtensionListener() {
             private PluginLoader l = etc.getLoader();
             private long lastCheck = 0;
-            public void onSignAdded(int x, int y, int z) {
-                if(etc.getServer().getTime()!=lastCheck) {
+            public void onSignAdded(World world, int x, int y, int z) {
+                if(world.getTime()!=lastCheck) {
                     if(l.getPlugin(p.getName())!=p) {
                         CopyOnWriteArrayList<ExtensionListener> taskList = LISTENERS;
                         while(taskList.contains(this)) taskList.remove(this);
                         return;
                     }
-                    lastCheck = etc.getServer().getTime();
+                    lastCheck = world.getTime();
                 }
-                if(p.isEnabled()) r.onSignAdded(x,y,z);
+                if(p.isEnabled()) r.onSignAdded(world, x,y,z);
             }
         };
     }
     
     public static interface ExtensionListener {
-        public void onSignAdded(int x, int y, int z);
+        public void onSignAdded(World world, int x, int y, int z);
     }
 }

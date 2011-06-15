@@ -173,7 +173,7 @@ public class CraftBookListener extends PluginListener {
                 // Add a default block bag
                 this.blockBags.clear();
                 this.blockBags.add(new BlockBagFactory() {
-                    public BlockBag createBlockSource(Vector v) {
+                    public BlockBag createBlockSource(int worldType, Vector v) {
                         return new DummyBlockSource();
                     }
                 });
@@ -199,7 +199,7 @@ public class CraftBookListener extends PluginListener {
         }
         if(listener instanceof TickExtensionListener) {
             TickPatch.addTask(TickPatch.wrapRunnable(craftBook, 
-                              (TickExtensionListener)listener));
+                              (TickExtensionListener)listener, 0), 0);
         }
         listener.loadConfiguration();
     }
@@ -229,6 +229,8 @@ public class CraftBookListener extends PluginListener {
      * @param newLevel
      * @return
      */
+    public int redstoneWorld = 0;
+    
     public int onRedstoneChange(BlockVector v, int oldLevel, int newLevel) {
         boolean wasOn = oldLevel >= 1;
         boolean isOn = newLevel >= 1;
@@ -243,8 +245,12 @@ public class CraftBookListener extends PluginListener {
         int x = v.getBlockX();
         int y = v.getBlockY();
         int z = v.getBlockZ();
+        
+        //[TODO]: wait for canary world support!
+        World world = CraftBook.getWorld(redstoneWorld);
+        int worldType = world.getType().getType();
 
-        int type = CraftBook.getBlockID(x, y, z);
+        int type = CraftBook.getBlockID(world, x, y, z);
 
         // When this hook has been called, the level in the world has not
         // yet been updated, so we're going to do this very ugly thing of
@@ -253,45 +259,45 @@ public class CraftBookListener extends PluginListener {
         try {
             if (type == BlockType.LEVER) {
                 // Fake data
-                CraftBook.fakeBlockData(x, y, z,
+                CraftBook.fakeBlockData(worldType, x, y, z,
                         newLevel > 0
-                            ? CraftBook.getBlockData(x, y, z) | 0x8
-                            : CraftBook.getBlockData(x, y, z) & 0x7);
+                            ? CraftBook.getBlockData(world, x, y, z) | 0x8
+                            : CraftBook.getBlockData(world, x, y, z) & 0x7);
             } else if (type == BlockType.STONE_PRESSURE_PLATE) {
                 // Fake data
-                CraftBook.fakeBlockData(x, y, z,
+                CraftBook.fakeBlockData(worldType, x, y, z,
                         newLevel > 0
-                            ? CraftBook.getBlockData(x, y, z) | 0x1
-                            : CraftBook.getBlockData(x, y, z) & 0x14);
+                            ? CraftBook.getBlockData(world, x, y, z) | 0x1
+                            : CraftBook.getBlockData(world, x, y, z) & 0x14);
             } else if (type == BlockType.WOODEN_PRESSURE_PLATE) {
                 // Fake data
-                CraftBook.fakeBlockData(x, y, z,
+                CraftBook.fakeBlockData(worldType, x, y, z,
                         newLevel > 0
-                            ? CraftBook.getBlockData(x, y, z) | 0x1
-                            : CraftBook.getBlockData(x, y, z) & 0x14);
+                            ? CraftBook.getBlockData(world, x, y, z) | 0x1
+                            : CraftBook.getBlockData(world, x, y, z) & 0x14);
             } else if (type == BlockType.STONE_BUTTON) {
                 // Fake data
-                CraftBook.fakeBlockData(x, y, z,
+                CraftBook.fakeBlockData(worldType, x, y, z,
                         newLevel > 0
-                            ? CraftBook.getBlockData(x, y, z) | 0x8
-                            : CraftBook.getBlockData(x, y, z) & 0x7);
+                            ? CraftBook.getBlockData(world, x, y, z) | 0x8
+                            : CraftBook.getBlockData(world, x, y, z) & 0x7);
             } else if (type == BlockType.REDSTONE_WIRE) {
                 // Fake data
-                CraftBook.fakeBlockData(x, y, z, newLevel);
+                CraftBook.fakeBlockData(worldType, x, y, z, newLevel);
 
-                int westSide = CraftBook.getBlockID(x, y, z + 1);
-                int westSideAbove = CraftBook.getBlockID(x, y + 1, z + 1);
-                int westSideBelow = CraftBook.getBlockID(x, y - 1, z + 1);
-                int eastSide = CraftBook.getBlockID(x, y, z - 1);
-                int eastSideAbove = CraftBook.getBlockID(x, y + 1, z - 1);
-                int eastSideBelow = CraftBook.getBlockID(x, y - 1, z - 1);
+                int westSide = CraftBook.getBlockID(world, x, y, z + 1);
+                int westSideAbove = CraftBook.getBlockID(world, x, y + 1, z + 1);
+                int westSideBelow = CraftBook.getBlockID(world, x, y - 1, z + 1);
+                int eastSide = CraftBook.getBlockID(world, x, y, z - 1);
+                int eastSideAbove = CraftBook.getBlockID(world, x, y + 1, z - 1);
+                int eastSideBelow = CraftBook.getBlockID(world, x, y - 1, z - 1);
 
-                int northSide = CraftBook.getBlockID(x - 1, y, z);
-                int northSideAbove = CraftBook.getBlockID(x - 1, y + 1, z);
-                int northSideBelow = CraftBook.getBlockID(x - 1, y - 1, z);
-                int southSide = CraftBook.getBlockID(x + 1, y, z);
-                int southSideAbove = CraftBook.getBlockID(x + 1, y + 1, z);
-                int southSideBelow = CraftBook.getBlockID(x + 1, y - 1, z);
+                int northSide = CraftBook.getBlockID(world, x - 1, y, z);
+                int northSideAbove = CraftBook.getBlockID(world, x - 1, y + 1, z);
+                int northSideBelow = CraftBook.getBlockID(world, x - 1, y - 1, z);
+                int southSide = CraftBook.getBlockID(world, x + 1, y, z);
+                int southSideAbove = CraftBook.getBlockID(world, x + 1, y + 1, z);
+                int southSideBelow = CraftBook.getBlockID(world, x + 1, y - 1, z);
 
                 // Make sure that the wire points to only this block
                 if (!BlockType.isRedstoneBlock(westSide)
@@ -301,10 +307,10 @@ public class CraftBookListener extends PluginListener {
                         && (!BlockType.isRedstoneBlock(westSideBelow) || westSide != 0)
                         && (!BlockType.isRedstoneBlock(eastSideBelow) || eastSide != 0)) {
                     // Possible blocks north / south
-                    handleDirectWireInput(new Vector(x - 1, y, z), isOn, v);
-                    handleDirectWireInput(new Vector(x + 1, y, z), isOn, v);
-                    handleDirectWireInput(new Vector(x - 1, y - 1, z), isOn, v);
-                    handleDirectWireInput(new Vector(x + 1, y - 1, z), isOn, v);
+                    handleDirectWireInput(world, new Vector(x - 1, y, z), isOn, v);
+                    handleDirectWireInput(world, new Vector(x + 1, y, z), isOn, v);
+                    handleDirectWireInput(world, new Vector(x - 1, y - 1, z), isOn, v);
+                    handleDirectWireInput(world, new Vector(x + 1, y - 1, z), isOn, v);
                 }
 
                 if (!BlockType.isRedstoneBlock(northSide)
@@ -314,14 +320,14 @@ public class CraftBookListener extends PluginListener {
                         && (!BlockType.isRedstoneBlock(northSideBelow) || northSide != 0)
                         && (!BlockType.isRedstoneBlock(southSideBelow) || southSide != 0)) {
                     // Possible blocks west / east
-                    handleDirectWireInput(new Vector(x, y, z - 1), isOn, v);
-                    handleDirectWireInput(new Vector(x, y, z + 1), isOn, v);
-                    handleDirectWireInput(new Vector(x, y - 1, z - 1), isOn, v);
-                    handleDirectWireInput(new Vector(x, y - 1, z + 1), isOn, v);
+                    handleDirectWireInput(world, new Vector(x, y, z - 1), isOn, v);
+                    handleDirectWireInput(world, new Vector(x, y, z + 1), isOn, v);
+                    handleDirectWireInput(world, new Vector(x, y - 1, z - 1), isOn, v);
+                    handleDirectWireInput(world, new Vector(x, y - 1, z + 1), isOn, v);
                 }
 
                 // Can be triggered from below
-                handleDirectWireInput(new Vector(x, y + 1, z), isOn, v);
+                handleDirectWireInput(world, new Vector(x, y + 1, z), isOn, v);
 
                 return newLevel;
             }
@@ -329,21 +335,21 @@ public class CraftBookListener extends PluginListener {
             // For redstone wires, the code already exited this method
             // Non-wire blocks proceed
 
-            handleDirectWireInput(new Vector(x - 1, y, z), isOn, v);
-            handleDirectWireInput(new Vector(x + 1, y, z), isOn, v);
-            handleDirectWireInput(new Vector(x - 1, y - 1, z), isOn, v);
-            handleDirectWireInput(new Vector(x + 1, y - 1, z), isOn, v);
-            handleDirectWireInput(new Vector(x, y, z - 1), isOn, v);
-            handleDirectWireInput(new Vector(x, y, z + 1), isOn, v);
-            handleDirectWireInput(new Vector(x, y - 1, z - 1), isOn, v);
-            handleDirectWireInput(new Vector(x, y - 1, z + 1), isOn, v);
+            handleDirectWireInput(world, new Vector(x - 1, y, z), isOn, v);
+            handleDirectWireInput(world, new Vector(x + 1, y, z), isOn, v);
+            handleDirectWireInput(world, new Vector(x - 1, y - 1, z), isOn, v);
+            handleDirectWireInput(world, new Vector(x + 1, y - 1, z), isOn, v);
+            handleDirectWireInput(world, new Vector(x, y, z - 1), isOn, v);
+            handleDirectWireInput(world, new Vector(x, y, z + 1), isOn, v);
+            handleDirectWireInput(world, new Vector(x, y - 1, z - 1), isOn, v);
+            handleDirectWireInput(world, new Vector(x, y - 1, z + 1), isOn, v);
 
             // Can be triggered from below
-            handleDirectWireInput(new Vector(x, y + 1, z), isOn, v);
+            handleDirectWireInput(world, new Vector(x, y + 1, z), isOn, v);
 
             return newLevel;
         } finally {
-            CraftBook.clearFakeBlockData();
+            CraftBook.clearFakeBlockData(worldType);
         }
     }
     
@@ -357,10 +363,10 @@ public class CraftBookListener extends PluginListener {
      * @param changed
      * @see CraftBookDelegateListener#onDirectWireInput(Vector, boolean, Vector)
      */
-    public void handleDirectWireInput(Vector pt, boolean isOn, Vector changed) {
+    public void handleDirectWireInput(World world, Vector pt, boolean isOn, Vector changed) {
         // Call the direct wire input hook of delegates
         for (CraftBookDelegateListener listener : delegates) {
-            listener.onDirectWireInput(pt, isOn, changed);
+            listener.onDirectWireInput(world, pt, isOn, changed);
         }
     }
 
@@ -378,7 +384,7 @@ public class CraftBookListener extends PluginListener {
                 && !player.canUseCommand("/makeblackhole")) {
             player.sendMessage(Colors.Rose
                     + "You don't have permission to make black holes.");
-            CraftBook.dropSign(sign.getX(), sign.getY(), sign.getZ());
+            CraftBook.dropSign(player.getWorld(), sign.getX(), sign.getY(), sign.getZ());
             return true;
         }
         
@@ -387,7 +393,7 @@ public class CraftBookListener extends PluginListener {
                 && !player.canUseCommand("/makeblocksource")) {
             player.sendMessage(Colors.Rose
                     + "You don't have permission to make block sources.");
-            CraftBook.dropSign(sign.getX(), sign.getY(), sign.getZ());
+            CraftBook.dropSign(player.getWorld(), sign.getX(), sign.getY(), sign.getZ());
             return true;
         }
         
@@ -513,12 +519,12 @@ public class CraftBookListener extends PluginListener {
      * @param origin
      * @return
      */
-    public BlockBag getBlockBag(Vector origin) {
+    public BlockBag getBlockBag(int worldType, Vector origin) {
         List<BlockBag> bags = new ArrayList<BlockBag>();
         
         for (BlockBagFactory f : blockBags) {
             
-            BlockBag b = f.createBlockSource(origin);
+            BlockBag b = f.createBlockSource(worldType, origin);
             if (b == null) {
                 continue;
             }

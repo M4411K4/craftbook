@@ -78,6 +78,13 @@ public abstract class CraftBookPlayer {
      * @return String
      */
     public abstract String getName();
+    
+    /**
+     * Get the world type the player is in.
+     *
+     * @return int
+     */
+    public abstract int getWorldType();
 
     /**
      * Get the player's view pitch.

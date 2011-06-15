@@ -52,7 +52,7 @@ public class MC1200 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
         String rider = sign.getLine4();
 
@@ -84,7 +84,7 @@ public class MC1200 extends BaseIC {
                 int z = pos.getBlockZ();
 
                 for (int y = pos.getBlockY() + 1; y <= maxY; y++) {
-                    if (BlockType.canPassThrough(CraftBook.getBlockID(x, y, z))) {
+                    if (BlockType.canPassThrough(CraftBook.getBlockID(chip.getWorldType(), x, y, z))) {
                         Location loc = new Location(x, y, z);
                         Mob mob = new Mob(id, loc);
                         if (rider.length() != 0 && Mob.isValid(rider)) {

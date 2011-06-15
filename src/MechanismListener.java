@@ -186,16 +186,16 @@ public class MechanismListener extends CraftBookDelegateListener {
      * @param z
      * @param isOn
      */
-    public void onDirectWireInput(final Vector pt,
+    public void onDirectWireInput(final World world, final Vector pt,
             final boolean isOn, final Vector changed) {
         
-        int type = CraftBook.getBlockID(pt);
+        int type = CraftBook.getBlockID(world, pt);
+        final int worldType = world.getType().getType();
         
         // Sign gates
         if (type == BlockType.WALL_SIGN
                 || type == BlockType.SIGN_POST) {
-            ComplexBlock cblock = etc.getServer().getComplexBlock(
-                    pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
+            ComplexBlock cblock = world.getComplexBlock(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
 
             if (!(cblock instanceof Sign)) {
                 return;
@@ -203,17 +203,18 @@ public class MechanismListener extends CraftBookDelegateListener {
 
             final Sign sign = (Sign)cblock;
             final String line2 = sign.getText(1);
+            final int worldIndex = CraftBook.getWorldIndex(worldType);
 
             // Gate
             if (useGates && redstoneGates
                     && (line2.equalsIgnoreCase("[Gate]")
                     || line2.equalsIgnoreCase("[DGate]"))) {
-                BlockBag bag = getBlockBag(pt);
-                bag.addSourcePosition(pt);
+                BlockBag bag = getBlockBag(worldType, pt);
+                bag.addSourcePosition(worldType, pt);
 
                 // A gate may toggle or not
                 try {
-                    GateSwitch.setGateState(pt, bag, isOn,
+                    GateSwitch.setGateState(worldType, pt, bag, isOn,
                             line2.equalsIgnoreCase("[DGate]"));
                 } catch (BlockSourceException e) {
                 }
@@ -223,14 +224,14 @@ public class MechanismListener extends CraftBookDelegateListener {
                     && redstoneBridges
                     && type == BlockType.SIGN_POST
                     && line2.equalsIgnoreCase("[Bridge]")) {
-                craftBook.getDelay().delayAction(
-                    new TickDelayer.Action(pt.toBlockVector(), 2) {
+                craftBook.getDelay(worldIndex).delayAction(
+                    new TickDelayer.Action(world, pt.toBlockVector(), 2) {
                         @Override
                         public void run() {
-                            BlockBag bag = listener.getBlockBag(pt);
-                            bag.addSourcePosition(pt);
+                            BlockBag bag = listener.getBlockBag(worldType, pt);
+                            bag.addSourcePosition(worldType, pt);
                             
-                            Bridge bridge = new Bridge(pt);
+                            Bridge bridge = new Bridge(worldType, pt);
                             if (isOn) {
                                 bridge.setActive(bag);
                             } else {
@@ -245,14 +246,14 @@ public class MechanismListener extends CraftBookDelegateListener {
                     && type == BlockType.SIGN_POST
                     && (line2.equalsIgnoreCase("[Door Up]")
                         || line2.equalsIgnoreCase("[Door Down]"))) {
-                craftBook.getDelay().delayAction(
-                    new TickDelayer.Action(pt.toBlockVector(), 2) {
+                craftBook.getDelay(worldIndex).delayAction(
+                    new TickDelayer.Action(world, pt.toBlockVector(), 2) {
                         @Override
                         public void run() {
-                            BlockBag bag = getBlockBag(pt);
-                            bag.addSourcePosition(pt);
+                            BlockBag bag = getBlockBag(worldType, pt);
+                            bag.addSourcePosition(worldType, pt);
                             
-                            Door door = new Door(pt);
+                            Door door = new Door(worldType, pt);
                             if (isOn) {
                                 door.setActive(bag);
                             } else {
@@ -265,14 +266,14 @@ public class MechanismListener extends CraftBookDelegateListener {
             } else if (useToggleAreas && redstoneToggleAreas
                     && (line2.equalsIgnoreCase("[Toggle]")
                     || line2.equalsIgnoreCase("[Area]"))) {                
-                craftBook.getDelay().delayAction(
-                    new TickDelayer.Action(pt.toBlockVector(), 2) {
+                craftBook.getDelay(worldIndex).delayAction(
+                    new TickDelayer.Action(world, pt.toBlockVector(), 2) {
                         @Override
                         public void run() {
-                            BlockBag bag = listener.getBlockBag(pt);
-                            bag.addSourcePosition(pt);
+                            BlockBag bag = listener.getBlockBag(worldType, pt);
+                            bag.addSourcePosition(worldType, pt);
 
-                            ToggleArea area = new ToggleArea(pt, listener.getCopyManager());
+                            ToggleArea area = new ToggleArea(worldType, pt, listener.getCopyManager());
                             
                             if (isOn) { 
                                 area.setActive(bag);
@@ -284,30 +285,30 @@ public class MechanismListener extends CraftBookDelegateListener {
             } else if (usePageReader && usePageSwitches
                     && line2.equalsIgnoreCase("[Book][X]")) {
             	
-            	Vector redstonept = Util.getWallSignBack(pt, -1);
+            	Vector redstonept = Util.getWallSignBack(worldType, pt, -1);
             	if(changed.equals(redstonept)
-            		&& CraftBook.getBlockID(redstonept) == BlockType.REDSTONE_WIRE)
+            		&& CraftBook.getBlockID(world, redstonept) == BlockType.REDSTONE_WIRE)
             	{
-            		craftBook.getDelay().delayAction(
-            			new TickDelayer.Action(pt.toBlockVector(), 2) {
+            		craftBook.getDelay(worldIndex).delayAction(
+            			new TickDelayer.Action(world, pt.toBlockVector(), 2) {
             				@Override
             				public void run() {
-            					Vector blockpt = Util.getWallSignBack(pt, 1);
+            					Vector blockpt = Util.getWallSignBack(worldType, pt, 1);
                 	            
         		            	int x = blockpt.getBlockX();
         		                int y = blockpt.getBlockY();
         		                int z = blockpt.getBlockZ();
         		                String hiddenType = "[Book][X]";
         		                
-        		                setHiddenSwitch(hiddenType, isOn, x, y - 1, z);
-        		                setHiddenSwitch(hiddenType, isOn, x, y + 1, z);
-        		                setHiddenSwitch(hiddenType, isOn, x - 1, y, z);
-        		                setHiddenSwitch(hiddenType, isOn, x + 1, y, z);
-        		                setHiddenSwitch(hiddenType, isOn, x, y, z - 1);
-        		                setHiddenSwitch(hiddenType, isOn, x, y, z + 1);
+        		                setHiddenSwitch(hiddenType, isOn, world, x, y - 1, z);
+        		                setHiddenSwitch(hiddenType, isOn, world, x, y + 1, z);
+        		                setHiddenSwitch(hiddenType, isOn, world, x - 1, y, z);
+        		                setHiddenSwitch(hiddenType, isOn, world, x + 1, y, z);
+        		                setHiddenSwitch(hiddenType, isOn, world, x, y, z - 1);
+        		                setHiddenSwitch(hiddenType, isOn, world, x, y, z + 1);
         		                
-        		                etc.getServer().updateBlockPhysics(x, y+1, z, CraftBook.getBlockData(x, y+1, z));
-        		                etc.getServer().updateBlockPhysics(x, y-1, z, CraftBook.getBlockData(x, y-1, z));
+        		                world.updateBlockPhysics(x, y+1, z, CraftBook.getBlockData(world, x, y+1, z));
+        		                world.updateBlockPhysics(x, y-1, z, CraftBook.getBlockData(world, x, y-1, z));
                             }
                         });
             	}
@@ -324,29 +325,34 @@ public class MechanismListener extends CraftBookDelegateListener {
      */
     @Override
     public boolean onBlockDestroy(Player player, Block block) {
+    	
+    	World world = player.getWorld();
+    	
+    	int blockType = TEMPBLOCKCLICKTYPE(world, block); //block.getType();
+    	
         // Random apple drops
-        if (dropAppleChance > 0 && block.getType() == BlockType.LEAVES
+        if (dropAppleChance > 0 && blockType == BlockType.LEAVES
                 && checkPermission(player, "/appledrops")) {
             if (block.getStatus() == 3 || block.getStatus() == 2) {
                 if (Math.random() <= dropAppleChance) {
-                    etc.getServer().dropItem(
+                	world.dropItem(
                             block.getX(), block.getY(), block.getZ(),
                             ItemType.APPLE);
                 }
             }
 
         // Bookshelf drops and Page reset
-        } else if (block.getType() == BlockType.BOOKCASE) {
+        } else if (blockType == BlockType.BOOKCASE) {
         	
             if (dropBookshelves && (block.getStatus() == 3 || block.getStatus() == 2) && checkPermission(player, "/bookshelfdrops")) {
-                    etc.getServer().dropItem(
+            	world.dropItem(
                             block.getX(), block.getY(), block.getZ(),
                             BlockType.BOOKCASE);
             }
             else if(usePageReader && block.getStatus() == 0 && checkPermission(player, "/readpages"))
             {
             	//page reset
-            	Sign sign = Util.getWallSignNextTo(block.getX(), block.getY(), block.getZ());
+            	Sign sign = Util.getWallSignNextTo(world, block.getX(), block.getY(), block.getZ());
             	
             	if(sign != null && (sign.getText(1).equalsIgnoreCase("[Book]") || sign.getText(1).equalsIgnoreCase("[Book][X]")) )
             	{
@@ -368,6 +374,8 @@ public class MechanismListener extends CraftBookDelegateListener {
         CraftBookPlayer ply = new CraftBookPlayerImpl(player);
         SignTextImpl signText = new SignTextImpl(sign);
         Vector pt = new Vector(sign.getX(), sign.getY(), sign.getZ());
+        World world = player.getWorld();
+        int worldType = world.getType().getType();
         
         String line2 = sign.getText(1);
         
@@ -376,7 +384,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             if (checkCreatePermissions && !player.canUseCommand("/makegate")) {
                 player.sendMessage(Colors.Rose
                         + "You don't have permission to make gates.");
-                CraftBook.dropSign(sign.getX(), sign.getY(), sign.getZ());
+                CraftBook.dropSign(world, sign.getX(), sign.getY(), sign.getZ());
                 return true;
             }
             
@@ -397,7 +405,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             if (checkCreatePermissions && !player.canUseCommand("/makelightswitch")) {
                 player.sendMessage(Colors.Rose
                         + "You don't have permission to make light switches.");
-                CraftBook.dropSign(sign.getX(), sign.getY(), sign.getZ());
+                CraftBook.dropSign(world, sign.getX(), sign.getY(), sign.getZ());
                 return true;
             }
             
@@ -419,7 +427,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             if (checkCreatePermissions && !player.canUseCommand("/makeelevator")) {
                 player.sendMessage(Colors.Rose
                         + "You don't have permission to make elevators.");
-                CraftBook.dropSign(sign.getX(), sign.getY(), sign.getZ());
+                CraftBook.dropSign(world, sign.getX(), sign.getY(), sign.getZ());
                 return true;
             }
 
@@ -436,7 +444,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             
             if (useElevators) {
                 if (line2.equalsIgnoreCase("[Lift Up]")) {
-                    if (Elevator.hasLinkedLift(pt, true)) {
+                    if (Elevator.hasLinkedLift(worldType, pt, true)) {
                         player.sendMessage(Colors.Gold
                                 + "Elevator created and linked!");
                     } else {
@@ -444,7 +452,7 @@ public class MechanismListener extends CraftBookDelegateListener {
                                 + "Elevator created but not yet linked to an existing lift sign.");
                     }
                 } else if (line2.equalsIgnoreCase("[Lift Down]")) {
-                    if (Elevator.hasLinkedLift(pt, false)) {
+                    if (Elevator.hasLinkedLift(worldType, pt, false)) {
                         player.sendMessage(Colors.Gold
                                 + "Elevator created and linked!");
                     } else {
@@ -452,8 +460,8 @@ public class MechanismListener extends CraftBookDelegateListener {
                                 + "Elevator created but not yet linked to an existing lift sign.");
                     }
                 } else if (line2.equalsIgnoreCase("[Lift]")) {
-                    if (Elevator.hasLinkedLift(pt, true)
-                            || Elevator.hasLinkedLift(pt, false)) {
+                    if (Elevator.hasLinkedLift(worldType, pt, true)
+                            || Elevator.hasLinkedLift(worldType, pt, false)) {
                         player.sendMessage(Colors.Gold
                                 + "Elevator created and linked!");
                     } else {
@@ -475,7 +483,7 @@ public class MechanismListener extends CraftBookDelegateListener {
                         && ToggleArea.validateEnvironment(ply, pt, signText)) {
                     signText.flushChanges();
                 } else {
-                    CraftBook.dropSign(pt);
+                    CraftBook.dropSign(world, pt);
                 }
             } else {
                 ply.printError("Area toggles are disabled on this server.");
@@ -490,7 +498,7 @@ public class MechanismListener extends CraftBookDelegateListener {
                         && Bridge.validateEnvironment(ply, pt, signText)) {
                     signText.flushChanges();
                 } else {
-                    CraftBook.dropSign(pt);
+                    CraftBook.dropSign(world, pt);
                 }
             } else {
                 player.sendMessage(Colors.Rose + "Bridges are disabled on this server.");
@@ -509,7 +517,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             	}
             	else
             	{
-                    CraftBook.dropSign(pt);
+                    CraftBook.dropSign(world, pt);
             	}
             }
             else
@@ -527,7 +535,7 @@ public class MechanismListener extends CraftBookDelegateListener {
                         && Door.validateEnvironment(ply, pt, signText)) {
                     signText.flushChanges();
                 } else {
-                    CraftBook.dropSign(pt);
+                    CraftBook.dropSign(world, pt);
                 }
             } else {
                 player.sendMessage(Colors.Rose + "Doors are disabled on this server.");
@@ -576,16 +584,26 @@ public class MechanismListener extends CraftBookDelegateListener {
      * @param itemInHand
      * @return
      */
+    private int TEMPBLOCKCLICKTYPE(World world, Block blockClicked)
+    {
+    	return CraftBook.getBlockID(world, blockClicked.getX(), blockClicked.getY(), blockClicked.getZ());
+    }
+    
     private boolean handleBlockUse(Player player, Block blockClicked,
             int itemInHand)
             throws BlockSourceException {
 
+    	World world = player.getWorld();
+    	int worldType = world.getType().getType();
+    	
+    	int blockType = TEMPBLOCKCLICKTYPE(world, blockClicked);//blockClicked.getType();
+    	
         int current = -1;
 
         // Ammeter
         if (enableAmmeter && itemInHand == 263) { // Coal
-            int type = blockClicked.getType();
-            int data = CraftBook.getBlockData(blockClicked.getX(),
+            int type = blockType;
+            int data = CraftBook.getBlockData(world, blockClicked.getX(),
                     blockClicked.getY(), blockClicked.getZ());
             
             if (type == BlockType.LEVER) {
@@ -637,11 +655,11 @@ public class MechanismListener extends CraftBookDelegateListener {
         
         // Page reading
         if(usePageReader
-        		&& blockClicked.getType() == BlockType.BOOKCASE
+        		&& blockType == BlockType.BOOKCASE
         		&& checkPermission(player, "/readpages")
         		)
         {
-        	Sign sign = Util.getWallSignNextTo(blockClicked.getX(), blockClicked.getY(), blockClicked.getZ());
+        	Sign sign = Util.getWallSignNextTo(world, blockClicked.getX(), blockClicked.getY(), blockClicked.getZ());
         	
         	if(sign != null && (sign.getText(1).equalsIgnoreCase("[Book]") || sign.getText(1).equalsIgnoreCase("[Book][X]")) )
         	{
@@ -654,15 +672,15 @@ public class MechanismListener extends CraftBookDelegateListener {
                     int z = blockClicked.getZ();
                     String type = "[Book][X]";
                     
-                    toggleHiddenSwitch(type, x, y - 1, z);
-                    toggleHiddenSwitch(type, x, y + 1, z);
-                    toggleHiddenSwitch(type, x - 1, y, z);
-                    toggleHiddenSwitch(type, x + 1, y, z);
-                    toggleHiddenSwitch(type, x, y, z - 1);
-                    toggleHiddenSwitch(type, x, y, z + 1);
+                    toggleHiddenSwitch(type, world, x, y - 1, z);
+                    toggleHiddenSwitch(type, world, x, y + 1, z);
+                    toggleHiddenSwitch(type, world, x - 1, y, z);
+                    toggleHiddenSwitch(type, world, x + 1, y, z);
+                    toggleHiddenSwitch(type, world, x, y, z - 1);
+                    toggleHiddenSwitch(type, world, x, y, z + 1);
                     
-                    etc.getServer().updateBlockPhysics(x, y+1, z, CraftBook.getBlockData(x, y+1, z));
-	                etc.getServer().updateBlockPhysics(x, y-1, z, CraftBook.getBlockData(x, y-1, z));
+                    world.updateBlockPhysics(x, y+1, z, CraftBook.getBlockData(world, x, y+1, z));
+	                world.updateBlockPhysics(x, y-1, z, CraftBook.getBlockData(world, x, y-1, z));
             	}
             	
             	return true;
@@ -671,16 +689,16 @@ public class MechanismListener extends CraftBookDelegateListener {
 
         // Book reading
         if (useBookshelves
-                && blockClicked.getType() == BlockType.BOOKCASE
+                && blockType == BlockType.BOOKCASE
                 && checkPermission(player, "/readbooks")) {
             BookReader.readBook(player, bookReadLine);
             return true;
 
         // Sign buttons
-        } else if (blockClicked.getType() == BlockType.WALL_SIGN ||
-                blockClicked.getType() == BlockType.SIGN_POST ||
-                CraftBook.getBlockID(plyX, plyY + 1, plyZ) == BlockType.WALL_SIGN ||
-                CraftBook.getBlockID(plyX, plyY, plyZ) == BlockType.WALL_SIGN) {
+        } else if (blockType == BlockType.WALL_SIGN ||
+        		blockType == BlockType.SIGN_POST ||
+                CraftBook.getBlockID(world, plyX, plyY + 1, plyZ) == BlockType.WALL_SIGN ||
+                CraftBook.getBlockID(world, plyX, plyY, plyZ) == BlockType.WALL_SIGN) {
             int x = blockClicked.getX();
             int y = blockClicked.getY();
             int z = blockClicked.getZ();
@@ -689,10 +707,10 @@ public class MechanismListener extends CraftBookDelegateListener {
             // it becomes impossible for the player to select the sign but
             // may try anyway, so we're fudging detection for this case
             Vector pt;
-            if (blockClicked.getType() == BlockType.WALL_SIGN
-                    || blockClicked.getType() == BlockType.SIGN_POST) {
+            if (blockType == BlockType.WALL_SIGN
+                    || blockType == BlockType.SIGN_POST) {
                 pt = new Vector(x, y, z);
-            } else if (CraftBook.getBlockID(plyX, plyY + 1, plyZ) == BlockType.WALL_SIGN) {
+            } else if (CraftBook.getBlockID(world, plyX, plyY + 1, plyZ) == BlockType.WALL_SIGN) {
                 pt = new Vector(plyX, plyY + 1, plyZ);
                 x = plyX;
                 y = plyY + 1;
@@ -704,7 +722,7 @@ public class MechanismListener extends CraftBookDelegateListener {
                 z = plyZ;
             }
 
-            ComplexBlock cBlock = etc.getServer().getComplexBlock(x, y, z);
+            ComplexBlock cBlock = world.getComplexBlock(x, y, z);
 
             if (cBlock instanceof Sign) {
                 Sign sign = (Sign)cBlock;
@@ -715,11 +733,11 @@ public class MechanismListener extends CraftBookDelegateListener {
                         && (line2.equalsIgnoreCase("[Gate]")
                                 || line2.equalsIgnoreCase("[DGate]"))
                         && checkPermission(player, "/gate")) {
-                    BlockBag bag = getBlockBag(pt);
-                    bag.addSourcePosition(pt);
+                    BlockBag bag = getBlockBag(worldType, pt);
+                    bag.addSourcePosition(worldType, pt);
 
                     // A gate may toggle or not
-                    if (GateSwitch.toggleGates(pt, bag,
+                    if (GateSwitch.toggleGates(worldType, pt, bag,
                             line2.equalsIgnoreCase("[DGate]"))) {
                         player.sendMessage(Colors.Gold + "*screeetch* Gate moved!");
                     } else {
@@ -730,10 +748,10 @@ public class MechanismListener extends CraftBookDelegateListener {
                 } else if (useLightSwitches &&
                         (line2.equalsIgnoreCase("[|]") || line2.equalsIgnoreCase("[I]"))
                         && checkPermission(player, "/lightswitch")) {
-                    BlockBag bag = getBlockBag(pt);
-                    bag.addSourcePosition(pt);
+                    BlockBag bag = getBlockBag(worldType, pt);
+                    bag.addSourcePosition(worldType, pt);
                     
-                    return LightSwitch.toggleLights(pt, bag);
+                    return LightSwitch.toggleLights(worldType, pt, bag);
 
                 // Elevator
                 } else if (useElevators
@@ -753,10 +771,10 @@ public class MechanismListener extends CraftBookDelegateListener {
                         || line2.equalsIgnoreCase("[Area]"))
                         && checkPermission(player, "/togglearea")) {
                     
-                    BlockBag bag = getBlockBag(pt);
-                    bag.addSourcePosition(pt);
+                    BlockBag bag = getBlockBag(worldType, pt);
+                    bag.addSourcePosition(worldType, pt);
                     
-                    ToggleArea area = new ToggleArea(pt, listener.getCopyManager());
+                    ToggleArea area = new ToggleArea(worldType, pt, listener.getCopyManager());
                     area.playerToggle(new CraftBookPlayerImpl(player), bag);
 
                     // Tell the player of missing blocks
@@ -773,29 +791,29 @@ public class MechanismListener extends CraftBookDelegateListener {
 
                 // Bridges
                 } else if (useBridges
-                        && blockClicked.getType() == BlockType.SIGN_POST
+                        && blockType == BlockType.SIGN_POST
                         && line2.equalsIgnoreCase("[Bridge]")
                         && checkPermission(player, "/bridge")) {
                     
-                    BlockBag bag = getBlockBag(pt);
-                    bag.addSourcePosition(pt);
+                    BlockBag bag = getBlockBag(worldType, pt);
+                    bag.addSourcePosition(worldType, pt);
                     
-                    Bridge bridge = new Bridge(pt);
+                    Bridge bridge = new Bridge(worldType, pt);
                     bridge.playerToggleBridge(new CraftBookPlayerImpl(player), bag);
                     
                     return true;
 
                 // Doors
                 } else if (useDoors
-                        && blockClicked.getType() == BlockType.SIGN_POST
+                        && blockType == BlockType.SIGN_POST
                         && (line2.equalsIgnoreCase("[Door Up]")
                                 || line2.equalsIgnoreCase("[Door Down]"))
                         && checkPermission(player, "/door")) {
                     
-                    BlockBag bag = getBlockBag(pt);
-                    bag.addSourcePosition(pt);
+                    BlockBag bag = getBlockBag(worldType, pt);
+                    bag.addSourcePosition(worldType, pt);
                     
-                    Door door = new Door(pt);
+                    Door door = new Door(worldType, pt);
                     door.playerToggleDoor(new CraftBookPlayerImpl(player), bag);
                     
                     return true;
@@ -817,21 +835,21 @@ public class MechanismListener extends CraftBookDelegateListener {
         // Hidden switches
         if (useHiddenSwitches
                 && itemInHand <= 0
-                && blockClicked.getType() != BlockType.SIGN_POST
-                && blockClicked.getType() != BlockType.WALL_SIGN
-                && !BlockType.isRedstoneBlock(blockClicked.getType())) {
+                && blockType != BlockType.SIGN_POST
+                && blockType != BlockType.WALL_SIGN
+                && !BlockType.isRedstoneBlock(blockType)) {
             
             int x = blockClicked.getX();
             int y = blockClicked.getY();
             int z = blockClicked.getZ();
             String type = "[X]";
 
-            toggleHiddenSwitch(type, x, y - 1, z);
-            toggleHiddenSwitch(type, x, y + 1, z);
-            toggleHiddenSwitch(type, x - 1, y, z);
-            toggleHiddenSwitch(type, x + 1, y, z);
-            toggleHiddenSwitch(type, x, y, z - 1);
-            toggleHiddenSwitch(type, x, y, z + 1);
+            toggleHiddenSwitch(type, world, x, y - 1, z);
+            toggleHiddenSwitch(type, world, x, y + 1, z);
+            toggleHiddenSwitch(type, world, x - 1, y, z);
+            toggleHiddenSwitch(type, world, x + 1, y, z);
+            toggleHiddenSwitch(type, world, x, y, z - 1);
+            toggleHiddenSwitch(type, world, x, y, z + 1);
             
             return true;
         }
@@ -844,36 +862,36 @@ public class MechanismListener extends CraftBookDelegateListener {
      * 
      * @param pt
      */
-    private void toggleHiddenSwitch(String type, int x, int y, int z) {
-        ComplexBlock cblock = etc.getServer().getComplexBlock(x, y, z);
+    private void toggleHiddenSwitch(String type, World world, int x, int y, int z) {
+        ComplexBlock cblock = world.getComplexBlock(x, y, z);
         
         if (cblock instanceof Sign) {
             Sign sign = (Sign)cblock;
             
             if (sign.getText(1).equalsIgnoreCase(type)) {
-                Redstone.toggleOutput(new Vector(x, y - 1, z));
-                Redstone.toggleOutput(new Vector(x, y + 1, z));
-                Redstone.toggleOutput(new Vector(x - 1, y, z));
-                Redstone.toggleOutput(new Vector(x + 1, y, z));
-                Redstone.toggleOutput(new Vector(x, y, z - 1));
-                Redstone.toggleOutput(new Vector(x, y, z + 1));
+                Redstone.toggleOutput(world, new Vector(x, y - 1, z));
+                Redstone.toggleOutput(world, new Vector(x, y + 1, z));
+                Redstone.toggleOutput(world, new Vector(x - 1, y, z));
+                Redstone.toggleOutput(world, new Vector(x + 1, y, z));
+                Redstone.toggleOutput(world, new Vector(x, y, z - 1));
+                Redstone.toggleOutput(world, new Vector(x, y, z + 1));
             }
         }
     }
     
-    private void setHiddenSwitch(String type, boolean state, int x, int y, int z) {
-        ComplexBlock cblock = etc.getServer().getComplexBlock(x, y, z);
+    private void setHiddenSwitch(String type, boolean state, World world, int x, int y, int z) {
+        ComplexBlock cblock = world.getComplexBlock(x, y, z);
         
         if (cblock instanceof Sign) {
             Sign sign = (Sign)cblock;
             
             if (sign.getText(1).equalsIgnoreCase(type)) {
-                Redstone.setOutput(new Vector(x, y - 1, z), state);
-                Redstone.setOutput(new Vector(x, y + 1, z), state);
-                Redstone.setOutput(new Vector(x - 1, y, z), state);
-                Redstone.setOutput(new Vector(x + 1, y, z), state);
-                Redstone.setOutput(new Vector(x, y, z - 1), state);
-                Redstone.setOutput(new Vector(x, y, z + 1), state);
+                Redstone.setOutput(world, new Vector(x, y - 1, z), state);
+                Redstone.setOutput(world, new Vector(x, y + 1, z), state);
+                Redstone.setOutput(world, new Vector(x - 1, y, z), state);
+                Redstone.setOutput(world, new Vector(x + 1, y, z), state);
+                Redstone.setOutput(world, new Vector(x, y, z - 1), state);
+                Redstone.setOutput(world, new Vector(x, y, z + 1), state);
             }
         }
     }
@@ -976,7 +994,8 @@ public class MechanismListener extends CraftBookDelegateListener {
                 lastCopySave.put(player.getName(), now);
                 
                 // Copy
-                CuboidCopy copy = new CuboidCopy(min, size);
+                int worldType = player.getWorld().getType().getType();
+                CuboidCopy copy = new CuboidCopy(worldType, min, size);
                 copy.copy();
                 
                 logger.info(player.getName() + " saving toggle area with folder '"
@@ -1000,6 +1019,30 @@ public class MechanismListener extends CraftBookDelegateListener {
             }
 
             return true;
+        }
+        else if(split[0].equalsIgnoreCase("/cbic") && player.canUseCommand("/cbic"))
+        {
+        	if(split.length < 2)
+        	{
+        		player.sendMessage(Colors.Gold + "Usage: "+Colors.White+"/cbic"+
+        				Colors.Gold+"[ "+Colors.White+"main"+
+        				Colors.Gold+" or "+Colors.White+"nether"+Colors.Gold+"]");
+        		player.sendMessage(Colors.Gold + "Example: /cbic nether");
+        		return true;
+        	}
+        	
+        	if(split[1].equalsIgnoreCase("main"))
+        	{
+        		this.listener.redstoneWorld = 0;
+        		player.sendMessage(Colors.Gold + "ICs set to main world");
+        	}
+        	else if(split[1].equalsIgnoreCase("nether"))
+        	{
+        		this.listener.redstoneWorld = -1;
+        		player.sendMessage(Colors.Gold + "ICs set to nether");
+        	}
+        	
+        	return true;
         }
         else if(split[0].equalsIgnoreCase("/mcx120") && player.canUseCommand("/mcx120"))
         {

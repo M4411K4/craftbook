@@ -54,8 +54,8 @@ public class Bridge extends SignOrientedMechanism {
      * @param signText
      * @param copyManager
      */
-    public Bridge(Vector pt) {
-        super(pt);
+    public Bridge(int worldType, Vector pt) {
+        super(worldType, pt);
     }
 
     /**
@@ -88,7 +88,7 @@ public class Bridge extends SignOrientedMechanism {
      * @throws InvalidDirection
      */
     private Direction getDirection() throws InvalidDirectionException {
-        int data = CraftBook.getBlockData(pt);
+        int data = CraftBook.getBlockData(worldType, pt);
         
         if (data == 0x0) {
             return Bridge.Direction.EAST;
@@ -190,17 +190,17 @@ public class Bridge extends SignOrientedMechanism {
         }
 
         // Block above the sign
-        int type = CraftBook.getBlockID(pt.add(0, 1, 0));
+        int type = CraftBook.getBlockID(worldType, pt.add(0, 1, 0));
         int data = 0;
         if(BlockType.isColorTypeBlock(type))
-        	data = CraftBook.getBlockData(pt.add(0, 1, 0));
+        	data = CraftBook.getBlockData(worldType, pt.add(0, 1, 0));
 
         // Attempt to detect whether the bridge is above or below the sign,
         // first assuming that the bridge is above
         if (type == 0
                 || !canUseBlock(type)
-                || CraftBook.getBlockID(leftSide) != type
-                || CraftBook.getBlockID(rightSide) != type) {
+                || CraftBook.getBlockID(worldType, leftSide) != type
+                || CraftBook.getBlockID(worldType, rightSide) != type) {
             
             // The bridge is not above, so let's try below
             leftSide = leftSide.add(0, -2, 0);
@@ -208,18 +208,18 @@ public class Bridge extends SignOrientedMechanism {
             centerShift = -1;
 
             // Block below the sign
-            type = CraftBook.getBlockID(pt.add(0, -1, 0));
+            type = CraftBook.getBlockID(worldType, pt.add(0, -1, 0));
             data = 0;
             if(BlockType.isColorTypeBlock(type))
-            	data = CraftBook.getBlockData(pt.add(0, -1, 0));
+            	data = CraftBook.getBlockData(worldType, pt.add(0, -1, 0));
             
             if (!canUseBlock(type)) {
                 throw new UnacceptableTypeException();
             }
 
             // Guess not
-            if (CraftBook.getBlockID(leftSide) != type
-                    || CraftBook.getBlockID(rightSide) != type) {
+            if (CraftBook.getBlockID(worldType, leftSide) != type
+                    || CraftBook.getBlockID(worldType, rightSide) != type) {
                 throw new InvalidConstructionException(
                         "Blocks adjacent to the bridge block must be of the same type.");
             }
@@ -231,10 +231,10 @@ public class Bridge extends SignOrientedMechanism {
         
         // Find the other side
         for (int i = 0; i < maxLength + 2; i++) {
-            int id = CraftBook.getBlockID(cur);
+            int id = CraftBook.getBlockID(worldType, cur);
 
             if (id == BlockType.SIGN_POST) {
-                SignText otherSignText = CraftBook.getSignText(cur);
+                SignText otherSignText = CraftBook.getSignText(worldType, cur);
                 
                 if (otherSignText != null) {
                     String line2 = otherSignText.getLine2();
@@ -260,16 +260,16 @@ public class Bridge extends SignOrientedMechanism {
         Vector shift = change.multiply(dist + 1);
         
         // Check the other side to see if it's built correctly
-        if (CraftBook.getBlockID(pt.add(shift).add(0, centerShift, 0)) != type
-                || CraftBook.getBlockID(leftSide.add(shift)) != type
-                || CraftBook.getBlockID(rightSide.add(shift)) != type) {
+        if (CraftBook.getBlockID(worldType, pt.add(shift).add(0, centerShift, 0)) != type
+                || CraftBook.getBlockID(worldType, leftSide.add(shift)) != type
+                || CraftBook.getBlockID(worldType, rightSide.add(shift)) != type) {
             throw new InvalidConstructionException(
                     "The other side must be made with the same blocks.");
         }
 
         // Figure out whether the bridge needs to be opened or closed
         if (toOpen == null) {
-            int existing = CraftBook.getBlockID(pt.add(change).add(0, centerShift, 0));
+            int existing = CraftBook.getBlockID(worldType, pt.add(change).add(0, centerShift, 0));
             toOpen = !canPassThrough(existing);
         }
 
@@ -297,9 +297,9 @@ public class Bridge extends SignOrientedMechanism {
             throws BlockSourceException {
         for (int i = 1; i <= dist; i++) {
             Vector p = origin.add(change.multiply(i));
-            int t = CraftBook.getBlockID(p);
+            int t = CraftBook.getBlockID(worldType, p);
             if (t == type) {
-                bag.setBlockID(p, 0);
+                bag.setBlockID(worldType, p, 0);
             } else if (t != 0) {
                 break;
             }
@@ -317,9 +317,9 @@ public class Bridge extends SignOrientedMechanism {
             throws BlockSourceException {
         for (int i = 1; i <= dist; i++) {
             Vector p = origin.add(change.multiply(i));
-            int t = CraftBook.getBlockID(p);
+            int t = CraftBook.getBlockID(worldType, p);
             if (canPassThrough(t)) {
-                bag.setBlockID(p, type, data);
+                bag.setBlockID(worldType, p, type, data);
             } else if (t != type) {
                 break;
             }

@@ -73,8 +73,8 @@ public class Door extends SignOrientedMechanism {
      * 
      * @param pt
      */
-    public Door(Vector pt) {
-        super(pt);
+    public Door(int worldType, Vector pt) {
+        super(worldType, pt);
     }
     
     /**
@@ -84,7 +84,7 @@ public class Door extends SignOrientedMechanism {
      * @throws InvalidDirection
      */
     private Direction getDirection() throws InvalidDirectionException {
-        int data = CraftBook.getBlockData(pt);
+        int data = CraftBook.getBlockData(worldType, pt);
 
         if (data == 0x0 || data == 0x8) { // East-west
             return Direction.NORTH_SOUTH;
@@ -179,11 +179,13 @@ public class Door extends SignOrientedMechanism {
             sideDir = new Vector(0, 0, 1);
         }
         
-        int type = CraftBook.getBlockID(pt.add(vertDir));
+        World world = CraftBook.getWorld(worldType);
+        
+        int type = CraftBook.getBlockID(world, pt.add(vertDir));
         int data = 0;
         
         if(BlockType.isColorTypeBlock(type))
-        	data = CraftBook.getBlockData(pt.add(vertDir));
+        	data = CraftBook.getBlockData(world, pt.add(vertDir));
 
         // Check construction
         if (!canUseBlock(type)) {
@@ -191,15 +193,15 @@ public class Door extends SignOrientedMechanism {
         }
         
         // Check sides
-        if (CraftBook.getBlockID(pt.add(vertDir).add(sideDir)) != type
-                || CraftBook.getBlockID(pt.add(vertDir).subtract(sideDir)) != type) {
+        if (CraftBook.getBlockID(world, pt.add(vertDir).add(sideDir)) != type
+                || CraftBook.getBlockID(world, pt.add(vertDir).subtract(sideDir)) != type) {
             throw new InvalidConstructionException(
                     "The blocks for the door to the sides have to be the same.");
         }
         
         // Detect whether the door needs to be opened
         if (toOpen == null) {
-            toOpen = !canPassThrough(CraftBook.getBlockID(pt.add(vertDir.multiply(2))));
+            toOpen = !canPassThrough(CraftBook.getBlockID(world, pt.add(vertDir.multiply(2))));
         }
         
         Vector cur = pt.add(vertDir.multiply(2));
@@ -208,10 +210,10 @@ public class Door extends SignOrientedMechanism {
         
         // Find the other side
         for (int i = 0; i < maxLength + 2; i++) {
-            int id = CraftBook.getBlockID(cur);
+            int id = CraftBook.getBlockID(world, cur);
 
             if (id == BlockType.SIGN_POST) {
-                SignText otherSignText = CraftBook.getSignText(cur);
+                SignText otherSignText = CraftBook.getSignText(world, cur);
                 
                 if (otherSignText != null) {
                     String line2 = otherSignText.getLine2();
@@ -238,21 +240,21 @@ public class Door extends SignOrientedMechanism {
         Vector otherSideBlockPt = pt.add(vertDir.multiply(dist + 2));
 
         // Check the other side to see if it's built correctly
-        if (CraftBook.getBlockID(otherSideBlockPt) != type
-                || CraftBook.getBlockID(otherSideBlockPt.add(sideDir)) != type
-                || CraftBook.getBlockID(otherSideBlockPt.subtract(sideDir)) != type) {
+        if (CraftBook.getBlockID(world, otherSideBlockPt) != type
+                || CraftBook.getBlockID(world, otherSideBlockPt.add(sideDir)) != type
+                || CraftBook.getBlockID(world, otherSideBlockPt.subtract(sideDir)) != type) {
             throw new InvalidConstructionException(
             "The other side must be made with the same blocks.");
         }
 
         if (toOpen) {
-            clearColumn(pt.add(vertDir.multiply(2)), vertDir, type, dist, bag);
-            clearColumn(pt.add(vertDir.multiply(2).add(sideDir)), vertDir, type, dist, bag);
-            clearColumn(pt.add(vertDir.multiply(2).subtract(sideDir)), vertDir, type, dist, bag);
+            clearColumn(worldType, pt.add(vertDir.multiply(2)), vertDir, type, dist, bag);
+            clearColumn(worldType, pt.add(vertDir.multiply(2).add(sideDir)), vertDir, type, dist, bag);
+            clearColumn(worldType, pt.add(vertDir.multiply(2).subtract(sideDir)), vertDir, type, dist, bag);
         } else {
-            setColumn(pt.add(vertDir.multiply(2)), vertDir, type, data, dist, bag);
-            setColumn(pt.add(vertDir.multiply(2).add(sideDir)), vertDir, type, data, dist, bag);
-            setColumn(pt.add(vertDir.multiply(2).subtract(sideDir)), vertDir, type, data, dist, bag);
+            setColumn(worldType, pt.add(vertDir.multiply(2)), vertDir, type, data, dist, bag);
+            setColumn(worldType, pt.add(vertDir.multiply(2).add(sideDir)), vertDir, type, data, dist, bag);
+            setColumn(worldType, pt.add(vertDir.multiply(2).subtract(sideDir)), vertDir, type, data, dist, bag);
         }
 
         bag.flushChanges();
@@ -267,13 +269,13 @@ public class Door extends SignOrientedMechanism {
      * @param change
      * @param dist
      */
-    private static void clearColumn(Vector origin, Vector change, int type, int dist, BlockBag bag)
+    private static void clearColumn(int worldType, Vector origin, Vector change, int type, int dist, BlockBag bag)
             throws BlockSourceException {
         for (int i = 0; i < dist; i++) {
             Vector p = origin.add(change.multiply(i));
-            int t = CraftBook.getBlockID(p);
+            int t = CraftBook.getBlockID(worldType, p);
             if (t == type) {
-                bag.setBlockID(p, 0);
+                bag.setBlockID(worldType, p, 0);
             } else if (t != 0) {
                 break;
             }
@@ -287,13 +289,13 @@ public class Door extends SignOrientedMechanism {
      * @param change
      * @param dist
      */
-    private static void setColumn(Vector origin, Vector change, int type, int data, int dist, BlockBag bag)
+    private static void setColumn(int worldType, Vector origin, Vector change, int type, int data, int dist, BlockBag bag)
             throws BlockSourceException {
         for (int i = 0; i < dist; i++) {
             Vector p = origin.add(change.multiply(i));
-            int t = CraftBook.getBlockID(p);
+            int t = CraftBook.getBlockID(worldType, p);
             if (canPassThrough(t)) {
-                bag.setBlockID(p, type, data);
+                bag.setBlockID(worldType, p, type, data);
             } else if (t != type) {
                 break;
             }

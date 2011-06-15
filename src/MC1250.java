@@ -60,7 +60,7 @@ public class MC1250 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         if (sign.getLine3().length() != 0) {
             return "The third line must be blank.";
         }
@@ -87,7 +87,11 @@ public class MC1250 extends BaseIC {
                 return;
             }
             
-            OEntityArrow arrow = shoot(x + 0.5, y + 1.5, z + 0.5);
+            OWorldServer oworld = CraftBook.getOWorldServer(chip.getWorldType());
+            if(oworld == null)
+            	return;
+            
+            OEntityArrow arrow = shoot(oworld, x + 0.5, y + 1.5, z + 0.5);
 
             Firework instance = new Firework(arrow);
             (new Thread(instance)).start();
@@ -128,18 +132,18 @@ public class MC1250 extends BaseIC {
         public void run() {
             try {
                 while (true) {
-                    final double arrowX = arrow.aL;
-                    final double arrowY = arrow.aM;
-                    final double arrowZ = arrow.aN;
+                    final double arrowX = arrow.aP;
+                    final double arrowY = arrow.aQ;
+                    final double arrowZ = arrow.aR;
                     
                     if (arrowY < lastY) {
                         etc.getServer().addToServerQueue(new Runnable() {
                             public void run() {
-                                etc.getMCServer().e.f(arrow);
+                            	arrow.aL.f(arrow);
                                 
                                 // Make TNT explode
-                                explodeTNT(arrowX, arrowY, arrowZ);
-                                explodeTNT(
+                                explodeTNT(arrow.aL, arrowX, arrowY, arrowZ);
+                                explodeTNT(arrow.aL, 
                                         arrowX + r.nextDouble() * 2 - 1,
                                         arrowY + r.nextDouble() * 1,
                                         arrowZ + r.nextDouble() * 2 - 1);
@@ -170,10 +174,10 @@ public class MC1250 extends BaseIC {
      * @param spread
      * @param vertVel
      */
-    protected OEntityArrow shoot(double x, double y, double z) {
-        OEntityArrow arrow = new OEntityArrow(etc.getMCServer().e);
+    protected OEntityArrow shoot(OWorldServer oworld, double x, double y, double z) {
+        OEntityArrow arrow = new OEntityArrow(oworld);
         arrow.c(x, y, z, 0, 0);
-        etc.getMCServer().e.b(arrow);
+        oworld.b(arrow);
         arrow.a(0, 50, 0, 1.05F, 20);
         return arrow;
     }
@@ -185,10 +189,10 @@ public class MC1250 extends BaseIC {
      * @param y
      * @param z
      */
-    protected void explodeTNT(double x, double y, double z) {
+    protected void explodeTNT(OWorld oworld, double x, double y, double z) {
         // Make TNT explode
-    	OEntityTNTPrimed tnt = new OEntityTNTPrimed(etc.getMCServer().e);
+    	OEntityTNTPrimed tnt = new OEntityTNTPrimed(oworld);
         tnt.a(x, y, z);
-        tnt.p_();
+        tnt.o_();
     }
 }

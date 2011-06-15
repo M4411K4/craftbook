@@ -57,7 +57,7 @@ public class MCX238 extends BaseIC {
         return true;
     }
 
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
     	if (sign.getLine3().length() == 0) {
     		return "Please put a distance on the third line.";
         }
@@ -109,7 +109,7 @@ public class MCX238 extends BaseIC {
 	    		else if(exists != null && exists)
 	    		{
 	    			players.remove(player);
-	    			if(etc.getMCServer().e.q().l())
+	    			if(CraftBook.getWorld(chip.getWorldType()).isRaining())
 	    				player.getEntity().a.b(new OPacket70Bed(1));
 	    		}
 	        }
@@ -120,7 +120,7 @@ public class MCX238 extends BaseIC {
     	    while (it.hasNext())
     	    {
 				Map.Entry<Player, Boolean> item = (Map.Entry<Player, Boolean>)it.next();
-				if(etc.getMCServer().e.q().l())
+				if(CraftBook.getWorld(chip.getWorldType()).isRaining())
 					item.getKey().getEntity().a.b(new OPacket70Bed(1));
 				it.remove();
     	    }

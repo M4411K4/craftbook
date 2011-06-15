@@ -40,9 +40,12 @@ public class LightSwitch {
      * @param oz
      * @return
      */
-    public static boolean toggleLights(Vector origin, BlockBag bag)
+    public static boolean toggleLights(int worldType, Vector origin, BlockBag bag)
             throws BlockSourceException {
-        int aboveID = CraftBook.getBlockID(origin.add(0, 1, 0));
+    	
+    	World world = CraftBook.getWorld(worldType);
+    	
+        int aboveID = CraftBook.getBlockID(world, origin.add(0, 1, 0));
 
         if (aboveID == BlockType.TORCH || aboveID == BlockType.REDSTONE_TORCH_OFF
                 || aboveID == BlockType.REDSTONE_TORCH_ON) {
@@ -68,7 +71,7 @@ public class LightSwitch {
             for (int x = -10 + ox; x <= 10 + ox; x++) {
                 for (int y = -10 + oy; y <= 10 + oy; y++) {
                     for (int z = -5 + oz; z <= 5 + oz; z++) {
-                        int id = CraftBook.getBlockID(x, y, z);
+                        int id = CraftBook.getBlockID(world, x, y, z);
 
                         if (id == BlockType.TORCH || id == BlockType.REDSTONE_TORCH_OFF
                                 || id == BlockType.REDSTONE_TORCH_ON) {
@@ -78,9 +81,9 @@ public class LightSwitch {
                             }
 
                             if (on) {
-                                bag.setBlockID(x, y, z, BlockType.TORCH);
+                                bag.setBlockID(world, x, y, z, BlockType.TORCH);
                             } else {
-                                bag.setBlockID(x, y, z, BlockType.REDSTONE_TORCH_OFF);
+                                bag.setBlockID(world, x, y, z, BlockType.REDSTONE_TORCH_OFF);
                             }
 
                             changed++;

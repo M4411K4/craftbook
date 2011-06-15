@@ -59,7 +59,7 @@ public class MC1260 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String yOffsetLine = sign.getLine3();
 
         try {
@@ -103,7 +103,7 @@ public class MC1260 extends BaseIC {
         
         y = Math.min(Math.max(0, y), 127);
         
-        int type = etc.getServer().getBlockIdAt(x, y, z);
+        int type = CraftBook.getBlockID(chip.getWorldType(), x, y, z);
         
         chip.getOut(1).set(type == 8 || type == 9);
     }

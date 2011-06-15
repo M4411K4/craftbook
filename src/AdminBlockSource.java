@@ -81,11 +81,11 @@ public class AdminBlockSource extends BlockBag {
      * @param pos
      * @return
      */
-    public void addSourcePosition(Vector pos) {
+    public void addSourcePosition(int worldType, Vector pos) {
         for (int x = -3; x <= 3; x++) {
             for (int y = -3; y <= 3; y++) {
                 for (int z = -3; z <= 3; z++) { 
-                    addSingleSourcePosition(pos.add(x, y, z));
+                    addSingleSourcePosition(worldType, pos.add(x, y, z));
                 }
             }
         }
@@ -97,12 +97,12 @@ public class AdminBlockSource extends BlockBag {
      * @param pos
      * @return
      */
-    public void addSingleSourcePosition(Vector pos) {
-        if (CraftBook.getBlockID(pos) == BlockType.WALL_SIGN
-                || CraftBook.getBlockID(pos) == BlockType.SIGN_POST) {
+    public void addSingleSourcePosition(int worldType, Vector pos) {
+    	World world = CraftBook.getWorld(worldType);
+        if (CraftBook.getBlockID(world, pos) == BlockType.WALL_SIGN
+                || CraftBook.getBlockID(world, pos) == BlockType.SIGN_POST) {
             
-            Sign s = (Sign)etc.getServer().getComplexBlock(
-                    pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+            Sign s = (Sign)world.getComplexBlock(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
             
             if (store && s.getText(1).equalsIgnoreCase("[Black Hole]")) {
                 canStore = true;
@@ -126,7 +126,7 @@ public class AdminBlockSource extends BlockBag {
      * @author sk89q
      */
     public static class BlackHoleFactory implements BlockBagFactory {
-        public BlockBag createBlockSource(Vector v) {
+        public BlockBag createBlockSource(int worldType, Vector v) {
             return new AdminBlockSource(false, true);
         }
     }
@@ -137,7 +137,7 @@ public class AdminBlockSource extends BlockBag {
      * @author sk89q
      */
     public static class UnlimitedSourceFactory implements BlockBagFactory {
-        public BlockBag createBlockSource(Vector v) {
+        public BlockBag createBlockSource(int worldType, Vector v) {
             return new AdminBlockSource(true, false);
         }
     }

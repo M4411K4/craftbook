@@ -52,7 +52,7 @@ public class MCX201 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -132,6 +132,7 @@ public class MCX201 extends BaseIC {
         
         int item = getItem(id);
 
+        World world = CraftBook.getWorld(chip.getWorldType());
         if (item > 0 && !(item >= 21 && item <= 34) && item != 36) {
             Vector pos = chip.getBlockPosition();
             int maxY = Math.min(128, pos.getBlockY() + 10);
@@ -139,12 +140,12 @@ public class MCX201 extends BaseIC {
             int z = pos.getBlockZ();
 
             for (int y = pos.getBlockY() + 1; y <= maxY; y++) {
-                if (BlockType.canPassThrough(CraftBook.getBlockID(x, y, z))) {
+                if (BlockType.canPassThrough(CraftBook.getBlockID(world, x, y, z))) {
                 	
                 	if(color >= 0)
-                		dropColorItem(x, y, z, item, quantity, color);
+                		dropColorItem(CraftBook.getOWorld(chip.getWorldType()), x, y, z, item, quantity, color);
                 	else
-                		etc.getServer().dropItem(x, y, z, item, quantity);
+                		world.dropItem(x, y, z, item, quantity);
                     return;
                 }
             }
@@ -173,14 +174,14 @@ public class MCX201 extends BaseIC {
     	return color;
     }
     
-    protected void dropColorItem(double x, double y, double z, int itemId, int quantity, int color)
+    protected void dropColorItem(OWorld oworld, double x, double y, double z, int itemId, int quantity, int color)
     {
-    	double d1 = etc.getMCServer().e.m.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
-    	double d2 = etc.getMCServer().e.m.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
-    	double d3 = etc.getMCServer().e.m.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
+    	double d1 = oworld.r.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
+    	double d2 = oworld.r.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
+    	double d3 = oworld.r.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
     	
-    	OEntityItem localgl = new OEntityItem(etc.getMCServer().e, x + d1, y + d2, z + d3, new OItemStack(itemId, quantity, color));
+    	OEntityItem localgl = new OEntityItem(oworld, x + d1, y + d2, z + d3, new OItemStack(itemId, quantity, color));
     	localgl.c = 10;
-    	etc.getMCServer().e.b(localgl);
+    	oworld.b(localgl);
     }
 }

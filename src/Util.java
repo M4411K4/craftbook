@@ -41,11 +41,32 @@ public class Util {
      * @param multiplier
      * @return
      */
-    public static Vector getWallSignBack(Vector pt, int multiplier) {
+	public static Vector getWallSignBack(int worldType, Vector pt, int multiplier) {
+		return getWallSignBack(CraftBook.getWorld(worldType), pt, multiplier);
+	}
+    public static Vector getWallSignBack(World world, Vector pt, int multiplier) {
         int x = pt.getBlockX();
         int y = pt.getBlockY();
         int z = pt.getBlockZ();
-        int data = CraftBook.getBlockData(x, y, z);
+        int data = CraftBook.getBlockData(world, x, y, z);
+        if (data == 0x2) { // East
+            return new Vector(x, y, z + multiplier);
+        } else if (data == 0x3) { // West
+            return new Vector(x, y, z - multiplier);
+        } else if (data == 0x4) { // North
+            return new Vector(x + multiplier, y, z);
+        } else {
+            return new Vector(x - multiplier, y, z);
+        }
+    }
+    public static Vector getWallSignBack(int worldType, Vector pt, double multiplier) {
+		return getWallSignBack(CraftBook.getWorld(worldType), pt, multiplier);
+	}
+    public static Vector getWallSignBack(World world, Vector pt, double multiplier) {
+        int x = pt.getBlockX();
+        int y = pt.getBlockY();
+        int z = pt.getBlockZ();
+        int data = CraftBook.getBlockData(world, x, y, z);
         if (data == 0x2) { // East
             return new Vector(x, y, z + multiplier);
         } else if (data == 0x3) { // West
@@ -66,11 +87,14 @@ public class Util {
      * @param multiplier
      * @return
      */
-    public static Vector getSignPostOrthogonalBack(Vector pt, int multiplier) {
+    public static Vector getSignPostOrthogonalBack(int worldType, Vector pt, int multiplier) {
+    	return getSignPostOrthogonalBack(CraftBook.getWorld(worldType), pt, multiplier);
+    }
+    public static Vector getSignPostOrthogonalBack(World world, Vector pt, int multiplier) {
         int x = pt.getBlockX();
         int y = pt.getBlockY();
         int z = pt.getBlockZ();
-        int data = CraftBook.getBlockData(x, y, z);
+        int data = CraftBook.getBlockData(world, x, y, z);
         if (data == 0x8) { // East
             return new Vector(x, y, z + multiplier);
         } else if (data == 0x0) { // West
@@ -93,11 +117,14 @@ public class Util {
      * @param multiplier
      * @return
      */
-    public static Vector getWallSignSide(Vector pt, int multiplier) {
+    public static Vector getWallSignSide(int worldType, Vector pt, int multiplier) {
+    	return getWallSignSide(CraftBook.getWorld(worldType), pt, multiplier);
+    }
+    public static Vector getWallSignSide(World world, Vector pt, int multiplier) {
         int x = pt.getBlockX();
         int y = pt.getBlockY();
         int z = pt.getBlockZ();
-        int data = CraftBook.getBlockData(x, y, z);
+        int data = CraftBook.getBlockData(world, x, y, z);
         if (data == 0x2) { // East
             return new Vector(x + multiplier, y, z );
         } else if (data == 0x3) { // West
@@ -118,8 +145,11 @@ public class Util {
      * @param text
      * @return
      */
-    public static boolean doesSignSay(Vector pt, int lineNo, String text) {
-        ComplexBlock cBlock = etc.getServer().getComplexBlock(
+    public static boolean doesSignSay(int worldType, Vector pt, int lineNo, String text) {
+    	return doesSignSay(CraftBook.getWorld(worldType), pt, lineNo, text);
+    }
+    public static boolean doesSignSay(World world, Vector pt, int lineNo, String text) {
+        ComplexBlock cBlock = world.getComplexBlock(
                 pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
     
         if (cBlock instanceof Sign) {
@@ -139,17 +169,21 @@ public class Util {
      * @param z
      * @return
      */
-    public static Sign getWallSignNextTo(int x, int y, int z)
+    public static Sign getWallSignNextTo(int worldType, int x, int y, int z)
+    {
+    	return getWallSignNextTo(CraftBook.getWorld(worldType), x, y, z);
+    }
+    public static Sign getWallSignNextTo(World world, int x, int y, int z)
     {
     	ComplexBlock cBlock = null;
-    	if (CraftBook.getBlockID(x+1, y, z) == BlockType.WALL_SIGN)
-    		cBlock = etc.getServer().getComplexBlock(x+1, y, z);
-    	else if (CraftBook.getBlockID(x-1, y, z) == BlockType.WALL_SIGN)
-    		cBlock = etc.getServer().getComplexBlock(x-1, y, z);
-    	else if (CraftBook.getBlockID(x, y, z+1) == BlockType.WALL_SIGN)
-    		cBlock = etc.getServer().getComplexBlock(x, y, z+1);
-    	else if (CraftBook.getBlockID(x, y, z-1) == BlockType.WALL_SIGN)
-    		cBlock = etc.getServer().getComplexBlock(x, y, z-1);
+    	if (CraftBook.getBlockID(world, x+1, y, z) == BlockType.WALL_SIGN)
+    		cBlock = world.getComplexBlock(x+1, y, z);
+    	else if (CraftBook.getBlockID(world, x-1, y, z) == BlockType.WALL_SIGN)
+    		cBlock = world.getComplexBlock(x-1, y, z);
+    	else if (CraftBook.getBlockID(world, x, y, z+1) == BlockType.WALL_SIGN)
+    		cBlock = world.getComplexBlock(x, y, z+1);
+    	else if (CraftBook.getBlockID(world, x, y, z-1) == BlockType.WALL_SIGN)
+    		cBlock = world.getComplexBlock(x, y, z-1);
     	
     	if(cBlock != null && cBlock instanceof Sign)
     	{
@@ -157,6 +191,36 @@ public class Util {
     	}
     	
     	return null;
+    }
+    
+    /**
+     * Gets the rotation of the wall sign
+     * 
+     * @param worldType
+     * @param pt
+     * @return
+     */
+    public static int getWallSignRotation(int worldType, Vector pt)
+    {
+    	return getWallSignRotation(CraftBook.getWorld(worldType), pt);
+    }
+    
+    public static int getWallSignRotation(World world, Vector pt)
+    {
+    	int x = pt.getBlockX();
+        int y = pt.getBlockY();
+        int z = pt.getBlockZ();
+    	
+    	int data = CraftBook.getBlockData(world, x, y, z);
+        if (data == 0x2) { // East
+            return 90;
+        } else if (data == 0x3) { // West
+            return 270;
+        } else if (data == 0x4) { // North
+            return 0;
+        } else {
+            return 180;
+        }
     }
 
     /**
@@ -315,10 +379,13 @@ public class Util {
     	
     	return point;
     }
-    
-    public static int getFrontBlockId(float rotation, int x, int y, int z)
+    public static int getFrontBlockId(int worldType, float rotation, int x, int y, int z)
+    {
+    	return getFrontBlockId(CraftBook.getWorld(worldType), rotation, x, y, z);
+    }
+    public static int getFrontBlockId(World world, float rotation, int x, int y, int z)
     {
     	Vector point = getFrontPoint(rotation, x, y, z);
-    	return CraftBook.getBlockID(point);
+    	return CraftBook.getBlockID(world, point);
     }
 }

@@ -57,7 +57,8 @@ public class MC3231 extends BaseIC {
             else
                 specific = 13000l;
 
-            etc.getServer().setRelativeTime(specific);
+            World world = CraftBook.getWorld(chip.getWorldType());
+            world.setRelativeTime(specific);
         }
     }
 }

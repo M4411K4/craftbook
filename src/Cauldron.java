@@ -70,13 +70,15 @@ public class Cauldron {
         int y = pt.getBlockY();
         int z = pt.getBlockZ();
 
+        World world = player.getWorld();
+        
         int rootY = y;
-        int below = CraftBook.getBlockID(x, y - 1, z);
-        int below2 = CraftBook.getBlockID(x, y - 2, z);
-        int s1 = CraftBook.getBlockID(x + 1, y, z);
-        int s3 = CraftBook.getBlockID(x - 1, y, z);
-        int s2 = CraftBook.getBlockID(x, y, z + 1);
-        int s4 = CraftBook.getBlockID(x, y, z - 1);
+        int below = CraftBook.getBlockID(world, x, y - 1, z);
+        int below2 = CraftBook.getBlockID(world, x, y - 2, z);
+        int s1 = CraftBook.getBlockID(world, x + 1, y, z);
+        int s3 = CraftBook.getBlockID(world, x - 1, y, z);
+        int s2 = CraftBook.getBlockID(world, x, y, z + 1);
+        int s4 = CraftBook.getBlockID(world, x, y, z - 1);
 
         // Preliminary check so we don't waste CPU cycles
         if ((BlockType.isLava(below) || BlockType.isLava(below2))
@@ -105,10 +107,12 @@ public class Cauldron {
         // Used to store cauldron blocks -- walls are counted
         Map<BlockVector,Integer> visited = new HashMap<BlockVector,Integer>();
 
+        World world = player.getWorld();
+        
         try {
             // The following attempts to recursively find adjacent blocks so
             // that it can find all the blocks used within the cauldron
-            findCauldronContents(pt, rootY - 1, rootY, visited);
+            findCauldronContents(world, pt, rootY - 1, rootY, visited);
 
             // We want cauldrons of a specific shape and size, and 24 is just
             // the right number of blocks that the cauldron we want takes up --
@@ -173,14 +177,14 @@ public class Cauldron {
                         if (!BlockType.isBottomDependentBlock(entry.getValue())) {
                             removeQueue.add(entry.getKey());
                         } else {
-                            CraftBook.setBlockID(entry.getKey(), 0);
+                            CraftBook.setBlockID(world, entry.getKey(), 0);
                         }
                         ingredients.remove(entry.getValue());
                     }
                 }
                 
                 for (BlockVector v : removeQueue) {
-                    CraftBook.setBlockID(v, 0);
+                    CraftBook.setBlockID(world, v, 0);
                 }
 
                 // Give results
@@ -209,7 +213,7 @@ public class Cauldron {
      * @param visited
      * @throws Cauldron.NotACauldronException
      */
-    public void findCauldronContents(BlockVector pt, int minY, int maxY,
+    public void findCauldronContents(World world, BlockVector pt, int minY, int maxY,
             Map<BlockVector,Integer> visited) throws NotACauldronException {
 
         // Don't want to go too low or high
@@ -224,7 +228,7 @@ public class Cauldron {
         // Prevent infinite looping
         if (visited.containsKey(pt)) { return; }
 
-        int type = CraftBook.getBlockID(pt);
+        int type = CraftBook.getBlockID(world, pt);
 
         // Make water work reliably
         if (type == 9) {
@@ -244,16 +248,16 @@ public class Cauldron {
 
         // Must have a lava floor
         Vector lavaPos = pt.subtract(0, pt.getBlockY() - minY + 1, 0);
-        if (!BlockType.isLava(CraftBook.getBlockID(lavaPos))) {
+        if (!BlockType.isLava(CraftBook.getBlockID(world, lavaPos))) {
             throw new NotACauldronException("Cauldron lacks lava below");
         }
 
         // Now we recurse!
-        findCauldronContents(pt.add(1, 0, 0).toBlockVector(), minY, maxY, visited);
-        findCauldronContents(pt.add(-1, 0, 0).toBlockVector(), minY, maxY, visited);
-        findCauldronContents(pt.add(0, 0, 1).toBlockVector(), minY, maxY, visited);
-        findCauldronContents(pt.add(0, 0, -1).toBlockVector(), minY, maxY, visited);
-        findCauldronContents(pt.add(0, 1, 0).toBlockVector(), minY, maxY, visited);
-        findCauldronContents(pt.add(0, -1, 0).toBlockVector(), minY, maxY, visited);
+        findCauldronContents(world, pt.add(1, 0, 0).toBlockVector(), minY, maxY, visited);
+        findCauldronContents(world, pt.add(-1, 0, 0).toBlockVector(), minY, maxY, visited);
+        findCauldronContents(world, pt.add(0, 0, 1).toBlockVector(), minY, maxY, visited);
+        findCauldronContents(world, pt.add(0, 0, -1).toBlockVector(), minY, maxY, visited);
+        findCauldronContents(world, pt.add(0, 1, 0).toBlockVector(), minY, maxY, visited);
+        findCauldronContents(world, pt.add(0, -1, 0).toBlockVector(), minY, maxY, visited);
     }
 }

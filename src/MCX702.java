@@ -59,7 +59,7 @@ public class MCX702 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -98,7 +98,7 @@ public class MCX702 extends BaseIC {
     			chip.getText().supressUpdate();
     			
     			RedstoneListener listener = (RedstoneListener) chip.getExtra();
-    			listener.onSignAdded(chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    			listener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     		}
     		else
     		{
@@ -153,7 +153,7 @@ public class MCX702 extends BaseIC {
     	if(chip.inputAmount() == 0)
     	{
     		//can add input swap options, but I don't think it's worth it at this point
-    		getMessage = Redstone.isHighBinary(Util.getWallSignSide(chip.getPosition(), 1), true);
+    		getMessage = Redstone.isHighBinary(chip.getWorldType(), Util.getWallSignSide(chip.getWorldType(), chip.getPosition(), 1), true);
     	}
     	else
     	{
@@ -205,25 +205,27 @@ public class MCX702 extends BaseIC {
     
     private Vector findNoteBlock(ChipState chip)
     {
-    	Vector noteblock = Util.getWallSignBack(chip.getPosition(), 2);
+    	World world = CraftBook.getWorld(chip.getWorldType());
     	
-    	if(CraftBook.getBlockID(noteblock) == BlockType.NOTE_BLOCK)
+    	Vector noteblock = Util.getWallSignBack(world, chip.getPosition(), 2);
+    	
+    	if(CraftBook.getBlockID(world, noteblock) == BlockType.NOTE_BLOCK)
     		return noteblock;
     	
     	Vector other = chip.getBlockPosition().add(0, 1, 0);
-    	if(CraftBook.getBlockID(other) == BlockType.NOTE_BLOCK)
+    	if(CraftBook.getBlockID(world, other) == BlockType.NOTE_BLOCK)
     		return other;
     	
-    	other = Util.getWallSignSide(chip.getBlockPosition(), 1);
-    	if(CraftBook.getBlockID(other) == BlockType.NOTE_BLOCK)
+    	other = Util.getWallSignSide(world, chip.getBlockPosition(), 1);
+    	if(CraftBook.getBlockID(world, other) == BlockType.NOTE_BLOCK)
     		return other;
     	
-    	other = Util.getWallSignSide(chip.getBlockPosition(), -1);
-    	if(CraftBook.getBlockID(other) == BlockType.NOTE_BLOCK)
+    	other = Util.getWallSignSide(world, chip.getBlockPosition(), -1);
+    	if(CraftBook.getBlockID(world, other) == BlockType.NOTE_BLOCK)
     		return other;
     	
     	other = chip.getBlockPosition().add(0, -1, 0);
-    	if(CraftBook.getBlockID(other) == BlockType.NOTE_BLOCK)
+    	if(CraftBook.getBlockID(world, other) == BlockType.NOTE_BLOCK)
     		return other;
     	
     	return noteblock;

@@ -57,7 +57,7 @@ public class MCX701 extends MCX700 {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         if (sign.getLine3().length() == 0)
         {
             return "Specify song file name on line 3.";
@@ -156,6 +156,7 @@ public class MCX701 extends MCX700 {
     		Vector noteblockPos = findNoteBlock(chip);
     		
     		MusicPlayer player = new MusicPlayer(chip.getText().getLine3(),
+    											chip.getWorldType(),
 												noteblockPos.getBlockX(),
 												noteblockPos.getBlockY(),
 												noteblockPos.getBlockZ(),
@@ -168,7 +169,7 @@ public class MCX701 extends MCX700 {
     		
     		player.loadSong();
     		
-    		listener.onSignAdded(chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    		listener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     	}
     	else if(chip.getIn(2).isTriggered() && chip.getIn(2).is())
     	{

@@ -75,8 +75,8 @@ public abstract class CraftBookDelegateListener extends PluginListener {
      * @param origin
      * @return
      */
-    protected BlockBag getBlockBag(Vector origin) {
-        return listener.getBlockBag(origin);
+    protected BlockBag getBlockBag(int worldType, Vector origin) {
+        return listener.getBlockBag(worldType, origin);
     }
     
     /**
@@ -88,7 +88,7 @@ public abstract class CraftBookDelegateListener extends PluginListener {
      * @param isOn
      * @param changed
      */
-    public void onDirectWireInput(Vector pt, boolean isOn, Vector changed) {
+    public void onDirectWireInput(World world, Vector pt, boolean isOn, Vector changed) {
     }
     
     /**

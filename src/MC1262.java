@@ -59,7 +59,7 @@ public class MC1262 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String minLightLine = sign.getLine3();
 
         try {
@@ -145,7 +145,8 @@ public class MC1262 extends BaseIC {
             return;
         }
         
-        int light = etc.getMCServer().e.j(x, y + 1, z);
+        OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
+        int light = oworld.k(x, y + 1, z);
         
         chip.getOut(1).set(light >= minLight);
     }

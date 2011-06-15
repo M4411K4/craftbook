@@ -366,7 +366,7 @@ public final class Perlstone32_1 implements PlcLang {
         }
     }
     
-    public final String validateEnvironment(Vector v, SignText t, String code) {
+    public final String validateEnvironment(int worldType, Vector v, SignText t, String code) {
         privatePersistentStorage.remove(v.toBlockVector());
         try {
             checkSyntax(code);
@@ -549,7 +549,10 @@ public final class Perlstone32_1 implements PlcLang {
         out[1] = new Signal(false);
         out[2] = new Signal(false);
         
-        ChipState chip = new ChipState(new Vector(0,0,0), new BlockVector(0,0,0), in, out, new SignText("","[MC5032]","","private"), 0);
+      //[TODO]: Support world types?
+        int worldType = 0;
+        
+        ChipState chip = new ChipState(worldType, new Vector(0,0,0), new BlockVector(0,0,0), in, out, new SignText("","[MC5032]","","private"), 0);
         
         while(true) {
             System.out.print("Input: ");

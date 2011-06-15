@@ -20,7 +20,7 @@ public class MCX230 extends BaseIC {
         return "IS IT RAIN";
     }
     
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         if (sign.getLine3().length() != 0) {
         	return "Third line needs to be blank";
         }
@@ -39,6 +39,7 @@ public class MCX230 extends BaseIC {
      */
     public void think(ChipState chip)
     {
-    	chip.getOut(1).set(etc.getMCServer().e.q().l());
+    	World world = CraftBook.getWorld(chip.getWorldType());
+    	chip.getOut(1).set(world.isRaining());
     }
 }

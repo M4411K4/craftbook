@@ -77,6 +77,16 @@ public class CraftBookPlayerImpl extends CraftBookPlayer {
     public String getName() {
         return player.getName();
     }
+    
+    /**
+     * Get the world type the player is in.
+     *
+     * @return int
+     */
+    @Override
+    public int getWorldType() {
+        return player.getWorld().getType().getType();
+    }
 
     /**
      * Get the player's view pitch.

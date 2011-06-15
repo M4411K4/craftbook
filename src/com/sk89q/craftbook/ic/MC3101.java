@@ -63,7 +63,7 @@ public class MC3101 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0 || !id.matches("^[0-9]+:(INF|ONCE)$")) {

@@ -43,12 +43,12 @@ public abstract class BlockBag {
      * @return
      * @throws OutOfSpaceException
      */
-    public boolean setBlockID(int x, int y, int z, int id) throws BlockSourceException {
-        return setBlockID(new Vector(x, y, z), id);
+    public boolean setBlockID(int worldType, int x, int y, int z, int id) throws BlockSourceException {
+        return setBlockID(worldType, new Vector(x, y, z), id);
     }
     
-    public boolean setBlockID(int x, int y, int z, int id, int data) throws BlockSourceException {
-        return setBlockID(new Vector(x, y, z), id, data);
+    public boolean setBlockID(int worldType, int x, int y, int z, int id, int data) throws BlockSourceException {
+        return setBlockID(worldType, new Vector(x, y, z), id, data);
     }
 
     /**
@@ -59,15 +59,33 @@ public abstract class BlockBag {
      * @return
      * @throws OutOfSpaceException
      */
-    public boolean setBlockID(Vector pos, int id) throws BlockSourceException
+    public boolean setBlockID(int worldType, Vector pos, int id) throws BlockSourceException
     {
-    	return setBlockID(pos, id, 0);
+    	return setBlockID(worldType, pos, id, 0);
+    }
+    
+    public boolean setBlockID(int worldType, Vector pos, int id, int data) throws BlockSourceException
+    {
+    	return setBlockID(CraftBook.getWorld(worldType), pos, id, data);
+    }
+    
+    public boolean setBlockID(World world, int x, int y, int z, int id) throws BlockSourceException {
+        return setBlockID(world, new Vector(x, y, z), id);
+    }
+    
+    public boolean setBlockID(World world, int x, int y, int z, int id, int data) throws BlockSourceException {
+        return setBlockID(world, new Vector(x, y, z), id, data);
+    }
+    
+    public boolean setBlockID(World world, Vector pos, int id) throws BlockSourceException
+    {
+    	return setBlockID(world, pos, id, 0);
     }
     
     
-    public boolean setBlockID(Vector pos, int id, int data) throws BlockSourceException {
+    public boolean setBlockID(World world, Vector pos, int id, int data) throws BlockSourceException {
         if (id == 0) { // Clearing
-            int existingID = CraftBook.getBlockID(pos);
+            int existingID = CraftBook.getBlockID(world, pos);
 
             if (existingID != 0) {
                 int dropped = BlockType.getDroppedBlock(existingID);
@@ -77,14 +95,14 @@ public abstract class BlockBag {
                     storeBlock(dropped);
                 }
 
-                return CraftBook.setBlockID(pos, id);
+                return CraftBook.setBlockID(world, pos, id);
             }
 
             return false;
         } else { // Setting
             try {
                 try {
-                    int existingID = CraftBook.getBlockID(pos);
+                    int existingID = CraftBook.getBlockID(world, pos);
 
                     /* [TODO]: a replacement to recognize colors. Works, but there's another part of the code that needs to be fixed with
                      * this, which is why it's currently commented out.
@@ -110,6 +128,8 @@ public abstract class BlockBag {
                                 || id == BlockType.COAL_ORE
                                 || id == BlockType.DIAMOND_ORE
                                 || id == BlockType.LEAVES
+                                || id == BlockType.TALL_GRASS
+                                || id == BlockType.DEAD_SHRUBS
                                 || id == BlockType.TNT
                                 || id == BlockType.MOB_SPAWNER
                                 || id == BlockType.CROPS
@@ -129,14 +149,14 @@ public abstract class BlockBag {
                                 || id == BlockType.STATIONARY_WATER
                                 || id == BlockType.LAVA
                                 || id == BlockType.STATIONARY_LAVA) {
-                            return CraftBook.setBlockIdAndData(pos, id, data);
+                            return CraftBook.setBlockIdAndData(world, pos, id, data);
                         }
 
                         fetchBlock(id);
-                        return CraftBook.setBlockIdAndData(pos, id, data);
+                        return CraftBook.setBlockIdAndData(world, pos, id, data);
                     } else if (existingID == 0) {
                         fetchBlock(id);
-                        return CraftBook.setBlockIdAndData(pos, id, data);
+                        return CraftBook.setBlockIdAndData(world, pos, id, data);
                     }
                 } catch (OutOfBlocksException e) {
                     // Look for cobblestone
@@ -164,7 +184,7 @@ public abstract class BlockBag {
                         throw e;
                     }
 
-                    return CraftBook.setBlockIdAndData(pos, id, data);
+                    return CraftBook.setBlockIdAndData(world, pos, id, data);
                 }
             } catch (OutOfBlocksException e) {
                 int missingID = e.getID();
@@ -223,14 +243,14 @@ public abstract class BlockBag {
      * @param pos
      * @return
      */
-    public abstract void addSourcePosition(Vector pos);
+    public abstract void addSourcePosition(int worldType, Vector pos);
     /**
      * Adds a position to be used a source.
      *
      * @param pos
      * @return
      */
-    public abstract void addSingleSourcePosition(Vector pos);
+    public abstract void addSingleSourcePosition(int worldType, Vector pos);
 
     /**
      * Return the list of missing blocks.

@@ -52,7 +52,7 @@ public class MCX256 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
     	if (sign.getLine3().length() != 0) {
             try
             {
@@ -122,7 +122,7 @@ public class MCX256 extends BaseIC {
 		int zmax = zcenter + radius;
 
 		boolean fill = chip.getMode() != '1';
-		OWorld world = etc.getMCServer().e;
+		OWorld world = CraftBook.getOWorld(chip.getWorldType());
 		
 		for(int x = xmin; x <= xmax; x++)
 		{

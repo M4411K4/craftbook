@@ -34,12 +34,16 @@ public class TickPatch extends OEntityTracker {
      */
     @Deprecated
     public static final CopyOnWriteArrayList<Runnable> TASK_LIST = new CopyOnWriteArrayList<Runnable>();
+    //public static final CopyOnWriteArrayList<Runnable> TASK_LIST_NETH = new CopyOnWriteArrayList<Runnable>();
     
     private static Class<OEntityTracker> CLASS = OEntityTracker.class;
     private static Field[] FIELDS = CLASS.getDeclaredFields();
     
-    private TickPatch(MinecraftServer arg0, OEntityTracker g) {
-        super(arg0);
+    private final int WORLD_INDEX;
+    
+    private TickPatch(MinecraftServer arg0, OEntityTracker g, int index) {
+        super(arg0, index);
+        WORLD_INDEX = index;
         if(g.getClass()!=CLASS) throw new RuntimeException("unexpected type for im instance");
         for(Field f:FIELDS) try {
             if(Modifier.isStatic(f.getModifiers())) continue;
@@ -60,8 +64,11 @@ public class TickPatch extends OEntityTracker {
     @Deprecated
     public void a() {
         super.a();
-        Runnable[] tasks = TASK_LIST.toArray(new Runnable[0]);
-        for(int i=0;i<tasks.length;i++) tasks[i].run();
+        if(WORLD_INDEX == 0)
+        {
+	        Runnable[] tasks = TASK_LIST.toArray(new Runnable[0]);
+	        for(int i=0;i<tasks.length;i++) tasks[i].run();
+        }
     }
     
     /**
@@ -70,28 +77,41 @@ public class TickPatch extends OEntityTracker {
      */
     public static void applyPatch() {
         MinecraftServer s = etc.getServer().getMCServer();
-        try {
-            s.k.getClass().getDeclaredField("HP_PATCH_APPLIED");
-        } catch (SecurityException e) {
-            throw new RuntimeException("unexpected error: cannot use reflection");
-        } catch (NoSuchFieldException e) {
-            s.k = new TickPatch(s,s.k);
+        //for(int i = 0; i < s.k.length; i++)
+        int i = 0;
+        {
+	        try {
+	            s.k[i].getClass().getDeclaredField("HP_PATCH_APPLIED");
+	        } catch (SecurityException e) {
+	            throw new RuntimeException("unexpected error: cannot use reflection");
+	        } catch (NoSuchFieldException e) {
+	            s.k[i] = new TickPatch(s,s.k[i],i);
+	        }
         }
     }
     /**
      * Adds a new task.
      */
-    public static void addTask(Runnable r) {
-        getTaskList().add(r);
+    public static void addTask(Runnable r, int worldIndex) {
+    	MinecraftServer s = etc.getServer().getMCServer();
+    	
+    	if(worldIndex < 0 || worldIndex >= s.k.length)
+    		return;
+    	
+    	getTaskList(worldIndex).add(r);
     }
     /**
      * Retrieves the task list.
      */
     @SuppressWarnings("unchecked")
-    public static CopyOnWriteArrayList<Runnable> getTaskList() {
+    public static CopyOnWriteArrayList<Runnable> getTaskList(int index) {
+    	
+    	//[TODO]: add multi-world tasks? Might use more resources than needed, so for now keep to one.
+    	index = 0;
+    	
         MinecraftServer s = etc.getServer().getMCServer();
         try {
-            return (CopyOnWriteArrayList<Runnable>) s.k.getClass().getField("TASK_LIST").get(null);
+            return (CopyOnWriteArrayList<Runnable>) s.k[index].getClass().getField("TASK_LIST").get(null);
         } catch (SecurityException e) {
             throw new RuntimeException("unexpected error: cannot use reflection");
         } catch (NoSuchFieldException e) {
@@ -106,12 +126,16 @@ public class TickPatch extends OEntityTracker {
     /**
      * Wraps a runnable to allow easier use by plugins.
      */
-    public static Runnable wrapRunnable(final Plugin p, final Runnable r) {
+    public static Runnable wrapRunnable(final Plugin p, final Runnable r, final int worldIndex) {
         return new Runnable() {
             private PluginLoader l = etc.getLoader();
+            //private MinecraftServer s = etc.getMCServer();
             public void run() {
-                CopyOnWriteArrayList<Runnable> taskList = getTaskList();
-                if(l.getPlugin(p.getName())!=p) while(taskList.contains(this)) getTaskList().remove(this);
+            	
+                CopyOnWriteArrayList<Runnable> taskList = getTaskList(worldIndex);
+                if(l.getPlugin(p.getName())!=p)
+                	while(taskList.contains(this))
+                		getTaskList(worldIndex).remove(this);
                 if(p.isEnabled()) r.run();
             }
         };

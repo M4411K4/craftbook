@@ -63,7 +63,7 @@ public class MCX705 extends MCX700 {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
     	String tune = sign.getLine3() + sign.getLine4();
         if (tune.length() == 0)
         {
@@ -139,6 +139,7 @@ public class MCX705 extends MCX700 {
     		Vector noteblockPos = findNoteBlock(chip);
     		
     		MusicPlayer player = new MusicPlayer(chip.getText().getLine3() + chip.getText().getLine4(),
+												chip.getWorldType(),
 												noteblockPos.getBlockX(),
 												noteblockPos.getBlockY(),
 												noteblockPos.getBlockZ(),
@@ -150,7 +151,7 @@ public class MCX705 extends MCX700 {
     		
     		player.loadSong();
     		
-    		listener.onSignAdded(chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    		listener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     	}
     }
     

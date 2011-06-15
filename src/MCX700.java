@@ -65,7 +65,7 @@ public class MCX700 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         if (sign.getLine3().length() == 0)
         {
             return "Specify song file name on line 3.";
@@ -150,6 +150,7 @@ public class MCX700 extends BaseIC {
     		Vector noteblockPos = findNoteBlock(chip);
     		
     		MusicPlayer player = new MusicPlayer(chip.getText().getLine3(),
+    											chip.getWorldType(),
 												noteblockPos.getBlockX(),
 												noteblockPos.getBlockY(),
 												noteblockPos.getBlockZ(),
@@ -161,7 +162,7 @@ public class MCX700 extends BaseIC {
     		
     		player.loadSong();
     		
-    		listener.onSignAdded(chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    		listener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     	}
     }
     
@@ -216,25 +217,27 @@ public class MCX700 extends BaseIC {
     
     protected Vector findNoteBlock(ChipState chip)
     {
-    	Vector noteblock = Util.getWallSignBack(chip.getPosition(), 2);
+    	World world = CraftBook.getWorld(chip.getWorldType());
     	
-    	if(CraftBook.getBlockID(noteblock) == BlockType.NOTE_BLOCK)
+    	Vector noteblock = Util.getWallSignBack(world, chip.getPosition(), 2);
+    	
+    	if(CraftBook.getBlockID(world, noteblock) == BlockType.NOTE_BLOCK)
     		return noteblock;
     	
     	Vector other = chip.getBlockPosition().add(0, 1, 0);
-    	if(CraftBook.getBlockID(other) == BlockType.NOTE_BLOCK)
+    	if(CraftBook.getBlockID(world, other) == BlockType.NOTE_BLOCK)
     		return other;
     	
-    	other = Util.getWallSignSide(chip.getBlockPosition(), 1);
-    	if(CraftBook.getBlockID(other) == BlockType.NOTE_BLOCK)
+    	other = Util.getWallSignSide(world, chip.getBlockPosition(), 1);
+    	if(CraftBook.getBlockID(world, other) == BlockType.NOTE_BLOCK)
     		return other;
     	
-    	other = Util.getWallSignSide(chip.getBlockPosition(), -1);
-    	if(CraftBook.getBlockID(other) == BlockType.NOTE_BLOCK)
+    	other = Util.getWallSignSide(world, chip.getBlockPosition(), -1);
+    	if(CraftBook.getBlockID(world, other) == BlockType.NOTE_BLOCK)
     		return other;
     	
     	other = chip.getBlockPosition().add(0, -1, 0);
-    	if(CraftBook.getBlockID(other) == BlockType.NOTE_BLOCK)
+    	if(CraftBook.getBlockID(world, other) == BlockType.NOTE_BLOCK)
     		return other;
     	
     	return noteblock;

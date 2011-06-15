@@ -52,7 +52,7 @@ public class MC1206 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(Vector pos, SignText sign) {
+    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
         String id = sign.getLine3();
         String force = sign.getLine4();
 
@@ -108,8 +108,9 @@ public class MC1206 extends BaseIC {
             int x = pos.getBlockX();
             int z = pos.getBlockZ();
 
-            if (y >= 0 && (isForced || CraftBook.getBlockID(x, y, z) == 0)) {
-                CraftBook.setBlockID(x, y, z, item);
+            World world = CraftBook.getWorld(chip.getWorldType());
+            if (y >= 0 && (isForced || CraftBook.getBlockID(world, x, y, z) == 0)) {
+                CraftBook.setBlockID(world, x, y, z, item);
                 chip.getOut(1).set(true);
             } else {
                 chip.getOut(1).set(false);
