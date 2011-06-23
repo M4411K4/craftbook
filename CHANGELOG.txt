@@ -1,25 +1,14 @@
-2.0extra10_Test1:
-Since I finally have a wiki, specific details will not be added to this
-change log anymore. Details are easier to explain on a wiki than a
+2.0extra10_Test2:
+Since I finally have a wiki, many specific details will not be added
+to this change log. Details are easier to explain on a wiki than a
 change log.
 The wiki can be found at: http://cbx.m4411k4.com
 - updated to minecraft 1.6.6
     - This involved the biggest change to CraftBook I've ever done due
         to needed multiple world support.
     - All features will need to be tested
-- !IMPORTANT!
-    -due to crow not yet having world hooks, redstone features such as:
-        -ICs
-        -Redstone wire to [Bridge], [Gate], etc signs
-    will not work in the Nether.
-    -The redstone features will only work in one world.
-        -I have added an in-game command to switch redstone support
-            between the Main world and the Nether world. The redstone
-            support will not work in both worlds at the same time.
-        -In game command:
-            /cbic main
-            -or-
-            /cbic nether
+- added custom plugin hooks. This allows other plugins to communicate
+    with CraftBook. Such as creating toll bridges.
 - added [MCX246] Fireball IC
 - added [MCT246] Cannon IC
 - updated [MCX200] to support spawning sitting and angry wolves
@@ -29,6 +18,7 @@ The wiki can be found at: http://cbx.m4411k4.com
 - fixed [MC3032] having a name longer than 15 chars.
     -thanks Riot for reporting it!
 - fixed [MC1500] having a name longer than 15 chars.
+- fixed minecart reverse blocks. Still a little buggy, but works now
 
 2.0extra9.2:
 - 2 new optional properties in craftbook.properties file

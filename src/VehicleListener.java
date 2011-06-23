@@ -288,7 +288,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                 return;
             }*/
 
-            int worldType = world.getType().getType();
+            int worldType = world.getType().getId();
             NearbyChestBlockBag blockBag = new NearbyChestBlockBag(worldType, pt);
             blockBag.addSingleSourcePosition(worldType, pt);
             blockBag.addSingleSourcePosition(worldType, pt.add(1, 0, 0));
@@ -521,49 +521,13 @@ public class VehicleListener extends CraftBookDelegateListener {
                         minecart.setMotionZ(minecart.getMotionZ() * 0.8);
                         return;
                     }
-                } else if (under == minecartReverseBlock[0] && underColor == minecartReverseBlock[1]) {
-                    Boolean test = Redstone.testAnyInput(world, underPt);
-
-                    if (test == null || test) {
-                        Vector signPos = new Vector(blockX, blockY - 2, blockZ);
-                        boolean reverseX = true;
-                        boolean reverseZ = true;
-
-                        // Directed reverse block
-                        if (CraftBook.getBlockID(world, signPos) == BlockType.SIGN_POST
-                                && Util.doesSignSay(world, signPos, 1, "[Reverse]")) {
-                            Vector dir = Util.getSignPostOrthogonalBack(world, signPos, 1)
-                                    .subtract(signPos);
-
-                            // Acceptable sign direction
-                            if (dir != null) {
-                                if (MathUtil.isSameSign(minecart.getMotionX(),
-                                        dir.getBlockX())) {
-                                    reverseX = false;
-                                }
-                                if (MathUtil.isSameSign(minecart.getMotionZ(),
-                                        dir.getBlockZ())) {
-                                    reverseZ = false;
-                                }
-                            }
-                        }
-                        
-                        if (reverseX) {
-                            minecart.setMotionX(minecart.getMotionX() * -1);
-                        }
-                        if (reverseZ) {
-                            minecart.setMotionZ(minecart.getMotionZ() * -1);
-                        }
-                        
-                        return;
-                    }
                 } else if (under == minecartDepositBlock[0] && underColor == minecartDepositBlock[1]) {
                     Boolean test = Redstone.testAnyInput(world, underPt);
 
                     if (test == null || test) {
                         if (minecart.getType() == Minecart.Type.StorageCart) {
                             Vector pt = new Vector(blockX, blockY, blockZ);
-                            int worldType = world.getType().getType();
+                            int worldType = world.getType().getId();
                             NearbyChestBlockBag bag = new NearbyChestBlockBag(worldType, pt);
 
                             for (int y = -1; y <= 0; y++) {
@@ -1051,7 +1015,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                     Sign sign = getControllerSign(world, depositPt.add(0, -1, 0), "[Dispenser]");
                     String collectType = sign != null ? sign.getText(2) : "";
                     
-                    int worldType = world.getType().getType();
+                    int worldType = world.getType().getId();
                     NearbyChestBlockBag blockBag = new NearbyChestBlockBag(worldType, depositPt);
                     blockBag.addSingleSourcePosition(worldType, depositPt);
                     blockBag.addSingleSourcePosition(worldType, depositPt.add(1, 0, 0));
@@ -1206,6 +1170,51 @@ public class VehicleListener extends CraftBookDelegateListener {
                             }
                         }
                     }
+                }
+                else if(under == minecartReverseBlock[0] && underColor == minecartReverseBlock[1])
+                {
+                	Boolean test = Redstone.testAnyInput(world, underPt);
+                	if (test == null || test)
+                	{
+                		OEntityMinecart eminecart = minecart.getEntity();
+                		if(OMathHelper.b(eminecart.aM) == OMathHelper.b(eminecart.aP)
+                		   && OMathHelper.b(eminecart.aN) == OMathHelper.b(eminecart.aQ)
+                		   && OMathHelper.b(eminecart.aO) == OMathHelper.b(eminecart.aR))
+                			return;
+                		
+                		Vector signPos = new Vector(blockX, blockY - 2, blockZ);
+                		boolean reverseX = true;
+                		boolean reverseZ = true;
+                		
+                		// Directed reverse block
+                		if (CraftBook.getBlockID(world, signPos) == BlockType.SIGN_POST
+                			&& Util.doesSignSay(world, signPos, 1, "[Reverse]"))
+                		{
+                			Vector dir = Util.getSignPostOrthogonalBack(world, signPos, 1).subtract(signPos);
+                			
+                			// Acceptable sign direction
+                			if (dir != null)
+                			{
+                				if (MathUtil.isSameSign(minecart.getMotionX(),dir.getBlockX()))
+                				{
+                					reverseX = false;
+                				}
+                				if (MathUtil.isSameSign(minecart.getMotionZ(),dir.getBlockZ()))
+                				{
+                					reverseZ = false;
+                				}
+                			}
+                		}
+                		
+                		if (reverseX) {
+                            minecart.setMotionX(minecart.getMotionX() * -1);
+                        }
+                        if (reverseZ) {
+                            minecart.setMotionZ(minecart.getMotionZ() * -1);
+                        }
+                        
+                        return;
+                	}
                 }
                 else if(under == minecartLiftBlock[0] && underColor == minecartLiftBlock[1])
                 {

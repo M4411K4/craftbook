@@ -190,7 +190,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             final boolean isOn, final Vector changed) {
         
         int type = CraftBook.getBlockID(world, pt);
-        final int worldType = world.getType().getType();
+        final int worldType = world.getType().getId();
         
         // Sign gates
         if (type == BlockType.WALL_SIGN
@@ -328,7 +328,7 @@ public class MechanismListener extends CraftBookDelegateListener {
     	
     	World world = player.getWorld();
     	
-    	int blockType = TEMPBLOCKCLICKTYPE(world, block); //block.getType();
+    	int blockType = block.getType();
     	
         // Random apple drops
         if (dropAppleChance > 0 && blockType == BlockType.LEAVES
@@ -375,7 +375,7 @@ public class MechanismListener extends CraftBookDelegateListener {
         SignTextImpl signText = new SignTextImpl(sign);
         Vector pt = new Vector(sign.getX(), sign.getY(), sign.getZ());
         World world = player.getWorld();
-        int worldType = world.getType().getType();
+        int worldType = world.getType().getId();
         
         String line2 = sign.getText(1);
         
@@ -584,19 +584,15 @@ public class MechanismListener extends CraftBookDelegateListener {
      * @param itemInHand
      * @return
      */
-    private int TEMPBLOCKCLICKTYPE(World world, Block blockClicked)
-    {
-    	return CraftBook.getBlockID(world, blockClicked.getX(), blockClicked.getY(), blockClicked.getZ());
-    }
     
     private boolean handleBlockUse(Player player, Block blockClicked,
             int itemInHand)
             throws BlockSourceException {
 
     	World world = player.getWorld();
-    	int worldType = world.getType().getType();
+    	int worldType = world.getType().getId();
     	
-    	int blockType = TEMPBLOCKCLICKTYPE(world, blockClicked);//blockClicked.getType();
+    	int blockType = blockClicked.getType();
     	
         int current = -1;
 
@@ -733,6 +729,11 @@ public class MechanismListener extends CraftBookDelegateListener {
                         && (line2.equalsIgnoreCase("[Gate]")
                                 || line2.equalsIgnoreCase("[DGate]"))
                         && checkPermission(player, "/gate")) {
+                	
+                	
+                	if(!CBHooked.getBoolean(CBHook.SIGN_MECH, new Object[] {CBPluginInterface.CBSignMech.GATE, sign, player}))
+                		return true;
+                	
                     BlockBag bag = getBlockBag(worldType, pt);
                     bag.addSourcePosition(worldType, pt);
 
@@ -761,6 +762,8 @@ public class MechanismListener extends CraftBookDelegateListener {
 
                     // Go up or down?
                     boolean up = line2.equalsIgnoreCase("[Lift Up]");
+                    if(!CBHooked.getBoolean(CBHook.SIGN_MECH, new Object[] {CBPluginInterface.CBSignMech.LIFT, sign, player}))
+                		return true;
                     Elevator.performLift(player, pt, up);
                     
                     return true;
@@ -771,6 +774,9 @@ public class MechanismListener extends CraftBookDelegateListener {
                         || line2.equalsIgnoreCase("[Area]"))
                         && checkPermission(player, "/togglearea")) {
                     
+                	if(!CBHooked.getBoolean(CBHook.SIGN_MECH, new Object[] {CBPluginInterface.CBSignMech.AREA, sign, player}))
+                		return true;
+                	
                     BlockBag bag = getBlockBag(worldType, pt);
                     bag.addSourcePosition(worldType, pt);
                     
@@ -795,6 +801,9 @@ public class MechanismListener extends CraftBookDelegateListener {
                         && line2.equalsIgnoreCase("[Bridge]")
                         && checkPermission(player, "/bridge")) {
                     
+                	if(!CBHooked.getBoolean(CBHook.SIGN_MECH, new Object[] {CBPluginInterface.CBSignMech.BRIDGE, sign, player}))
+                		return true;
+                	
                     BlockBag bag = getBlockBag(worldType, pt);
                     bag.addSourcePosition(worldType, pt);
                     
@@ -810,6 +819,9 @@ public class MechanismListener extends CraftBookDelegateListener {
                                 || line2.equalsIgnoreCase("[Door Down]"))
                         && checkPermission(player, "/door")) {
                     
+                	if(!CBHooked.getBoolean(CBHook.SIGN_MECH, new Object[] {CBPluginInterface.CBSignMech.DOOR, sign, player}))
+                		return true;
+                	
                     BlockBag bag = getBlockBag(worldType, pt);
                     bag.addSourcePosition(worldType, pt);
                     
@@ -994,7 +1006,7 @@ public class MechanismListener extends CraftBookDelegateListener {
                 lastCopySave.put(player.getName(), now);
                 
                 // Copy
-                int worldType = player.getWorld().getType().getType();
+                int worldType = player.getWorld().getType().getId();
                 CuboidCopy copy = new CuboidCopy(worldType, min, size);
                 copy.copy();
                 
@@ -1019,30 +1031,6 @@ public class MechanismListener extends CraftBookDelegateListener {
             }
 
             return true;
-        }
-        else if(split[0].equalsIgnoreCase("/cbic") && player.canUseCommand("/cbic"))
-        {
-        	if(split.length < 2)
-        	{
-        		player.sendMessage(Colors.Gold + "Usage: "+Colors.White+"/cbic"+
-        				Colors.Gold+"[ "+Colors.White+"main"+
-        				Colors.Gold+" or "+Colors.White+"nether"+Colors.Gold+"]");
-        		player.sendMessage(Colors.Gold + "Example: /cbic nether");
-        		return true;
-        	}
-        	
-        	if(split[1].equalsIgnoreCase("main"))
-        	{
-        		this.listener.redstoneWorld = 0;
-        		player.sendMessage(Colors.Gold + "ICs set to main world");
-        	}
-        	else if(split[1].equalsIgnoreCase("nether"))
-        	{
-        		this.listener.redstoneWorld = -1;
-        		player.sendMessage(Colors.Gold + "ICs set to nether");
-        	}
-        	
-        	return true;
         }
         else if(split[0].equalsIgnoreCase("/mcx120") && player.canUseCommand("/mcx120"))
         {

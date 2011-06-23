@@ -215,7 +215,7 @@ public class CraftBookListener extends PluginListener {
         BlockVector v = new BlockVector(block.getX(), block.getY(), block.getZ());
         
         // Give the method a BlockVector instead of a Block
-        return onRedstoneChange(v, oldLevel, newLevel);
+        return onRedstoneChange(block.getWorld(), v, oldLevel, newLevel);
     }
     
     /**
@@ -229,9 +229,7 @@ public class CraftBookListener extends PluginListener {
      * @param newLevel
      * @return
      */
-    public int redstoneWorld = 0;
-    
-    public int onRedstoneChange(BlockVector v, int oldLevel, int newLevel) {
+    public int onRedstoneChange(World world, BlockVector v, int oldLevel, int newLevel) {
         boolean wasOn = oldLevel >= 1;
         boolean isOn = newLevel >= 1;
         boolean wasChange = wasOn != isOn;
@@ -246,9 +244,7 @@ public class CraftBookListener extends PluginListener {
         int y = v.getBlockY();
         int z = v.getBlockZ();
         
-        //[TODO]: wait for canary world support!
-        World world = CraftBook.getWorld(redstoneWorld);
-        int worldType = world.getType().getType();
+        int worldType = world.getType().getId();
 
         int type = CraftBook.getBlockID(world, x, y, z);
 

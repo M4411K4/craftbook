@@ -101,6 +101,8 @@ public class CraftBook extends Plugin {
     private final CraftBookDelegateListener vehicle =
             new VehicleListener(this, listener);
     
+    private PluginInterface cbRequest = new CBHookFunc();
+    
     /**
      * Initializes the plugin.
      */
@@ -136,6 +138,11 @@ public class CraftBook extends Plugin {
         registerHook(vehicle, "VEHICLE_DESTROYED", PluginListener.Priority.MEDIUM);
         registerHook(vehicle, "VEHICLE_COLLISION", PluginListener.Priority.MEDIUM);
         listener.registerDelegate(vehicle);
+        
+        PluginLoader loader = etc.getLoader();
+        loader.addCustomListener(CBPluginInterface.cbSignMech);
+        
+        loader.addCustomListener(cbRequest);
         
         //for(int i = 0; i < delays.length; i++)
         	//TickPatch.addTask(TickPatch.wrapRunnable(this, delays[i], i), i);
@@ -278,11 +285,11 @@ public class CraftBook extends Plugin {
     }
     
     protected static int getBlockData(World world, int x, int y, int z) {
-    	return getBlockData(world, world.getType().getType(), new BlockVector(x, y, z));
+    	return getBlockData(world, world.getType().getId(), new BlockVector(x, y, z));
     }
 
     protected static int getBlockData(World world, Vector pt) {
-    	return getBlockData(world, world.getType().getType(), pt.toBlockVector());
+    	return getBlockData(world, world.getType().getId(), pt.toBlockVector());
     }
     
     protected static int getBlockData(World world, int worldType, BlockVector bVec)
@@ -379,9 +386,8 @@ public class CraftBook extends Plugin {
     	return 0;
     }
     
-    //[TODO]: change this when canary gets a "getWorld" method
     protected static World getWorld(int worldType) {
-        return new World(etc.getMCServer().a(worldType));
+        return etc.getServer().getWorld(worldType);
     }
     
     protected static SignText getSignText(int worldType, Vector pt) {

@@ -231,4 +231,80 @@ public class GateSwitch {
         recurseColumn(world, topPoint.add(0, 0, 1), visitedColumns, close, bag);
         recurseColumn(world, topPoint.add(0, 0, -1), visitedColumns, close, bag);
     }
+    
+    public static boolean isOpen(Sign sign) {
+    	
+    	String line2 = sign.getText(1);
+    	boolean smallSearchSize = line2.equalsIgnoreCase("[DGate]");
+    	
+        int x = sign.getX();
+        int y = sign.getY();
+        int z = sign.getZ();
+        
+        World world = sign.getWorld();
+
+        boolean foundGate = false;
+
+        Set<BlockVector> visitedColumns = new HashSet<BlockVector>();
+
+        if (smallSearchSize) {
+            // Toggle nearby gates
+            for (int x1 = x - 1; x1 <= x + 1; x1++) {
+                for (int y1 = y - 2; y1 <= y + 1; y1++) {
+                    for (int z1 = z - 1; z1 <= z + 1; z1++) {
+                        if (testColumn(world, new Vector(x1, y1, z1), visitedColumns)) {
+                            foundGate = true;
+                        }
+                    }
+                }
+            }
+        } else {
+            // Toggle nearby gates
+            for (int x1 = x - 3; x1 <= x + 3; x1++) {
+                for (int y1 = y - 3; y1 <= y + 6; y1++) {
+                    for (int z1 = z - 3; z1 <= z + 3; z1++) {
+                        if (testColumn(world, new Vector(x1, y1, z1), visitedColumns)) {
+                            foundGate = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return foundGate;
+    }
+    
+    private static boolean testColumn(World world, Vector pt, Set<BlockVector> visitedColumns)
+    {
+        if (visitedColumns.size() > 14) { return false; }
+        if (visitedColumns.contains(pt.setY(0).toBlockVector())) { return false; }
+        if (CraftBook.getBlockID(world, pt) != BlockType.FENCE) { return false; }
+        
+        int x = pt.getBlockX();
+        int y = pt.getBlockY();
+        int z = pt.getBlockZ();
+
+        visitedColumns.add(pt.setY(0).toBlockVector());
+
+        // Find the top most fence
+        for (int y1 = y + 1; y1 <= y + 12; y1++) {
+            if (CraftBook.getBlockID(world, x, y1, z) == BlockType.FENCE) {
+                y = y1;
+            } else {
+                break;
+            }
+        }
+
+        // The block above the gate cannot be air -- it has to be some
+        // non-fence block
+        if (CraftBook.getBlockID(world, x, y + 1, z) == 0) {
+            return false;
+        }
+
+        // Close the gate if the block below does not exist as a fence
+        // block, otherwise open the gate
+        boolean close = CraftBook.getBlockID(world, x, y - 1, z) != BlockType.FENCE;
+
+        return close;
+    }
 }

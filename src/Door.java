@@ -302,6 +302,88 @@ public class Door extends SignOrientedMechanism {
         }
     }
     
+    
+    public static boolean isOpen(Sign sign)
+    {
+    	World world = sign.getWorld();
+    	int worldType = world.getType().getId();
+    	
+    	int direction = CraftBook.getBlockData(worldType, sign.getX(), sign.getY(), sign.getZ());
+    	
+		boolean upwards = sign.getText(1).equalsIgnoreCase("[Door Up]");
+		
+		Vector sideDir = null;
+		Vector vertDir = upwards ? new Vector(0, 1, 0) : new Vector(0, -1, 0);
+		
+		if (direction == 0x0 || direction == 0x8) { //north south
+		    sideDir = new Vector(1, 0, 0);
+		} else if(direction == 0x4 || direction == 0xC) { //west east
+		    sideDir = new Vector(0, 0, 1);
+		}
+		
+		Vector pt = new Vector(sign.getX(), sign.getY(), sign.getZ());
+		
+		int type = CraftBook.getBlockID(world, pt.add(vertDir));
+		
+		// Check construction
+		if (!canUseBlock(type)) {
+		    return false;
+		}
+		
+		// Check sides
+		if (CraftBook.getBlockID(world, pt.add(vertDir).add(sideDir)) != type
+		        || CraftBook.getBlockID(world, pt.add(vertDir).subtract(sideDir)) != type) {
+		    return false;
+		}
+		
+		// Detect whether the door needs to be opened
+		boolean toOpen = canPassThrough(CraftBook.getBlockID(world, pt.add(vertDir.multiply(2))));
+		
+		Vector cur = pt.add(vertDir.multiply(2));
+		boolean found = false;
+		int dist = 0;
+		
+		// Find the other side
+		for (int i = 0; i < maxLength + 2; i++) {
+		    int id = CraftBook.getBlockID(world, cur);
+		
+		    if (id == BlockType.SIGN_POST) {
+		        SignText otherSignText = CraftBook.getSignText(world, cur);
+		        
+		        if (otherSignText != null) {
+		            String line2 = otherSignText.getLine2();
+		
+		            if (line2.equalsIgnoreCase("[Door Up]")
+		                    || line2.equalsIgnoreCase("[Door Down]")
+		                    || line2.equalsIgnoreCase("[Door End]")) {
+		                found = true;
+		                dist = i - 1;
+		                break;
+		            }
+		        }
+		    }
+		
+		    cur = cur.add(vertDir);
+		}
+		
+		// Failed to find the other side!
+		if (!found) {
+		    return false;
+		}
+		
+		Vector otherSideBlockPt = pt.add(vertDir.multiply(dist + 2));
+		
+		// Check the other side to see if it's built correctly
+		if (CraftBook.getBlockID(world, otherSideBlockPt) != type
+		        || CraftBook.getBlockID(world, otherSideBlockPt.add(sideDir)) != type
+		        || CraftBook.getBlockID(world, otherSideBlockPt.subtract(sideDir)) != type) {
+		    return false;
+		}
+		
+		return toOpen;
+	}
+    
+    
     /**
      * Validates the sign's environment.
      * 

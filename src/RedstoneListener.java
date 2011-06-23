@@ -345,7 +345,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                         sign.getText(0), sign.getText(1), sign.getText(2),
                         sign.getText(3));
 
-                    int worldType = world.getType().getType();
+                    int worldType = world.getType().getId();
                     
                     // Maybe the IC is setup incorrectly
                     String envError = ic.ic.validateEnvironment(worldType, pos, signText);
@@ -399,7 +399,7 @@ public class RedstoneListener extends CraftBookDelegateListener
     	if(!enableSelfTriggeredICs || !updateSelfTriggeredICList || sign.getBlock().getType() != BlockType.WALL_SIGN)
     		return;
     	
-    	onSignAdded(player.getWorld().getType().getType(), sign);
+    	onSignAdded(player.getWorld().getType().getId(), sign);
     }
 
     /**
@@ -510,7 +510,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                 	def = orders[1];
                 
                 
-                final int worldType = world.getType().getType();
+                final int worldType = world.getType().getId();
                 
                 final RedstoneListener thisListener = this;
                 
@@ -559,7 +559,7 @@ public class RedstoneListener extends CraftBookDelegateListener
 	        //XXX HACK: Do this in a more proper way later.
 	        if(world.getTime()%2!=0) continue;
 	        
-	        int worldType = world.getType().getType();
+	        int worldType = world.getType().getId();
 	        
 	        WorldBlockVector[] bv = this.instantICs.toArray(new WorldBlockVector[0]);
 	        
@@ -625,7 +625,7 @@ public class RedstoneListener extends CraftBookDelegateListener
             
         Sign sign = (Sign)world.getComplexBlock(x,y,z);
         
-        onSignAdded(world.getType().getType(), sign);
+        onSignAdded(world.getType().getId(), sign);
     }
     
     public void onSignAdded(int worldType, Sign sign)
@@ -670,7 +670,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         SignText signText = new SignText(sign.getText(0), line2, sign.getText(2), sign.getText(3));
         Vector pos = new Vector(block.getX(), block.getY(), block.getZ());
         
-        String message = ic.ic.clear(world.getType().getType(), pos, signText);
+        String message = ic.ic.clear(world.getType().getId(), pos, signText);
         if(message != null)
         {
         	//player.sendMessage(Colors.Rose + message);
