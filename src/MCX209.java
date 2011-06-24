@@ -283,7 +283,7 @@ public class MCX209 extends BaseIC {
 	    					//set
 	    					if(type[0] == 1 || canPassThrough(bType))
 	    	        		{
-	    						bag.setBlockID(x, y, z, type[1], type[2]);
+	    						bag.setBlockID(world, x, y, z, type[1], type[2]);
 	    	        		}
 	    					else if(type[0] == 0 && bType != type[1])
 	    	        		{
