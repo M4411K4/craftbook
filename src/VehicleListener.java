@@ -2158,13 +2158,16 @@ public class VehicleListener extends CraftBookDelegateListener {
         
         if (parts.length >= 2) {
             if (player != null && parts[0].equalsIgnoreCase("Held")) {
-                try {
-                    int item = Integer.parseInt(parts[1]);
-                    if (player.getItemInHand() == item) {
-                        return true;
-                    }
-                } catch (NumberFormatException e) {
-                }
+            	int[] info = getItemInfoFromParts(parts);
+            	if(info == null)
+            		return false;
+            	
+            	OItemStack iStack = player.getEntity().i.b();
+            	if(iStack != null && player.getItemInHand() >= 0
+            	   && contentEqualsItem(player.getItemInHand(), iStack.h(), iStack.a, info))
+            	{
+            		return true;
+            	}
             } else if (player != null && parts[0].equalsIgnoreCase("Group")) {
                 if (player.isInGroup(parts[1])) {
                     return true;
@@ -2173,63 +2176,47 @@ public class VehicleListener extends CraftBookDelegateListener {
                 if (parts[1].equalsIgnoreCase(player.getName())) {
                     return true;
                 }
+            } else if (player != null && parts[0].equalsIgnoreCase("INV")) {
+            	Inventory inv = player.getInventory();
+            	if(inv == null)
+            		return false;
+            	
+            	int[] info = getItemInfoFromParts(parts);
+            	if(info == null)
+            		return false;
+            	
+            	if(contentsHasItems(inv.getContents(), info))
+        			return true;
+            	
             } else if (minecart.getType() == Minecart.Type.StorageCart
             		&& ( parts[0].equalsIgnoreCase("SCI")
             				|| parts[0].equalsIgnoreCase("SCI+") )
             		) {
-            	try
-            	{
-            		String[] parts2 = parts[1].split("@", 2);
-            		int item = Integer.parseInt(parts2[0]);
-            		int color = 0;
-            		if(parts2.length > 1)
-            		{
-            			color = Integer.parseInt(parts2[1]);
-            			if(color > 15 || color < 0)
-            				return false;
-            		}
-            		
-            		int amount = 1;
-            		if(parts.length > 2)
-            		{
-            			amount = Integer.parseInt(parts[2]);
-            		}
-                    
-                    StorageMinecart storage = minecart.getStorage();
-                    if(storage != null)
-                    {
-                    	if(parts[0].equalsIgnoreCase("SCI"))
+            	
+            	int[] info = getItemInfoFromParts(parts);
+            	if(info == null)
+            		return false;
+            	
+                StorageMinecart storage = minecart.getStorage();
+                if(storage != null)
+                {
+                	if(parts[0].equalsIgnoreCase("SCI"))
+                	{
+                		//get from first slot
+                		Item scItem = storage.getItemFromSlot(0);
+                		if(scItem != null
+                			&& contentEqualsItem(scItem.getItemId(), scItem.getDamage(), scItem.getAmount(), info))
                     	{
-                    		//get from first slot
-                    		Item scItem = storage.getItemFromSlot(0);
-                    		if(scItem != null
-                    			&& scItem.getItemId() == item
-                    			&& scItem.getDamage() == color
-                    			&& scItem.getAmount() >= amount)
-                        	{
-                        		return true;
-                        	}
+                    		return true;
                     	}
-                    	else if(parts[0].equalsIgnoreCase("SCI+"))
-                    	{
-                    		//get from any match
-                    		Item[] items = storage.getContents();
-                    		int foundAmt = 0;
-                            for (Item scItem : items)
-                            {
-                            	if(scItem != null
-                        			&& scItem.getItemId() == item
-                        			&& scItem.getDamage() == color)
-                            	{
-                            		foundAmt += scItem.getAmount();
-                            		
-                            		if(foundAmt >= amount)
-                            			return true;
-                            	}
-                            }
-                    	}
-                    }
-                } catch (NumberFormatException e) {
+                	}
+                	else if(parts[0].equalsIgnoreCase("SCI+"))
+                	{
+                		//get from any match
+                		Item[] items = storage.getContents();
+                		if(contentsHasItems(items, info))
+                			return true;
+                	}
                 }
             } else if (parts[0].equalsIgnoreCase("Mob")) {
                 String testMob = parts[1];
@@ -2241,6 +2228,70 @@ public class VehicleListener extends CraftBookDelegateListener {
                     }
                 }
             }
+        }
+        
+        return false;
+    }
+    
+    private int[] getItemInfoFromParts(String[] parts)
+    {
+    	if(parts == null || parts.length < 2)
+    		return null;
+    	
+    	String[] parts2 = parts[1].split("@", 2);
+    	int[] item = new int[3];
+    	
+    	try
+    	{
+			item[0] = Integer.parseInt(parts2[0]);
+			item[1] = -1;
+			if(parts2.length > 1)
+			{
+				item[1] = Integer.parseInt(parts2[1]);
+				if(item[1] > 15 || item[1] < 0)
+					return null;
+			}
+			
+			item[2] = 1;
+			if(parts.length > 2)
+			{
+				item[2] = Integer.parseInt(parts[2]);
+			}
+    	}
+    	catch(NumberFormatException e)
+    	{
+    		return null;
+    	}
+		
+		return item;
+    }
+    
+    private boolean contentEqualsItem(int id, int color, int amount, int[] item)
+    {
+    	if(id == item[0]
+		   && (item[1] == -1 || color == item[1])
+		   && amount >= item[2])
+    	{
+    		return true;
+    	}
+    	
+    	return false;
+    }
+    
+    private boolean contentsHasItems(Item[] items, int[] item)
+    {
+    	int foundAmt = 0;
+        for (Item scItem : items)
+        {
+        	if(scItem != null
+    			&& scItem.getItemId() == item[0]
+    			&& (item[1] == -1 || scItem.getDamage() == item[1]) )
+        	{
+        		foundAmt += scItem.getAmount();
+        		
+        		if(foundAmt >= item[2])
+        			return true;
+        	}
         }
         
         return false;

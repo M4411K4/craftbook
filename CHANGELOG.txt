@@ -1,4 +1,4 @@
-2.0extra10_Test2:
+2.0extra10_Test4:
 Since I finally have a wiki, many specific details will not be added
 to this change log. Details are easier to explain on a wiki than a
 change log.
@@ -11,6 +11,11 @@ The wiki can be found at: http://cbx.m4411k4.com
     with CraftBook. Such as creating toll bridges.
 - added [MCX246] Fireball IC
 - added [MCT246] Cannon IC
+- added color/damage and amount minecart sorting to player "Held"
+    items.
+    - thanks Riot for the suggestion!
+- added player inventory minecart sorting. Searches the player's
+    whole inventory for matching item, color/damage, and amount
 - updated [MCX200] to support spawning sitting and angry wolves
 - updated [MCT233] to have a faster weather change
 - updated /savearea .cbcopy files to version 2 for world support
