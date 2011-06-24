@@ -1,4 +1,4 @@
-2.0extra10_Test4:
+2.0extra10 Test4:
 Since I finally have a wiki, many specific details will not be added
 to this change log. Details are easier to explain on a wiki than a
 change log.
