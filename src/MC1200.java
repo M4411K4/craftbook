@@ -86,6 +86,8 @@ public class MC1200 extends BaseIC {
                 for (int y = pos.getBlockY() + 1; y <= maxY; y++) {
                     if (BlockType.canPassThrough(CraftBook.getBlockID(chip.getWorldType(), x, y, z))) {
                         Location loc = new Location(x, y, z);
+                        loc.dimension = chip.getWorldType();
+                        
                         Mob mob = new Mob(id, loc);
                         if (rider.length() != 0 && Mob.isValid(rider)) {
                             mob.spawn(new Mob(rider));

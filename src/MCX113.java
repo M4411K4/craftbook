@@ -111,6 +111,7 @@ public class MCX113 extends BaseIC {
 	        	Vector bpos = chip.getBlockPosition();
 				
 				Location loc = new Location(bpos.getX(), bpos.getY(), bpos.getZ(), 90, 0);
+				loc.dimension = chip.getWorldType();
 				
 				if(bpos.getBlockX() - pt.getBlockX() > 0)
 					loc.rotX = 90;

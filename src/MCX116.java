@@ -98,9 +98,10 @@ public class MCX116 extends BaseIC {
         	Location pLoc = player.getLocation();
         	Vector pVec = new Vector(pLoc.x, pLoc.y, pLoc.z);
         	
-        	if( (pVec.getBlockX() == x || pVec.getBlockX() == x + 1 || pVec.getBlockX() == x - 1) &&
-        			pVec.getBlockY() == y &&
-        			(pVec.getBlockZ() == z || pVec.getBlockZ() == z + 1 || pVec.getBlockZ() == z - 1)
+        	if(player.getWorld() == world
+        	   && (pVec.getBlockX() == x || pVec.getBlockX() == x + 1 || pVec.getBlockX() == x - 1)
+        	   &&  pVec.getBlockY() == y
+        	   && (pVec.getBlockZ() == z || pVec.getBlockZ() == z + 1 || pVec.getBlockZ() == z - 1)
         		)
         	{
         		if(!id.isEmpty())

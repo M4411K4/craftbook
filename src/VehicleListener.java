@@ -727,6 +727,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             loc.x = loc.x + 0.5;
                             loc.y = loc.y + 0.1;
                             loc.z = loc.z + 0.5;
+                            loc.dimension = player.getWorld().getType().getId();
 
                             OEntity nullEntity = null; //to eject
                             player.getEntity().b(nullEntity);
@@ -1347,6 +1348,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             	if(player != null && destSign != null && destSign.getText(0).length() > 0)
                             		player.sendMessage(Colors.Gold+destSign.getText(0));
                             	
+                            	targetTrack.dimension = minecart.getWorld().getType().getId();
                             	minecart.teleportTo(targetTrack);
                             	minecart.setMotion(motion.getX(), 0, motion.getZ());
                             }
@@ -1445,6 +1447,7 @@ public class VehicleListener extends CraftBookDelegateListener {
 		                		
 		                		if(motion != null)
 		                		{
+		                			targetTrack.dimension = minecart.getWorld().getType().getId();
 		                			minecart.teleportTo(targetTrack);
 		                			minecart.setMotion(motion.getX(), motion.getY(), motion.getZ());
 		                		}
@@ -2149,7 +2152,7 @@ public class VehicleListener extends CraftBookDelegateListener {
         
         if (player != null) {
             String stop = stopStation.get(player.getName());
-            if (stop != null && stop.equals(line)) {
+            if (stop != null && stop.equalsIgnoreCase(line)) {
                 return true;
             }
         }

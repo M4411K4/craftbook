@@ -65,13 +65,18 @@ public class MCT246 extends MCX246 {
         if (chip.getIn(1).is() && chip.getIn(1).isTriggered()) {
             String dest = chip.getText().getLine3();
             String settings = chip.getText().getLine4();
+            float power = 1.0F;
             double speed = 0.2D;
             float rotation = 0F;
             float pitch = 0F;
 
             try {
             	if (!dest.isEmpty()) {
-                	speed = Double.parseDouble(dest);
+            		String[] args = dest.split(":", 2);
+            		
+            		speed = Double.parseDouble(args[0]);
+            		if(args.length > 1)
+            			power = Float.parseFloat(args[1]);
                 }
 
                 if (!settings.isEmpty()) {
@@ -84,7 +89,7 @@ public class MCT246 extends MCX246 {
             } catch (NumberFormatException e) {
             }
             
-            shoot(chip, speed, rotation, pitch);
+            shoot(chip, power, speed, rotation, pitch);
         }
         else if(chip.getIn(2).is() && chip.getIn(2).isTriggered())
         {

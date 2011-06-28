@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import com.sk89q.craftbook.music.media.ChatAdMedia;
 import com.sk89q.craftbook.music.media.ExternalMedia;
@@ -14,6 +15,8 @@ import com.sk89q.craftbook.music.media.Media;
 
 public class Playlist
 {
+	private static final Logger logger = Logger.getLogger("Minecraft.CraftBook");
+	
 	protected final IMusicPlayer MUSIC_PLAYER;
 	
 	private final String NAME;
@@ -97,10 +100,12 @@ public class Playlist
 		}
 		catch(FileNotFoundException e)
 		{
+			logger.warning("CraftBook playlist not found: "+NAME);
 			return;
 		}
 		catch(IOException e)
 		{
+			logger.warning("Error loading CraftBook playlist: "+NAME);
 			return;
 		}
 		finally
@@ -114,6 +119,11 @@ public class Playlist
 			{
 				
 			}
+		}
+		
+		if(getSize() == 0)
+		{
+			logger.warning("Error. CraftBook playlist is empty: "+NAME);
 		}
 	}
 	

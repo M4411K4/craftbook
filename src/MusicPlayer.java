@@ -148,6 +148,10 @@ public class MusicPlayer implements IMusicPlayer
 			else if(includePlaylist && song[1].equalsIgnoreCase("p"))
 			{
 				playlist = new Playlist(this, song[0]);
+				if(playlist.getSize() == 0)
+				{
+					playlist = null;
+				}
 				media = null;
 			}
 		}

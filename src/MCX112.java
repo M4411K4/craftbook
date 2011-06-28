@@ -77,7 +77,10 @@ public class MCX112 extends BaseIC {
                 chip.getOut(1).set(false);
             } else
             {
+            	int dimension = dest.dimension;
             	dest = new Location(dest.x+0.5, dest.y, dest.z+0.5, dest.rotX, dest.rotY);
+            	dest.dimension = dimension;
+            	
             	Vector pos;
             	World world = CraftBook.getWorld(chip.getWorldType());
             	
@@ -105,12 +108,13 @@ public class MCX112 extends BaseIC {
                 	Location pLoc = player.getLocation();
                 	Vector pVec = new Vector(pLoc.x, pLoc.y, pLoc.z);
                 	
-                	if( (pVec.getBlockX() == x || pVec.getBlockX() == x + 1 || pVec.getBlockX() == x - 1) &&
-                			pVec.getBlockY() == y &&
-                			(pVec.getBlockZ() == z || pVec.getBlockZ() == z + 1 || pVec.getBlockZ() == z - 1)
+                	if(player.getWorld() == world
+                	   && (pVec.getBlockX() == x || pVec.getBlockX() == x + 1 || pVec.getBlockX() == x - 1)
+                	   &&  pVec.getBlockY() == y
+                	   && (pVec.getBlockZ() == z || pVec.getBlockZ() == z + 1 || pVec.getBlockZ() == z - 1)
                 		)
                 	{
-                        dest.y = getSafeY(world, new Vector(dest.x, dest.y, dest.z)) + 0.2;
+                        dest.y = getSafeY(CraftBook.getWorld(dest.dimension), new Vector(dest.x, dest.y, dest.z)) + 1.0;
                         
                         String msg = chip.getText().getLine4();
                 		if(msg.length() == 0)

@@ -1,4 +1,4 @@
-2.0extra10 Test4:
+2.0extra10:
 Since I finally have a wiki, many specific details will not be added
 to this change log. Details are easier to explain on a wiki than a
 change log.
@@ -20,10 +20,15 @@ The wiki can be found at: http://cbx.m4411k4.com
 - updated [MCT233] to have a faster weather change
 - updated /savearea .cbcopy files to version 2 for world support
     -version 1 .cbcopy files will default to the main world.
+- updated station names for minecart sorting to be case insensitive
+    - thanks Riot for the suggestion!
+- updated playlists to log a couple playlist loading errors
 - fixed [MC3032] having a name longer than 15 chars.
     -thanks Riot for reporting it!
 - fixed [MC1500] having a name longer than 15 chars.
 - fixed minecart reverse blocks. Still a little buggy, but works now
+- fixed music playlists causing errors when empty
+    -thanks Riot for reporting it!
 
 2.0extra9.2:
 - 2 new optional properties in craftbook.properties file

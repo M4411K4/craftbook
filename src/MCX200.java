@@ -117,16 +117,20 @@ public class MCX200 extends BaseIC {
                     if (BlockType.canPassThrough(blockId) || BlockType.isWater(blockId))
                     {
                         Location loc = new Location(x, y, z);
+                        loc.dimension = chip.getWorldType();
+                        
                         Mob mob = new Mob(id, loc);
                         if (rider.length() != 0 && Mob.isValid(rider)) {
                         	Mob mobRider = new Mob(rider);
-                            mob.spawn(mobRider);
+                            //mob.spawn(mobRider);
+                            spawn(mob, chip.getWorldType(), mobRider); //[TODO]: remove when Canary fixes Mob spawn's world
                             
                             if(colorRider >= 0)
                             	setMobColor(mobRider.getEntity(), colorRider);
                             
                         } else {
-                            mob.spawn();
+                            //mob.spawn();
+                            spawn(mob, chip.getWorldType(), null); //[TODO]: remove when Canary fixes Mob spawn's world
                         }
                         
                         if(color >= 0)
@@ -137,6 +141,24 @@ public class MCX200 extends BaseIC {
                 }
             }
         }
+    }
+    
+    //[TODO]: remove when Canary fixes Mob spawn's world
+    private void spawn(BaseEntity entity, int worldType, BaseEntity rider)
+    {
+    	OWorld oworld = CraftBook.getOWorld(worldType);
+    	OEntity oentity = entity.getEntity();
+    	
+    	oentity.c(entity.getX() + 0.5D, entity.getY(), entity.getZ() + 0.5D, entity.getRotation(), 0.0F);
+    	oworld.b(oentity);
+    	
+    	if (rider != null)
+    	{
+    		OEntity orider = rider.getEntity();
+    		orider.c(entity.getX(), entity.getY(), entity.getZ(), entity.getRotation(), 0.0F);
+    		oworld.b(orider);
+    		orider.b(oentity);
+    	}
     }
     
     private int getColor(String[] args)

@@ -96,7 +96,8 @@ public class MCX236 extends BaseIC {
 	    		
 	    		Boolean exists = players.get(player);
 	    		
-	    		if(diff.getX() * diff.getX() + diff.getY() * diff.getY() + diff.getZ() * diff.getZ() < dist)
+	    		if(pLoc.dimension == chip.getWorldType()
+	    		   && diff.getX() * diff.getX() + diff.getY() * diff.getY() + diff.getZ() * diff.getZ() < dist)
 	    		{
 	    			if(exists == null)
 	    			{

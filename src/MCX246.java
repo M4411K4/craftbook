@@ -62,15 +62,23 @@ public class MCX246 extends BaseIC {
         {
         	if(!dest.isEmpty())
         	{
-        		int speed = Integer.parseInt(dest);
+        		String[] args = dest.split(":", 2);
         		
+        		double speed = Double.parseDouble(args[0]);
         		if(speed > 5D || speed <= 0D)
         			return "Speed must be a number between 0 and 5";
+        		
+        		if(args.length > 1)
+        		{
+        			float power = Float.parseFloat(args[1]);
+        			if(power > 10 || power < 0.1)
+        				return "Power must be a number from 0.1 to 10";
+        		}
         	}
         }
         catch(NumberFormatException e)
         {
-        	return "3rd line must be a number";
+        	return "3rd line must be numbers "+e;
         }
         
         try
@@ -78,14 +86,14 @@ public class MCX246 extends BaseIC {
         	if(!settings.isEmpty())
         	{
         		String[] args = settings.split(":", 2);
-        		double rotation = Float.parseFloat(args[0]);
+        		float rotation = Float.parseFloat(args[0]);
         		
         		if(rotation > 90 || rotation < -90)
         			return "rotation must be a number from -90 to 90";
         		
         		if(args.length > 1)
         		{
-        			double pitch = Float.parseFloat(args[1]);
+        			float pitch = Float.parseFloat(args[1]);
         			
         			if(pitch > 1 || pitch < -1)
         				return "pitch must be a number from -1 to 1";
@@ -95,7 +103,7 @@ public class MCX246 extends BaseIC {
         }
         catch(NumberFormatException e)
         {
-        	return "4th line must be a numbers";
+        	return "4th line must be numbers";
         }
 
         return null;
@@ -110,13 +118,18 @@ public class MCX246 extends BaseIC {
         if (chip.getIn(1).is()) {
             String dest = chip.getText().getLine3();
             String settings = chip.getText().getLine4();
+            float power = 1.0F;
             double speed = 0.2D;
             float rotation = 0F;
             float pitch = 0F;
 
             try {
             	if (!dest.isEmpty()) {
-                	speed = Double.parseDouble(dest);
+            		String[] args = dest.split(":", 2);
+            		
+            		speed = Double.parseDouble(args[0]);
+            		if(args.length > 1)
+            			power = Float.parseFloat(args[1]);
                 }
 
                 if (!settings.isEmpty()) {
@@ -129,7 +142,7 @@ public class MCX246 extends BaseIC {
             } catch (NumberFormatException e) {
             }
             
-            shoot(chip, speed, rotation, pitch);
+            shoot(chip, power, speed, rotation, pitch);
         }
     }
     
@@ -141,10 +154,10 @@ public class MCX246 extends BaseIC {
      * @param spread
      * @param vertVel
      */
-    protected void shoot(ChipState chip, double speed, float rotation, float pitch) {
-    	shootFireball(chip, speed, rotation, pitch, 0, 0, 0);
+    protected void shoot(ChipState chip, float power, double speed, float rotation, float pitch) {
+    	shootFireball(chip, power, speed, rotation, pitch, 0, 0, 0);
     }
-    protected void shootFireball(ChipState chip, double speed, float rotation, float pitch, int offsetx, int offsety, int offsetz)
+    protected void shootFireball(ChipState chip, float power, double speed, float rotation, float pitch, int offsetx, int offsety, int offsetz)
     {
     	Vector start = Util.getWallSignBack(chip.getWorldType(), chip.getPosition(), 2);
     	double x = start.getBlockX() + offsetx + 0.5D;
@@ -154,23 +167,7 @@ public class MCX246 extends BaseIC {
     	pitch *= 90;
     	
         OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
-        OEntityFireball fireball = new OEntityFireball(oworld);
-        
-        fireball.b = new OEntityCreature(oworld);
-        
-        fireball.bj = 1.0F;
-        fireball.bk = 1.0F;
-        
-        fireball.c(x, y, z, 0F, 0F);
-        fireball.a(x, y, z);
-        
-        fireball.bi = 0.0F;
-        fireball.aS = fireball.aT = fireball.aU = 0.0D;
-        
-        fireball.c = Math.cos(Math.toRadians(rotation)) * speed;
-        fireball.d = Math.sin(Math.toRadians(pitch)) * speed;
-        fireball.e = Math.sin(Math.toRadians(rotation)) * speed;
-		
+        OEntityFireball fireball = new CBFireball(oworld, x, y, z, rotation, pitch, power, speed);
 		oworld.b(fireball);
     }
 }
