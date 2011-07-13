@@ -186,7 +186,7 @@ public class MCX209 extends BaseIC {
     		return null;
     	}
     	
-    	if(out[0] <= 0 || out[1] <= 0 || out[0] > 11 || out[1] > 30 || out[2] > 10 || out[2] < -10)
+    	if(out[0] <= 0 || out[1] <= 0 || out[0] > 11 || out[1] > 64 || out[2] > 10 || out[2] < -10)
     		return null;
     	
     	return out;

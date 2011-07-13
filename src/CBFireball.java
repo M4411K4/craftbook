@@ -24,7 +24,7 @@ public class CBFireball extends OEntityFireball
 		this.bk = 1.0F;
         
 		this.c(x, y, z, 0F, 0F);
-		this.a(x, y, z);
+		this.c(x, y, z);
         
 		this.bi = 0.0F;
 		this.aS = this.aT = this.aU = 0.0D;
@@ -35,9 +35,9 @@ public class CBFireball extends OEntityFireball
 	}
 	
 	@Override
-	public void o_()
+	public void m_()
 	{
-		Q();
+		R();
 		this.by = 10;
 
 	    if (this.a > 0) this.a -= 1;
@@ -55,7 +55,7 @@ public class CBFireball extends OEntityFireball
 	        this.ticksInAir = 0;
 	      } else {
 	        this.ticksAlive += 1;
-	        if (this.ticksAlive == 1200) I();
+	        if (this.ticksAlive == 1200) J();
 	        return;
 	      }
 	    } else {
@@ -77,7 +77,7 @@ public class CBFireball extends OEntityFireball
 	    double d1 = 0.0D;
 	    for (int n = 0; n < localList.size(); n++) {
 	      OEntity localOEntity = (OEntity)localList.get(n);
-	      if ((!localOEntity.n_()) || ((localOEntity == this.b) && (this.ticksInAir < 25)))
+	      if ((!localOEntity.l_()) || ((localOEntity == this.b) && (this.ticksInAir < 25)))
 	        continue;
 	      float f3 = 0.3F;
 	      OAxisAlignedBB localOAxisAlignedBB = localOEntity.aZ.b(f3, f3, f3);
@@ -101,7 +101,7 @@ public class CBFireball extends OEntityFireball
 	          (localOMovingObjectPosition1.g.a(this.b, 0)));
 	        this.aL.a(null, this.aP, this.aQ, this.aR, this.power, true);
 	      }
-	      I();
+	      J();
 	    }
 	    this.aP += this.aS;
 	    this.aQ += this.aT;
@@ -125,7 +125,7 @@ public class CBFireball extends OEntityFireball
 	    this.aV = (this.aX + (this.aV - this.aX) * 0.2F);
 
 	    float f2 = 0.95F;
-	    if (ac()) {
+	    if (ad()) {
 	      for (int i1 = 0; i1 < 4; i1++) {
 	        float f4 = 0.25F;
 	        this.aL.a("bubble", this.aP - this.aS * f4, this.aQ - this.aT * f4, this.aR - this.aU * f4, this.aS, this.aT, this.aU);
@@ -142,7 +142,7 @@ public class CBFireball extends OEntityFireball
 
 	    this.aL.a("smoke", this.aP, this.aQ + 0.5D, this.aR, 0.0D, 0.0D, 0.0D);
 
-	    a(this.aP, this.aQ, this.aR);
+	    c(this.aP, this.aQ, this.aR);
 	}
 	
 	@Override

@@ -193,6 +193,6 @@ public class MC1250 extends BaseIC {
         // Make TNT explode
     	OEntityTNTPrimed tnt = new OEntityTNTPrimed(oworld);
         tnt.a(x, y, z);
-        tnt.o_();
+        tnt.m_();
     }
 }

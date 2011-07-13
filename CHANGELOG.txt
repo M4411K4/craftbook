@@ -1,3 +1,12 @@
+2.0extra11:
+- updated to minecraft 1.7.3
+- added [MCX118] & [MCZ118] Player Near?
+- added [MCX119] & [MCZ119] Mob Near?
+- added [MCX130] & [MCZ130] Mob Zapper
+- updated [MCX207] [MCX208] [MCX209] & [MCX210] to have a max length
+    of 64
+    - thanks PspTrusz for the suggestion!
+
 2.0extra10:
 Since I finally have a wiki, many specific details will not be added
 to this change log. Details are easier to explain on a wiki than a

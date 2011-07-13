@@ -146,7 +146,7 @@ public class MC1262 extends BaseIC {
         }
         
         OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
-        int light = oworld.k(x, y + 1, z);
+        int light = oworld.l(x, y + 1, z);
         
         chip.getOut(1).set(light >= minLight);
     }

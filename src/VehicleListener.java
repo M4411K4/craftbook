@@ -918,7 +918,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                         	for(int i = 0; i < oworld.d.size(); i++)
                         	{
                         		OEntityPlayer tmpplayer = (OEntityPlayer) oworld.d.get(i);
-                        		double d2 = tmpplayer.d(eminecart.aP, eminecart.aQ, eminecart.aR);
+                        		double d2 = tmpplayer.e(eminecart.aP, eminecart.aQ, eminecart.aR);
                         		
                         		if( (d2 < DIST * DIST) && ((closeDist == -1.0D) || (d2 < closeDist))
                         			&& ( (data == 0x0 && tmpplayer.aR >= eminecart.aR)

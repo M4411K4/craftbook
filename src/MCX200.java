@@ -188,7 +188,7 @@ public class MCX200 extends BaseIC {
     	if(entity instanceof OEntitySheep)
     	{
     		OEntitySheep sheep = (OEntitySheep)entity;
-    		sheep.a_(color);
+    		sheep.b_(color);
     	}
     	else if(entity instanceof OEntityCreeper)
     	{
@@ -199,7 +199,7 @@ public class MCX200 extends BaseIC {
     			return;
     		
     		OEntityCreeper creeper = (OEntityCreeper)entity;
-    		creeper.Z().b(17, (byte)1);
+    		creeper.aa().b(17, (byte)1);
     	}
     	else if(entity instanceof OEntityWolf)
     	{
@@ -210,7 +210,7 @@ public class MCX200 extends BaseIC {
     			return;
     		
     		OEntityWolf wolf = (OEntityWolf)entity;
-    		wolf.Z().b(16, (byte)color);
+    		wolf.aa().b(16, (byte)color);
     	}
 	}
     

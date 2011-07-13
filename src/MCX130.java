@@ -26,7 +26,7 @@ import com.sk89q.craftbook.ic.ChipState;
  *
  * @author sk89q
  */
-public class MCX117 extends MCX116 {
+public class MCX130 extends MCX119 {
     
 
     /**
@@ -35,49 +35,34 @@ public class MCX117 extends MCX116 {
      * @return
      */
     public String getTitle() {
-        return "PLAYER MINE";
+        return "MOB ZAPPER";
     }
     
     public boolean requiresPermission() {
         return true;
     }
-
-    /**
-     * Think.
-     *
-     * @param chip
-     */
-    public void think(ChipState chip) {
-    	
-    	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
-    	{
-    		World world = CraftBook.getWorld(chip.getWorldType());
-    		Player player = playerAbove(world, chip.getBlockPosition(), chip.getText().getLine3());
-    		
-    		if(player == null)
-    		{
-    			chip.getOut(1).set(false);
-    		}
-    		else
-    		{
-    			explodeTNT(player.getEntity().aL, player.getX(), player.getY(), player.getZ());
-    			
-    			chip.getOut(1).set(true);
-    		}
-    	}
-    }
     
-    /**
-     * Makes TNT go boom.
-     * 
-     * @param x
-     * @param y
-     * @param z
-     */
-    protected void explodeTNT(OWorld oworld, double x, double y, double z) {
-        // Make TNT explode
-    	OEntityTNTPrimed tnt = new OEntityTNTPrimed(oworld);
-        tnt.a(x, y, z);
-        tnt.m_();
+    
+    @Override
+    protected Boolean entityInRange(ChipState chip, BaseEntity entity, byte type)
+    {
+    	if(type == 0)
+    	{
+    		//entity.destroy();
+    		entity.getEntity().J();
+    		return null;
+    	}
+    	else if(type == 1 && (entity.isMob() || entity.isAnimal()) && entity instanceof Mob)
+    	{
+			Mob mob = (Mob) entity;
+			if(chip.getText().getLine3().isEmpty() || mob.getName().equalsIgnoreCase(chip.getText().getLine3()))
+			{
+				//entity.destroy();
+				entity.getEntity().J();
+				return null;
+			}
+    	}
+    	
+    	return false;
     }
 }

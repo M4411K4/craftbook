@@ -117,7 +117,7 @@ public class MCT246 extends MCX246 {
         	
         	//[HACK]:forces update since Sign.update() doesn't always work anymore due to Notch optimizing block updates
         	OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
-        	oworld.g(chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+        	oworld.h(chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
         }
         else if(chip.getIn(3).is() && chip.getIn(3).isTriggered())
         {
@@ -145,7 +145,7 @@ public class MCT246 extends MCX246 {
         	
         	//[HACK]:forces update since Sign.update() doesn't always work anymore due to Notch optimizing block updates
         	OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
-        	oworld.g(chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+        	oworld.h(chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
         }
     }
     

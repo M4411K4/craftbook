@@ -57,10 +57,14 @@ public final class BlockType {
     public static final int BED = 26;
     public static final int POWERED_RAIL = 27;
     public static final int DETECTOR_RAIL = 28;
+    public static final int STICKY_PISTON = 29;
     public static final int WEB = 30;
     public static final int TALL_GRASS = 31;
     public static final int DEAD_SHRUBS = 32;
+    public static final int PISTON = 33;
+    public static final int PISTON_EXTENSION = 34;
     public static final int CLOTH = 35;
+    public static final int PISTON_MOVED_BLOCK = 36;
     public static final int YELLOW_FLOWER = 37;
     public static final int RED_FLOWER = 38;
     public static final int BROWN_MUSHROOM = 39;
@@ -153,10 +157,14 @@ public final class BlockType {
         blockDrops.put(26, 355);
         blockDrops.put(27, 27);
         blockDrops.put(28, 28);
+        blockDrops.put(29, 29);
         blockDrops.put(30, 30);
         blockDrops.put(31, 31);
         blockDrops.put(32, 32);
+        blockDrops.put(33, 33);
+        blockDrops.put(34, 34);
         blockDrops.put(35, 35);
+        blockDrops.put(36, 36);
         blockDrops.put(37, 37);
         blockDrops.put(38, 38);
         blockDrops.put(39, 39);
@@ -360,6 +368,8 @@ public final class BlockType {
                 || id == REDSTONE_TORCH_ON
                 || id == REDSTONE_REPEATER_OFF
                 || id == REDSTONE_REPEATER_ON
+                || id == STICKY_PISTON
+                || id == PISTON
                 || id == BED
                 || id == STONE_BUTTON
                 || id == CLOTH
@@ -407,6 +417,8 @@ public final class BlockType {
                 || id == REDSTONE_REPEATER_ON
                 || id == STONE_BUTTON
                 || id == REDSTONE_WIRE
+                || id == STICKY_PISTON
+                || id == PISTON
                 || id == WOODEN_DOOR
                 || id == IRON_DOOR
                 || id == TRAPDOOR;
