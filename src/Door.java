@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import com.sk89q.craftbook.*;
@@ -40,6 +41,7 @@ public class Door extends SignOrientedMechanism {
      */
     public static Set<Integer> allowedBlocks
             = new HashSet<Integer>();
+    public static ArrayList<Integer> allowedICBlocks;
     /**
      * Max door length.
      */

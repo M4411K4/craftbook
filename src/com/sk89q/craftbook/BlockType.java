@@ -212,7 +212,7 @@ public final class BlockType {
         blockDrops.put(86, 86);
         blockDrops.put(87, 87);
         blockDrops.put(88, 88);
-        blockDrops.put(89, 248);
+        blockDrops.put(89, 89);
         blockDrops.put(91, 91);
         blockDrops.put(92, 354);
         blockDrops.put(93, 356);

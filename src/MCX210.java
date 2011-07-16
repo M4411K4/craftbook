@@ -34,6 +34,28 @@ public class MCX210 extends MCX209 {
         return "DOOR+";
     }
 
+    protected boolean canUseBlock(int id)
+    {
+    	if(Door.allowedICBlocks == null)
+    		return true;
+    	
+    	if(Door.allowedICBlocks.size() == 0)
+    		return false;
+    	
+    	for(Integer bid : Door.allowedICBlocks)
+    	{
+    		if(bid == id)
+    			return true;
+    	}
+    	
+    	return false;
+    }
+    
+    protected int getMaxLength()
+    {
+    	return Door.maxLength;
+    }
+    
     /**
      * Think.
      *
@@ -47,7 +69,7 @@ public class MCX210 extends MCX209 {
         int[] type = getType(chip.getText().getLine3());
         int[] values = getDimensions(chip.getText().getLine4());
         
-        if(type[0] < 0 || type[1] < 0 || type[2] < -1 || values == null || !(chip.getExtra() instanceof BlockBag))
+        if(type[0] < 0 || type[1] < 0 || !canUseBlock(type[1]) || type[2] < -1 || values == null || !(chip.getExtra() instanceof BlockBag))
         	return;
         
         if(type[2] < 0)

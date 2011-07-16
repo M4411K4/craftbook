@@ -24,6 +24,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -109,10 +110,14 @@ public class MechanismListener extends CraftBookDelegateListener {
         useHiddenSwitches = properties.getBoolean("door-enable", true);
         Bridge.allowedBlocks = Util.toBlockIDSet(properties.getString("bridge-blocks", "4,5,20,43"));
         Bridge.maxLength = properties.getInt("bridge-max-length", 30);
+        if(properties.containsKey("bridge-ic-blocks"))
+        	Bridge.allowedICBlocks = getICBlockList(properties.getString("bridge-ic-blocks", "all"));
         useDoors = properties.getBoolean("door-enable", true);
         redstoneDoors = properties.getBoolean("door-redstone", true);
         Door.allowedBlocks = Util.toBlockIDSet(properties.getString("door-blocks", "1,3,4,5,17,20,35,43,44,45,47,80,82"));
         Door.maxLength = properties.getInt("door-max-length", 30);
+        if(properties.containsKey("door-ic-blocks"))
+        	Door.allowedICBlocks = getICBlockList(properties.getString("door-ic-blocks", "all"));
         dropBookshelves = properties.getBoolean("drop-bookshelves", true);
         try {
             dropAppleChance = Double.parseDouble(properties.getString("apple-drop-chance", "0.5")) / 100.0;
@@ -129,6 +134,28 @@ public class MechanismListener extends CraftBookDelegateListener {
         enableAmmeter = properties.getBoolean("ammeter", true);
 
         loadCauldron();
+    }
+    
+    private ArrayList<Integer> getICBlockList(String arg)
+    {
+    	if(arg.equalsIgnoreCase("all"))
+    		return null;
+    	
+    	String[] args = arg.split(",");
+    	ArrayList<Integer> list = new ArrayList<Integer>();
+    	for(int i = 0; i < args.length; i++)
+    	{
+    		try
+    		{
+    			list.add( Integer.parseInt(args[i]) );
+    		}
+    		catch(NumberFormatException e)
+    		{
+    			
+    		}
+    	}
+    	
+    	return list;
     }
     
     /**
@@ -1031,6 +1058,35 @@ public class MechanismListener extends CraftBookDelegateListener {
             }
 
             return true;
+        }
+        else if(split[0].equalsIgnoreCase("/kill248") && player.canUseCommand("/kill248"))
+        {
+        	boolean found = false;
+        	for(int i = -1; i < 1; i++)
+        	{
+        		OWorldServer oworld = CraftBook.getOWorldServer(i);
+        		
+        		for(@SuppressWarnings("rawtypes")
+				Iterator it = oworld.b.iterator(); it.hasNext();)
+        		{
+        			Object obj = it.next();
+        			if(obj instanceof OEntityItem)
+        			{
+        				OEntityItem eitem = (OEntityItem) obj;
+        				if(eitem.a.c == 248)
+        				{
+        					found = true;
+        					eitem.J();
+        				}
+        			}
+        		}
+        	}
+        	if(found)
+        		player.sendMessage(Colors.Gold + "item 248 was found and set to be removed.");
+        	else
+        		player.sendMessage(Colors.Rose + "item 248 was not found.");
+        	
+        	return true;
         }
         else if(split[0].equalsIgnoreCase("/mcx120") && player.canUseCommand("/mcx120"))
         {

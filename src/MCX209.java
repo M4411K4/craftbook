@@ -73,6 +73,10 @@ public class MCX209 extends BaseIC {
         {
         	return "Not a valid block type: " + sign.getLine3() + ".";
         }
+        else if(!canUseBlock(type[1]))
+        {
+        	return "Block type not allowed.";
+        }
         
         //color check
         if(type[2] == -2)
@@ -186,10 +190,35 @@ public class MCX209 extends BaseIC {
     		return null;
     	}
     	
-    	if(out[0] <= 0 || out[1] <= 0 || out[0] > 11 || out[1] > 64 || out[2] > 10 || out[2] < -10)
+    	if(out[0] <= 0 || out[1] <= 0 || out[0] > 11 || out[2] > 10 || out[2] < -10)
     		return null;
     	
+    	if(out[1] > getMaxLength())
+    		out[1] = getMaxLength();
+    	
     	return out;
+    }
+    
+    protected boolean canUseBlock(int id)
+    {
+    	if(Bridge.allowedICBlocks == null)
+    		return true;
+    	
+    	if(Bridge.allowedICBlocks.size() == 0)
+    		return false;
+    	
+    	for(Integer bid : Bridge.allowedICBlocks)
+    	{
+    		if(bid == id)
+    			return true;
+    	}
+    	
+    	return false;
+    }
+    
+    protected int getMaxLength()
+    {
+    	return Bridge.maxLength;
     }
 
     /**
@@ -205,7 +234,7 @@ public class MCX209 extends BaseIC {
         int[] type = getType(chip.getText().getLine3());
         int[] values = getDimensions(chip.getText().getLine4());
         
-        if(type[0] < 0 || type[1] < 0 || type[2] < -1 || values == null || !(chip.getExtra() instanceof BlockBag))
+        if(type[0] < 0 || type[1] < 0 || !canUseBlock(type[1]) || type[2] < -1 || values == null || !(chip.getExtra() instanceof BlockBag))
         	return;
         
         if(type[2] < 0)

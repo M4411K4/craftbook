@@ -1,3 +1,18 @@
+2.0extra11.1:
+- added ability to set specific block types for Bridge and Door ICs
+    [MCX207] [MCX208] [MCX209] and [MCX210]
+    in the craftbook.properties
+    - thanks Riot for the suggestion!
+- updated Bridge and Door ICs to now use the Bridge and Door max
+    length values in the craftbook.properties
+    - thanks PspTrusz for the suggestion!
+- fixed block 89 (glowstone) dropping an invalid item
+    - Now drops glowstone instead of the attempted glowstone dust
+    - Added *temporary* in-game command /kill248 to remove any
+        invalid items from the 89-glowstone bug (does not include
+        items in chests)
+    - thanks Riot for the bug report!
+
 2.0extra11:
 - updated to minecraft 1.7.3
 - added [MCX118] & [MCZ118] Player Near?
