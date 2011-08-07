@@ -293,9 +293,18 @@ public class MCX209 extends BaseIC {
     }
     
     
-    protected void setBlocks(World world, int startX, int endX, int startY, int endY, int startZ, int endZ,
+    protected static void setBlocks(World world, int startX, int endX, int startY, int endY, int startZ, int endZ,
     		boolean set, int[] type, BlockBag bag)
     {
+    	if(startY < 0)
+    		startY = 0;
+    	else if(startY > 127)
+    		startY = 127;
+    	if(endY < 0)
+    		endY = 0;
+    	else if(endY > 127)
+    		endY = 127;
+    	
     	for(int x = startX; x < endX; x++)
         {
     		for(int y = startY; y < endY; y++)
@@ -340,7 +349,7 @@ public class MCX209 extends BaseIC {
         }
     }
     
-    protected boolean canPassThrough(int t)
+    protected static boolean canPassThrough(int t)
     {
         return t == 0 || t == BlockType.WATER || t == BlockType.STATIONARY_WATER
                 || t == BlockType.LAVA || t == BlockType.STATIONARY_LAVA

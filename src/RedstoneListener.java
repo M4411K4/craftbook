@@ -171,6 +171,8 @@ public class RedstoneListener extends CraftBookDelegateListener
             internalRegisterIC("MCZ120", new MCX120(), ICType.ZISO);
             internalRegisterIC("MCZ121", new MCX121(), ICType.ZISO);
             internalRegisterIC("MCZ130", new MCX130(), ICType.ZISO);
+            internalRegisterIC("MCZ203", new MCX203(), ICType.ZISO);
+            internalRegisterIC("MCZ205", new MCX205(), ICType.ZISO);
             internalRegisterIC("MCZ230", new MCX230(), ICType.ZISO);
             internalRegisterIC("MCZ231", new MCX231(), ICType.ZISO);
             internalRegisterIC("MCZ236", new MCX236(), ICType.ZISO);
@@ -190,6 +192,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MC1202", new MC1202(), ICType.SISO);
         internalRegisterIC("MC1205", new MC1205(), ICType.SISO);
         internalRegisterIC("MC1206", new MC1206(), ICType.SISO);
+        internalRegisterIC("MC1207", new MC1207(), ICType.SISO);
         internalRegisterIC("MC1230", new MC1230(), ICType.SISO);
         internalRegisterIC("MC1231", new MC1231(), ICType.SISO);
         internalRegisterIC("MC1240", new MC1240(), ICType.SISO);
@@ -205,6 +208,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MC1512", new MC1512(), ICType.SISO);
 
         internalRegisterIC("MC2020", new MC2020(), ICType.SI3O);
+        internalRegisterIC("MC2999", new MC2999(), ICType.SI3O);
         
         internalRegisterIC("MC3020", new MC3020(), ICType._3ISO);
         internalRegisterIC("MC3002", new MC3002(), ICType._3ISO);
@@ -242,6 +246,8 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX200", new MCX200(), ICType.SISO);
         internalRegisterIC("MCX201", new MCX201(), ICType.SISO);
         internalRegisterIC("MCX202", new MCX202(), ICType.SISO);
+        internalRegisterIC("MCX203", new MCX203(), ICType.SISO);
+        internalRegisterIC("MCX205", new MCX205(), ICType.SISO);
         internalRegisterIC("MCX207", new MCX207(), ICType.SISO);
         internalRegisterIC("MCX208", new MCX208(), ICType.SISO);
         internalRegisterIC("MCX209", new MCX209(), ICType.SISO);
@@ -269,6 +275,10 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCU700", new MCX700(), ICType.UISO);
         internalRegisterIC("MCU705", new MCX705(), ICType.UISO);
         
+        internalRegisterIC("MCU211", new MCX211(), ICType.MISO);
+        internalRegisterIC("MCU212", new MCX212(), ICType.MISO);
+        internalRegisterIC("MCU213", new MCX213(), ICType.MISO);
+        internalRegisterIC("MCU214", new MCX214(), ICType.MISO);
         internalRegisterIC("MCU701", new MCX701(), ICType.MISO);
         internalRegisterIC("MCU702", new MCX702(), ICType.MISO);
     }
@@ -531,8 +541,9 @@ public class RedstoneListener extends CraftBookDelegateListener
                     	//hopefully I can change it later on.
                     	if(id.equals("MCX207") || id.equals("MCX208") || id.equals("MCX209") || id.equals("MCX210"))
                     		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, listener.getBlockBag(worldType, pt));
-                    	else if(id.equals("MCU440") || id.equals("MCU700") || id.equals("MCU701")
-                    			|| id.equals("MCU702") || id.equals("MCU705"))
+                    	else if(id.equals("MCU440")
+                    			|| id.equals("MCU700") || id.equals("MCU701") || id.equals("MCU702") || id.equals("MCU705")
+                    			|| id.equals("MCU211") || id.equals("MCU212") || id.equals("MCU213") || id.equals("MCU214") )
                     		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, thisListener);
                         else
                         	ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, null);
@@ -669,6 +680,25 @@ public class RedstoneListener extends CraftBookDelegateListener
         RegisteredIC ic = icList.get(id);
         if (ic == null)
         	return false;
+        
+        if(id.equals("MCZ236"))
+        {
+        	if(MCX236.isSameCoord(MCX236.players.get(player),
+        			world.getType().getId(),
+        			new Vector(block.getX(), block.getY(), block.getZ())))
+        	{
+	        	MCX236.players.remove(player);
+        	}
+        }
+        else if(id.equals("MCZ238"))
+        {
+        	if(MCX236.isSameCoord(MCX238.players.get(player),
+        			world.getType().getId(),
+        			new Vector(block.getX(), block.getY(), block.getZ())))
+        	{
+        		MCX238.players.remove(player);
+        	}
+        }
         
         if(!ic.type.updateOnce)
         	return false;

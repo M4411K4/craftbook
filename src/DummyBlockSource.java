@@ -42,6 +42,9 @@ public class DummyBlockSource extends BlockBag {
      * @throws OutOfBlocksException
      */
     public void fetchBlock(int id) throws BlockSourceException {
+    	fetchBlock(id, (byte)-1);
+    }
+    public void fetchBlock(int id, byte data) throws BlockSourceException {
         if(!fetch) throw new OutOfBlocksException(id);
     }
 
@@ -54,6 +57,9 @@ public class DummyBlockSource extends BlockBag {
      * @throws OutOfSpaceException
      */
     public void storeBlock(int id) throws BlockSourceException {
+    	storeBlock(id, (byte)-1);
+    }
+    public void storeBlock(int id, byte data) throws BlockSourceException {
         if(!store) throw new OutOfSpaceException(id);
     }
 
@@ -79,6 +85,16 @@ public class DummyBlockSource extends BlockBag {
      * Flush changes.
      */
     public void flushChanges() {
+    }
+    
+    public boolean hasRealFetch()
+    {
+    	return fetch;
+    }
+    
+    public boolean hasRealStore()
+    {
+    	return store;
     }
     
     /**

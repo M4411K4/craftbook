@@ -51,6 +51,9 @@ public class NearbyChestBlockBag extends BlockBag {
      * @throws OutOfBlocksException
      */
     public void fetchBlock(int id) throws BlockSourceException {
+    	fetchBlock(id, (byte)-1);
+    }
+    public void fetchBlock(int id, byte data) throws BlockSourceException {
         try {
             for (ComparableInventory c : chests) {
                 Inventory chest = c.getInventory();
@@ -61,6 +64,7 @@ public class NearbyChestBlockBag extends BlockBag {
                     if (itemArray[i] != null) {
                         // Found an item
                         if (itemArray[i].getItemId() == id &&
+                        	(data == -1 || itemArray[i].getDamage() == data) &&
                             itemArray[i].getAmount() >= 1) {
                             int newAmount = itemArray[i].getAmount() - 1;
     
@@ -93,6 +97,9 @@ public class NearbyChestBlockBag extends BlockBag {
      * @throws OutOfSpaceException
      */
     public void storeBlock(int id) throws BlockSourceException {
+    	storeBlock(id, (byte)-1);
+    }
+    public void storeBlock(int id, byte data) throws BlockSourceException {
         try {
             for (ComparableInventory c : chests) {
                 Inventory chest = c.getInventory();
@@ -104,7 +111,8 @@ public class NearbyChestBlockBag extends BlockBag {
                     if (itemArray[i] != null) {
                         // Found an item
                         if (itemArray[i].getItemId() == id &&
-                            itemArray[i].getAmount() < 64) {
+                        	(data == -1 || itemArray[i].getDamage() == data) &&
+                            itemArray[i].getAmount() < ItemArrayUtil.getStackMax(itemArray[i])) {
                             int newAmount = itemArray[i].getAmount() + 1;
                             itemArray[i].setAmount(newAmount);
                             
@@ -120,6 +128,8 @@ public class NearbyChestBlockBag extends BlockBag {
                 // Didn't find an existing stack, so let's create a new one
                 if (emptySlot != -1) {
                     itemArray[emptySlot] = new Item(id, 1);
+                    if(data >= 0)
+                    	itemArray[emptySlot].setDamage(data);
                     
                     ItemArrayUtil.setContents((ItemArray<?>)chest, itemArray);
                     
@@ -131,6 +141,43 @@ public class NearbyChestBlockBag extends BlockBag {
         } finally {
             flushChanges(); 
         }
+    }
+    
+    /**
+     * Checks if the item can be placed some where. Either an empty slot or existing slot.
+     *
+     * @param pos
+     * @param id
+     * @return
+     * @throws OutOfSpaceException
+     */
+    public boolean hasAvailableSlotSpace(int id, byte color) {
+        for (ComparableInventory c : chests) {
+            Inventory chest = c.getInventory();
+            Item[] itemArray = chest.getContents();
+            int emptySlot = -1;
+
+            // Find an existing slot item can be put it into
+            for (int i = 0; itemArray.length > i; i++) {
+                if (itemArray[i] != null) {
+                    // Found an item
+                    if (itemArray[i].getItemId() == id &&
+                    	(color == -1 || itemArray[i].getDamage() == color) &&
+                        itemArray[i].getAmount() < ItemArrayUtil.getStackMax(itemArray[i])) {
+
+                        return true;
+                    }
+                } else {
+                    emptySlot = i;
+                }
+            }
+
+            // Didn't find an existing stack, so return if has empty slot
+            if (emptySlot != -1) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -264,6 +311,16 @@ public class NearbyChestBlockBag extends BlockBag {
         for (ComparableInventory c : chests) {
             c.getInventory().update();
         }
+    }
+    
+    public boolean hasRealFetch()
+    {
+    	return true;
+    }
+    
+    public boolean hasRealStore()
+    {
+    	return true;
     }
     
     /**

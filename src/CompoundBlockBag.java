@@ -47,9 +47,12 @@ public class CompoundBlockBag extends BlockBag {
      * @param id
      */
     public void storeBlock(int id) throws BlockSourceException {
+    	storeBlock(id, (byte)-1);
+    }
+    public void storeBlock(int id, byte data) throws BlockSourceException {
         for (BlockBag b : sources)
             try {
-                b.storeBlock(id);
+                b.storeBlock(id, data);
                 return;
             } catch (OutOfSpaceException e) {
             }
@@ -62,9 +65,12 @@ public class CompoundBlockBag extends BlockBag {
      * @param id
      */
     public void fetchBlock(int id) throws BlockSourceException {
+    	fetchBlock(id, (byte)-1);
+    }
+    public void fetchBlock(int id, byte data) throws BlockSourceException {
         for (BlockBag b : sources)
             try {
-                b.fetchBlock(id);
+                b.fetchBlock(id, data);
                 return;
             } catch (OutOfBlocksException e) {
             }
@@ -101,5 +107,15 @@ public class CompoundBlockBag extends BlockBag {
     public void flushChanges() {
         for (BlockBag b : sources)
             b.flushChanges();
+    }
+    
+    public boolean hasRealFetch()
+    {
+    	return true;
+    }
+    
+    public boolean hasRealStore()
+    {
+    	return true;
     }
 }

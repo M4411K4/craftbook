@@ -330,11 +330,11 @@ public class VehicleListener extends CraftBookDelegateListener {
                         }
                     }
                     
-                    minecart = new Minecart(
-                            depositPt.getX(),
-                            depositPt.getY(),
-                            depositPt.getZ(),
-                            minecartType);
+                    minecart = spawnMinecart(worldType,
+                    						depositPt.getX(),
+                    						depositPt.getY(),
+                    						depositPt.getZ(),
+                    						minecartType.getType());
                 }
                 else if (collectType.equalsIgnoreCase("Storage")) {
                     try {
@@ -350,11 +350,11 @@ public class VehicleListener extends CraftBookDelegateListener {
                         }
                     }
                     
-                    minecart = new Minecart(
-                            depositPt.getX(),
-                            depositPt.getY(),
-                            depositPt.getZ(),
-                            Minecart.Type.StorageCart);
+                    minecart = spawnMinecart(worldType,
+    						depositPt.getX(),
+    						depositPt.getY(),
+    						depositPt.getZ(),
+    						Minecart.Type.StorageCart.getType());
                 } else if (collectType.equalsIgnoreCase("Powered")) {
                     try {
                         blockBag.fetchBlock(ItemType.POWERED_MINECART);
@@ -369,18 +369,18 @@ public class VehicleListener extends CraftBookDelegateListener {
                         }
                     }
                     
-                    minecart = new Minecart(
-                            depositPt.getX(),
-                            depositPt.getY(),
-                            depositPt.getZ(),
-                            Minecart.Type.PoweredMinecart);
+                    minecart = spawnMinecart(worldType,
+    						depositPt.getX(),
+    						depositPt.getY(),
+    						depositPt.getZ(),
+    						Minecart.Type.PoweredMinecart.getType());
                 } else {
                     blockBag.fetchBlock(ItemType.MINECART);
-                    minecart = new Minecart(
-                            depositPt.getX(),
-                            depositPt.getY(),
-                            depositPt.getZ(),
-                            Minecart.Type.Minecart);
+                    minecart = spawnMinecart(worldType,
+    						depositPt.getX(),
+    						depositPt.getY(),
+    						depositPt.getZ(),
+    						Minecart.Type.Minecart.getType());
                 }
                 
                 if (push) {
@@ -1507,7 +1507,7 @@ public class VehicleListener extends CraftBookDelegateListener {
         Player passenger = vehicle.getPassenger();
 
         // Player.equals() now works correctly as of recent hMod versions
-        if (passenger != null && vehicle instanceof Minecart
+        if (passenger != null && attacker != null && vehicle instanceof Minecart
                 && attacker.isPlayer()
                 && attacker.getPlayer().equals(passenger)) {
             double speed = Math.sqrt(Math.pow(vehicle.getMotionX(), 2)
@@ -2003,7 +2003,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                 			if(((OEntityMinecart)eemptycart).d == 2)
                 				item = ItemType.POWERED_MINECART;
                 			
-                			eemptycart.I();
+                			eemptycart.J();
                 			if(vehicle.isEmpty())
                 			{
                 				World world = vehicle.getWorld();
@@ -2298,6 +2298,15 @@ public class VehicleListener extends CraftBookDelegateListener {
         }
         
         return false;
+    }
+    
+    private Minecart spawnMinecart(int worldType, double x, double y, double z, int type)
+    {
+    	OWorldServer oworld = CraftBook.getOWorldServer(worldType);
+    	OEntityMinecart oentity = new OEntityMinecart(oworld, x, y, z, type);
+    	oworld.b(oentity);
+    	
+    	return new Minecart(oentity);
     }
 
     /**

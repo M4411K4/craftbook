@@ -318,7 +318,7 @@ public class ItemArrayUtil {
     /*
      * assumes item is valid
      */
-    private static int getStackMax(Item item)
+    protected static int getStackMax(Item item)
     {
     	return OItem.c[item.getItemId()].c();
     }

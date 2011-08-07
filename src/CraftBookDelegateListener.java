@@ -75,7 +75,7 @@ public abstract class CraftBookDelegateListener extends PluginListener {
      * @param origin
      * @return
      */
-    protected BlockBag getBlockBag(int worldType, Vector origin) {
+    public BlockBag getBlockBag(int worldType, Vector origin) {
         return listener.getBlockBag(worldType, origin);
     }
     

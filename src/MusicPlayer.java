@@ -1,8 +1,10 @@
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.sk89q.craftbook.HistoryHashMap;
 import com.sk89q.craftbook.music.IMusicPlayer;
+import com.sk89q.craftbook.music.MusicMidiTrack;
 import com.sk89q.craftbook.music.MusicNote;
 import com.sk89q.craftbook.music.Playlist;
 import com.sk89q.craftbook.music.RadioObject;
@@ -16,6 +18,8 @@ import com.sk89q.craftbook.music.media.TextSongMedia;
 
 public class MusicPlayer implements IMusicPlayer
 {
+	private static final Logger logger = Logger.getLogger("Minecraft.CraftBook");
+	
 	private final boolean LOOP;
 	private final int MAX_BEAT_DURATION;
 	private final int MAX_TEXT_LINES;
@@ -86,6 +90,37 @@ public class MusicPlayer implements IMusicPlayer
 				playlistMax = properties.getInt("music-max-playlist-tracks", playlistMax);
 				if(playlistMax < 0)
 					playlistMax = 0;
+			}
+			
+			if(properties.containsKey("music-midi-instrument-list"))
+			{
+				String values = properties.getString("music-midi-instrument-list", "");
+				if(!values.isEmpty())
+				{
+					boolean result = MusicMidiTrack.setInstruments(values.split(","));
+					if(!result)
+					{
+						logger.warning("CraftBook custom MIDI instrument values are invalid. Using default.");
+					}
+				}
+			}
+			
+			if(properties.containsKey("music-midi-percussion-list"))
+			{
+				String values = properties.getString("music-midi-percussion-list", "");
+				if(!values.isEmpty())
+				{
+					boolean result = MusicMidiTrack.setPercussion(values.split(","));
+					if(!result)
+					{
+						logger.warning("CraftBook custom MIDI percussion values are invalid. Using default.");
+					}
+				}
+			}
+			
+			if(properties.containsKey("music-midi-percussion-channel-enable"))
+			{
+				MusicMidiTrack.enableChannel10 = properties.getBoolean("music-midi-percussion-channel-enable", false);
 			}
 			
 			if(properties.containsKey("music-max-midi-tracks"))

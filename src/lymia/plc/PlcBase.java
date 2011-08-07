@@ -62,7 +62,10 @@ public abstract class PlcBase extends BaseIC {
         } catch (Throwable r) {
             t.setLine2("§c"+t.getLine2());
             t.setLine3("!ERROR!");
-            t.setLine4(r.getClass().getSimpleName());
+            String msg = r.getClass().getSimpleName();
+            if(msg.length() > 15)
+            	msg = msg.substring(0, 15);
+            t.setLine4(msg);
             return;
         }
         

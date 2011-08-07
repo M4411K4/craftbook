@@ -902,6 +902,9 @@ public class MechanismListener extends CraftBookDelegateListener {
      * @param pt
      */
     private void toggleHiddenSwitch(String type, World world, int x, int y, int z) {
+    	if(y < 0 || y > 127)
+    		return;
+    	
         ComplexBlock cblock = world.getComplexBlock(x, y, z);
         
         if (cblock instanceof Sign) {
@@ -1632,5 +1635,7 @@ public class MechanismListener extends CraftBookDelegateListener {
     @Override
     public void onDisconnect(Player player) {
         lastCopySave.remove(player.getName());
+        MCX236.players.remove(player);
+        MCX238.players.remove(player);
     }
 }

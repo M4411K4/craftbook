@@ -92,9 +92,11 @@ public abstract class BlockBag {
                 if (dropped == -1) { // Bedrock, etc.
                     return false;
                 } else if (dropped != 0) {
-                    storeBlock(dropped);
+                    storeBlock(dropped, (byte)CraftBook.getBlockData(world, pos));
                 }
 
+                if(data >= 0)
+                	return CraftBook.setBlockIdAndData(world, pos, id, data);
                 return CraftBook.setBlockID(world, pos, id);
             }
 
@@ -103,22 +105,16 @@ public abstract class BlockBag {
             try {
                 try {
                     int existingID = CraftBook.getBlockID(world, pos);
-
-                    /* [TODO]: a replacement to recognize colors. Works, but there's another part of the code that needs to be fixed with
-                     * this, which is why it's currently commented out.
-                     * If using a colored wool, such as yellow, and attempting to replace another color such as white, the 
-                     * results in the chest when using "nearby-chests" is not correct.
-                     * 
-                     *if (existingID != 0 && (existingID != id || (BlockType.isColorTypeBlock(existingID) && CraftBook.getBlockData(pos) != data) )  ) {
-                    */
-                    if (existingID != 0 && existingID != id) {
+                    int existingData = CraftBook.getBlockData(world, pos);
+                    
+                    if (existingID != 0 && existingID != id && (data < 0 || existingData != data) ) {
                         int dropped = BlockType.getDroppedBlock(existingID);
 
                         // First store the existing block
                         if (dropped == -1) { // Bedrock, etc.
                             return false;
                         } else if (dropped != 0) {
-                            storeBlock(dropped);
+                            storeBlock(dropped, (byte)existingData);
                         }
 
                         // Blocks that can't be fetched...
@@ -152,10 +148,10 @@ public abstract class BlockBag {
                             return CraftBook.setBlockIdAndData(world, pos, id, data);
                         }
 
-                        fetchBlock(id);
+                        fetchBlock(id, (byte)data);
                         return CraftBook.setBlockIdAndData(world, pos, id, data);
                     } else if (existingID == 0) {
-                        fetchBlock(id);
+                        fetchBlock(id, (byte)data);
                         return CraftBook.setBlockIdAndData(world, pos, id, data);
                     }
                 } catch (OutOfBlocksException e) {
@@ -208,6 +204,7 @@ public abstract class BlockBag {
      * @param id
      */
     public abstract void fetchBlock(int id) throws BlockSourceException;
+    public abstract void fetchBlock(int id, byte data) throws BlockSourceException;
     
     /**
      * Store a block.
@@ -215,6 +212,7 @@ public abstract class BlockBag {
      * @param id
      */
     public abstract void storeBlock(int id) throws BlockSourceException;
+    public abstract void storeBlock(int id, byte data) throws BlockSourceException;
     
     /**
      * Checks to see if a block exists without removing it.
@@ -251,6 +249,15 @@ public abstract class BlockBag {
      * @return
      */
     public abstract void addSingleSourcePosition(int worldType, Vector pos);
+    
+    /**
+     * Returns if the BlockBag has a real fetch or unlimited
+     * 
+     * @return
+     */
+    public abstract boolean hasRealFetch();
+    
+    public abstract boolean hasRealStore();
 
     /**
      * Return the list of missing blocks.

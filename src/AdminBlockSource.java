@@ -56,6 +56,9 @@ public class AdminBlockSource extends BlockBag {
      * @throws OutOfBlocksException
      */
     public void fetchBlock(int id) throws BlockSourceException {
+    	fetchBlock(id, (byte)-1);
+    }
+    public void fetchBlock(int id, byte data) throws BlockSourceException {
         if (!canFetch) {
             throw new OutOfBlocksException(id);
         }
@@ -70,6 +73,9 @@ public class AdminBlockSource extends BlockBag {
      * @throws OutOfSpaceException
      */
     public void storeBlock(int id) throws BlockSourceException {
+    	storeBlock(id, (byte)-1);
+    }
+    public void storeBlock(int id, byte data) throws BlockSourceException {
         if (!canStore) {
             throw new OutOfSpaceException(id);
         }
@@ -118,6 +124,16 @@ public class AdminBlockSource extends BlockBag {
      * Flush changes.
      */
     public void flushChanges() {
+    }
+    
+    public boolean hasRealFetch()
+    {
+    	return fetch && canFetch;
+    }
+    
+    public boolean hasRealStore()
+    {
+    	return store && canStore;
     }
     
     /**

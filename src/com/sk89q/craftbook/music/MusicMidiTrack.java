@@ -1,6 +1,8 @@
 package com.sk89q.craftbook.music;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiEvent;
@@ -11,13 +13,61 @@ public class MusicMidiTrack
 {
 	public final Track TRACK;
 	
+	public static boolean enableChannel10 = false; //percussion channel
+	
 	private boolean finished = false;
 	private int octave = 2; //lowest octave
 	
-	public int instrument = 0;
+	public int instrument = -1;
 	public int position = 0;
 	
 	public byte playMode = 0;
+	
+	private final Map<Integer, Integer> programChanges = new HashMap<Integer, Integer>();
+	
+	private static int[] instruments = {
+        0, 0, 0, 0,  0, 0, 0, 0,
+        0, 0, 0, 0,  0, 0, 0, 0,
+        0, 0, 0, 0,  0, 0, 0, 0,
+        0, 0, 0, 0,  0, 0, 0, 0,
+        
+        1, 0, 1, 1,  0, 2, 0, 2,
+        1, 2, 1, 2,  1, 2, 1, 1,
+        2, 1, 2, 2,  0, 2, 2, 0,
+        2, 0, 2, 1,  1, 1, 1, 1,
+        
+        1, 1, 0, 0,  2, 2, 0, 0,
+        0, 2, 0, 0,  0, 0, 0, 0,
+        0, 0, 0, 0,  0, 0, 0, 0,
+        0, 0, 0, 0,  0, 0, 0, 0,
+        
+        0, 0, 0, 0,  0, 0, 0, 0,
+        0, 0, 0, 0,  0, 0, 0, 0,
+        1, 1, 1, 1,  1, 1, 1, 1,
+        1, 1, 1, 1,  1, 2, 4, 3,
+    };
+	
+	private static int[] percussion = {
+        1, 1, 1, 2,  3, 2, 1, 3,
+        1, 3, 1, 3,  1, 1, 3, 1,
+        3, 3, 3, 3,  3, 0, 3, 3,
+        3, 1, 1, 1,  1, 1, 1, 1,
+        
+        3, 3, 3, 3,  4, 4, 3, 3,
+        3, 3, 3, 1,  1, 3, 3, 2,
+        4, 4, 3, 1,  1, 4, 4, 4,
+        4, 4, 4, 4,  4, 4, 4, 4,
+        
+        4, 4, 4, 4,  4, 4, 4, 4,
+        4, 4, 4, 4,  4, 4, 4, 4,
+        4, 4, 4, 4,  4, 4, 4, 4,
+        4, 4, 4, 4,  4, 4, 4, 4,
+        
+        4, 4, 4, 4,  4, 4, 4, 4,
+        4, 4, 4, 4,  4, 4, 4, 4,
+        4, 4, 4, 4,  4, 4, 4, 4,
+        4, 4, 4, 4,  4, 4, 4, 4,
+	};
 	
 	public MusicMidiTrack(Track track)
 	{
@@ -64,7 +114,13 @@ public class MusicMidiTrack
 			ShortMessage message = (ShortMessage) event.getMessage();
 			
 			if(message.getCommand() != ShortMessage.NOTE_ON)
+			{
+				if(message.getCommand() == ShortMessage.PROGRAM_CHANGE)
+				{
+					programChanges.put(message.getChannel(), message.getData1());
+				}
 				continue;
+			}
 			
 			int note = message.getData1();
 			
@@ -83,7 +139,16 @@ public class MusicMidiTrack
 			if(note < 0)
 				continue;
 			
-			notes.add(new MusicNote(instrument, (byte)note));
+			int instrum;
+			if(instrument == -1)
+				instrum = getInstrument(message.getChannel());
+			else
+				instrum = instrument;
+			
+			if(instrum < 0)
+				continue;
+			
+			notes.add(new MusicNote(instrum, (byte)note));
 		}
 		
 		return notes;
@@ -158,5 +223,65 @@ public class MusicMidiTrack
 	private int getCycledOctaveNote(int note)
 	{
 		return (note - 6) % 24;
+	}
+	
+	/*
+	 * Converts instrument into a valid Minecraft instrument
+	 */
+	private int getInstrument(int channel)
+	{
+		Integer programChange = programChanges.get(channel);
+		
+		if(programChange == null || programChange < 0 || programChange >= instruments.length)
+			return 0;
+		
+		if(channel == 9)
+		{
+			if(!enableChannel10)
+				return -1;
+			
+			if(programChange < percussion.length)
+				return percussion[programChange];
+		}
+		
+		return instruments[programChange];
+	}
+	
+	public static boolean setPercussion(String[] values)
+	{
+		return setInstrumentList(values, false);
+	}
+	
+	public static boolean setInstruments(String[] values)
+	{
+		return setInstrumentList(values, true);
+	}
+	
+	private static boolean setInstrumentList(String[] values, boolean isInstrument)
+	{
+		if(values == null || values.length != 128)
+			return false;
+		
+		int[] inst = new int[128];
+		try
+		{
+			for(int i = 0; i < 128; i++)
+			{
+				inst[i] = Integer.parseInt(values[i]);
+				if(inst[i] < 0 || inst[i] > 4)
+					return false;
+			}
+		}
+		catch(NumberFormatException e)
+		{
+			return false;
+		}
+		
+		if(isInstrument)
+			instruments = inst;
+		else
+			percussion = inst;
+		
+		return true;
 	}
 }

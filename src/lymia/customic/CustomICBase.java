@@ -41,6 +41,8 @@ class CustomICBase extends PlcBase {
         return code;
     }
     protected String validateEnviromentEx(int worldType, Vector v, SignText t) {
+    	if(t.getLine4().isEmpty())
+    		t.setLine4("AAAAAAAAAAAA");
         return null;
     }
 }

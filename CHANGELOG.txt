@@ -1,3 +1,39 @@
+2.0extra11.2:
+- added [MCX203] & [MCZ203] Chest collector
+    - thanks Riot for the suggestion!
+- added [MCX205] & [MCZ205] Detect Block
+    - thanks ihatetn931 for the suggestion!
+- added [MCU211] & [MCU212] Delay Bridge & Delay Door
+    - thanks srs008 for the suggestion!
+- added [MCU213] & [MCU214] Auto Bridge & Auto Door
+- added [MC1207] Flexible Set from official CraftBook
+- added [MC2999] Marquee from official CraftBook
+- added ability to specify MIDI instruments in the
+    craftbook.properties
+    - Default MIDI sounds will now sound different.
+    - thanks phi for the code and suggestion!
+- added ability to turn on or off the MIDI percussion channel (10)
+    in the craftbook.properties
+- added updatr support. I hope...
+    - thanks ihatetn931 & Glacksy for the suggestion!
+- bugfix conflicts between [MCX236] [MCZ236] [MCX238] & [MCZ238]
+    - thanks Riot for the report!
+- bugfix for hidden switch [X] and hidden book switch [BOOK][X}
+    causing out of bounds error when a player has used either at
+    the very bottom of the map.
+    - thanks PspTrusz for the report!
+- bugfix for minecart collision mode 'plow'. Should hopefully work
+    now. Same "must go fast" rule applies.
+    - thanks Riot for the report!
+- bugfix for minecart [Dispenser] not spawning minecarts in the
+    nether.
+    - thanks 9of9 for the report!
+- bugfix for custom-ic array out of bounds error
+- bugfix for some custom-ic error messages being more than 15
+    characters, causing a crash to any player nearby.
+- bugfix for storing and fetching color blocks. May still need work
+    - thanks Riot for the report!
+
 2.0extra11.1:
 - added ability to set specific block types for Bridge and Door ICs
     [MCX207] [MCX208] [MCX209] and [MCX210]

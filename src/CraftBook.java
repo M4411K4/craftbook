@@ -192,8 +192,14 @@ public class CraftBook extends Plugin {
      */
     @Override
     public void disable() {
-        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
         
+        /*
+        // funny old code from sk89q
+        // this was to stop the MinecartMania plugin from disabling CraftBook.
+        // Instead of being disabled from MinecartMania, this disables MinecartMania
+        // and enables CraftBook again.
+        
+        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
         for (StackTraceElement element : elements) {
             if (element.getClassName().contains("MinecartMania")) {
                 etc.getServer().addToServerQueue(new Runnable() {
@@ -210,6 +216,7 @@ public class CraftBook extends Plugin {
                 return;
             }
         }
+        */
 
         SignPatch.removePatch();
         stateManager.save(pathToState);

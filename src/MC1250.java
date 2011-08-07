@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Random;
+//import java.util.Random;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.*;
@@ -32,7 +32,7 @@ public class MC1250 extends BaseIC {
     /**
      * Random number generator.
      */
-    private static Random r = new Random();
+    //private static Random r = new Random();
     
     /**
      * Get the title of the IC.
@@ -123,7 +123,7 @@ public class MC1250 extends BaseIC {
         public Firework(OEntityArrow arrow) {
             expireTime = System.currentTimeMillis() + 5000;
             this.arrow = arrow;
-            lastY = arrow.aM;
+            lastY = arrow.aQ;
         }
 
         /**
@@ -143,10 +143,10 @@ public class MC1250 extends BaseIC {
                                 
                                 // Make TNT explode
                                 explodeTNT(arrow.aL, arrowX, arrowY, arrowZ);
-                                explodeTNT(arrow.aL, 
-                                        arrowX + r.nextDouble() * 2 - 1,
-                                        arrowY + r.nextDouble() * 1,
-                                        arrowZ + r.nextDouble() * 2 - 1);
+                                //explodeTNT(arrow.aL, 
+                                        //arrowX + r.nextDouble() * 2 - 1,
+                                        //arrowY + r.nextDouble() * 1,
+                                        //arrowZ + r.nextDouble() * 2 - 1);
                             }
                         });
                         
@@ -178,7 +178,7 @@ public class MC1250 extends BaseIC {
         OEntityArrow arrow = new OEntityArrow(oworld);
         arrow.c(x, y, z, 0, 0);
         oworld.b(arrow);
-        arrow.a(0, 50, 0, 1.05F, 20);
+        arrow.a(0, 50D, 0, 1.05F, 20);
         return arrow;
     }
     
@@ -192,7 +192,7 @@ public class MC1250 extends BaseIC {
     protected void explodeTNT(OWorld oworld, double x, double y, double z) {
         // Make TNT explode
     	OEntityTNTPrimed tnt = new OEntityTNTPrimed(oworld);
-        tnt.a(x, y, z);
+        tnt.c(x, y, z);
         tnt.m_();
     }
 }

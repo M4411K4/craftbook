@@ -23,6 +23,7 @@ import java.util.Map;
 import com.sk89q.craftbook.HistoryHashMap;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
+import com.sk89q.craftbook.WorldBlockVector;
 import com.sk89q.craftbook.ic.BaseIC;
 import com.sk89q.craftbook.ic.ChipState;
 
@@ -36,8 +37,8 @@ public class MCX236 extends BaseIC {
 	/**
      * Data store.
      */
-    private static Map<Player,Boolean> players =
-            new HistoryHashMap<Player,Boolean>(100);
+    protected static Map<Player,WorldBlockVector> players =
+            new HistoryHashMap<Player,WorldBlockVector>(100);
 	
     /**
      * Get the title of the IC.
@@ -86,6 +87,7 @@ public class MCX236 extends BaseIC {
     	if(chip.inputAmount() == 0 || chip.getIn(1).is())
     	{
 	    	Vector pos = chip.getBlockPosition();
+	    	Vector cPos = chip.getPosition();
 	    	int dist = Integer.parseInt(chip.getText().getLine3());
 	    	dist = dist * dist;
 	    	
@@ -94,20 +96,26 @@ public class MCX236 extends BaseIC {
 	    		Location pLoc = player.getLocation();
 	    		Vector diff = pos.subtract(pLoc.x, pLoc.y, pLoc.z);
 	    		
-	    		Boolean exists = players.get(player);
+	    		WorldBlockVector exists = players.get(player);
+	    		
+	    		if(!isSameCoord(exists, chip.getWorldType(), cPos) || MCX238.players.get(player) != null)
+	    		{
+	    			//not this IC or player already part of another IC
+	    			continue;
+	    		}
 	    		
 	    		if(pLoc.dimension == chip.getWorldType()
 	    		   && diff.getX() * diff.getX() + diff.getY() * diff.getY() + diff.getZ() * diff.getZ() < dist)
 	    		{
 	    			if(exists == null)
 	    			{
-	    				players.put(player, chip.inputAmount() == 0);
+	    				players.put(player, new WorldBlockVector(chip.getWorldType(), cPos));
 	    				player.getEntity().a.b(new OPacket70Bed(1));
 	    				if(chip.getText().getLine4().length() > 0)
 	    					player.sendMessage(chip.getText().getLine4());
 	    			}
 	    		}
-	    		else if(exists != null && exists)
+	    		else if(exists != null)
 	    		{
 	    			players.remove(player);
 	    			if(!CraftBook.getWorld(chip.getWorldType()).isRaining())
@@ -117,14 +125,31 @@ public class MCX236 extends BaseIC {
     	}
     	else if(!chip.getIn(1).is())
     	{
-    		Iterator<Map.Entry<Player, Boolean>> it = players.entrySet().iterator();
+    		Iterator<Map.Entry<Player, WorldBlockVector>> it = players.entrySet().iterator();
+    		Vector cPos = chip.getPosition();
     	    while (it.hasNext())
     	    {
-				Map.Entry<Player, Boolean> item = (Map.Entry<Player, Boolean>)it.next();
+				Map.Entry<Player, WorldBlockVector> item = (Map.Entry<Player, WorldBlockVector>)it.next();
+				if(!isSameCoord(item.getValue(), chip.getWorldType(), cPos))
+					continue;
 				if(!CraftBook.getWorld(chip.getWorldType()).isRaining())
 					item.getKey().getEntity().a.b(new OPacket70Bed(2));
 				it.remove();
     	    }
     	}
+    }
+    
+    protected static boolean isSameCoord(WorldBlockVector wpos, int worldType, Vector pos)
+    {
+    	if(wpos == null)
+    		return true;
+    	
+    	if(wpos.getWorldType() != worldType
+    		|| wpos.getBlockX() != pos.getBlockX()
+    		|| wpos.getBlockY() != pos.getBlockY()
+    		|| wpos.getBlockZ() != pos.getBlockZ())
+    		return false;
+    	
+    	return true;
     }
 }
