@@ -248,6 +248,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX202", new MCX202(), ICType.SISO);
         internalRegisterIC("MCX203", new MCX203(), ICType.SISO);
         internalRegisterIC("MCX205", new MCX205(), ICType.SISO);
+        internalRegisterIC("MCX206", new MCX206(), ICType.SISO);
         internalRegisterIC("MCX207", new MCX207(), ICType.SISO);
         internalRegisterIC("MCX208", new MCX208(), ICType.SISO);
         internalRegisterIC("MCX209", new MCX209(), ICType.SISO);
@@ -271,6 +272,8 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCT246", new MCT246(), ICType._3ISO);
         
         internalRegisterIC("MCU113", new MCX113(), ICType.UISO);
+        internalRegisterIC("MCU300", new MCX300(), ICType.UISO);
+        internalRegisterIC("MCU301", new MCX301(), ICType.UISO);
         internalRegisterIC("MCU440", new MCX440(), ICType.UISO);
         internalRegisterIC("MCU700", new MCX700(), ICType.UISO);
         internalRegisterIC("MCU705", new MCX705(), ICType.UISO);
@@ -279,6 +282,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCU212", new MCX212(), ICType.MISO);
         internalRegisterIC("MCU213", new MCX213(), ICType.MISO);
         internalRegisterIC("MCU214", new MCX214(), ICType.MISO);
+        internalRegisterIC("MCU217", new MCX217(), ICType.MISO);
         internalRegisterIC("MCU701", new MCX701(), ICType.MISO);
         internalRegisterIC("MCU702", new MCX702(), ICType.MISO);
     }
@@ -539,11 +543,13 @@ public class RedstoneListener extends CraftBookDelegateListener
                     	
                     	//not too happy about putting in the "extra" param to get the blockbag access cuz it's a hack.
                     	//hopefully I can change it later on.
-                    	if(id.equals("MCX207") || id.equals("MCX208") || id.equals("MCX209") || id.equals("MCX210"))
+                    	if(id.equals("MCX206") || id.equals("MCX207") || id.equals("MCX208") || id.equals("MCX209") || id.equals("MCX210"))
                     		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, listener.getBlockBag(worldType, pt));
                     	else if(id.equals("MCU440")
                     			|| id.equals("MCU700") || id.equals("MCU701") || id.equals("MCU702") || id.equals("MCU705")
-                    			|| id.equals("MCU211") || id.equals("MCU212") || id.equals("MCU213") || id.equals("MCU214") )
+                    			|| id.equals("MCU211") || id.equals("MCU212") || id.equals("MCU213") || id.equals("MCU214")
+                    			|| id.equals("MCU217")
+                    			|| id.equals("MCU300") || id.equals("MCU301") )
                     		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, thisListener);
                         else
                         	ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, null);

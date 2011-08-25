@@ -58,7 +58,7 @@ public class MCX205 extends BaseIC {
 
         if (id.length() == 0) {
             return "Specify a block type on the third line.";
-        } else if (getItem(id) < 1) {
+        } else if (getItem(id) < 0) {
             return "Not a valid block type: " + sign.getLine3() + ".";
         }
 

@@ -1,3 +1,23 @@
+2.0extra11.3:
+- added [MCX206] a copy of MC1207 Flexible Set IC that has more
+    restrictions
+- added [MCU217] Drawbridge
+- added [MCU300] Bounce Up
+- added [MCU301] Soft Land
+- added Bounce blocks and Soft Land blocks. Disabled by default.
+    - To enable, set a block type for bounce-block and
+        soft-land-block
+    - This includes 5 new configuration settings for them
+    - thanks D3athrow for letting me add the bounce feature!
+- updated [MCX205] & [MCZ205] to be able to detect air blocks
+    - thanks Riot for the suggestion!
+- updated glass removed by features such as Area Toggle, Bridge,
+    Door, etc, to put glass into chests instead of nothing.
+    - thanks Riot for the suggestion!
+- fixed [MCX203] & [MCZ203] Chest collector not collecting
+    stacked items
+    - thanks Riot for the report!
+
 2.0extra11.2:
 - added [MCX203] & [MCZ203] Chest collector
     - thanks Riot for the suggestion!

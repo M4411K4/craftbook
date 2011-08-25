@@ -178,14 +178,14 @@ public class MCX203 extends BaseIC {
 			{
 				OEntityItem eitem = (OEntityItem) obj;
 				
-				if(!eitem.bh && (item == -1 || (eitem.a.c == item && (color < 0 || eitem.a.h() == color) )))
+				if(!eitem.bh && eitem.a.a > 0 && (item == -1 || (eitem.a.c == item && (color < 0 || eitem.a.h() == color) )))
 				{
     				double diffX = x - eitem.aP;
     				double diffY = y - eitem.aQ;
     				double diffZ = z - eitem.aR;
     				
     				if(((diffX * diffX + diffY * diffY + diffZ * diffZ) < dist)
-    					&& source.hasAvailableSlotSpace(eitem.a.c, (byte)eitem.a.h()))
+    					&& source.hasAvailableSlotSpace(eitem.a.c, (byte)eitem.a.h(), eitem.a.a))
     				{
     					found = true;
     					
@@ -194,7 +194,7 @@ public class MCX203 extends BaseIC {
     					
     					//store
     					try {
-                            source.storeBlock(eitem.a.c, (byte)eitem.a.h());
+                            source.storeBlock(eitem.a.c, (byte)eitem.a.h(), eitem.a.a);
                         } catch (BlockSourceException e) {
                             break;
                         }

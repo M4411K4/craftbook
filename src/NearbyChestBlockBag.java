@@ -97,9 +97,12 @@ public class NearbyChestBlockBag extends BlockBag {
      * @throws OutOfSpaceException
      */
     public void storeBlock(int id) throws BlockSourceException {
-    	storeBlock(id, (byte)-1);
+    	storeBlock(id, (byte)-1, 1);
     }
     public void storeBlock(int id, byte data) throws BlockSourceException {
+    	storeBlock(id, data, 1);
+    }
+    public void storeBlock(int id, byte data, int amount) throws BlockSourceException {
         try {
             for (ComparableInventory c : chests) {
                 Inventory chest = c.getInventory();
@@ -110,15 +113,29 @@ public class NearbyChestBlockBag extends BlockBag {
                 for (int i = 0; itemArray.length > i; i++) {
                     if (itemArray[i] != null) {
                         // Found an item
+                    	int itemMax = ItemArrayUtil.getStackMax(itemArray[i]);
                         if (itemArray[i].getItemId() == id &&
                         	(data == -1 || itemArray[i].getDamage() == data) &&
-                            itemArray[i].getAmount() < ItemArrayUtil.getStackMax(itemArray[i])) {
-                            int newAmount = itemArray[i].getAmount() + 1;
+                            itemArray[i].getAmount() < itemMax) {
+                        	
+                        	int newAmount;
+                        	if(itemArray[i].getAmount() + amount > itemMax)
+                        	{
+                        		newAmount = itemMax;
+                        		amount = itemArray[i].getAmount() + amount - itemMax;
+                        	}
+                        	else
+                        	{
+                        		newAmount = itemArray[i].getAmount() + amount;
+                        		amount = 0;
+                        	}
                             itemArray[i].setAmount(newAmount);
                             
                             ItemArrayUtil.setContents((ItemArray<?>)chest, itemArray);
-    
-                            return;
+                            
+                            if(amount <= 0)
+                            	return;
+                            continue;
                         }
                     } else {
                         emptySlot = i;
@@ -127,7 +144,7 @@ public class NearbyChestBlockBag extends BlockBag {
     
                 // Didn't find an existing stack, so let's create a new one
                 if (emptySlot != -1) {
-                    itemArray[emptySlot] = new Item(id, 1);
+                    itemArray[emptySlot] = new Item(id, amount);
                     if(data >= 0)
                     	itemArray[emptySlot].setDamage(data);
                     
@@ -151,7 +168,7 @@ public class NearbyChestBlockBag extends BlockBag {
      * @return
      * @throws OutOfSpaceException
      */
-    public boolean hasAvailableSlotSpace(int id, byte color) {
+    public boolean hasAvailableSlotSpace(int id, byte color, int amount) {
         for (ComparableInventory c : chests) {
             Inventory chest = c.getInventory();
             Item[] itemArray = chest.getContents();
@@ -161,9 +178,17 @@ public class NearbyChestBlockBag extends BlockBag {
             for (int i = 0; itemArray.length > i; i++) {
                 if (itemArray[i] != null) {
                     // Found an item
+                	int itemMax = ItemArrayUtil.getStackMax(itemArray[i]);
                     if (itemArray[i].getItemId() == id &&
                     	(color == -1 || itemArray[i].getDamage() == color) &&
-                        itemArray[i].getAmount() < ItemArrayUtil.getStackMax(itemArray[i])) {
+                        itemArray[i].getAmount() < itemMax) {
+                    	
+                    	//checks if the full stack can fit
+                    	if(itemArray[i].getAmount() + amount > itemMax)
+                    	{
+                    		amount = itemArray[i].getAmount() + amount - itemMax;
+                    		continue;
+                    	}
 
                         return true;
                     }

@@ -118,6 +118,24 @@ public class MechanismListener extends CraftBookDelegateListener {
         Door.maxLength = properties.getInt("door-max-length", 30);
         if(properties.containsKey("door-ic-blocks"))
         	Door.allowedICBlocks = getICBlockList(properties.getString("door-ic-blocks", "all"));
+        if(properties.containsKey("bounce-block"))
+        	Bounce.blockBounce = StringUtil.getPropColorInt(properties.getString("bounce-block"), 0, -1);
+        if(properties.containsKey("soft-land-block"))
+        	Bounce.blockSoft = StringUtil.getPropColorInt(properties.getString("soft-land-block"), 0, -1);
+        if(properties.containsKey("bounce-force"))
+        {
+        	Bounce.force = properties.getInt("bounce-force", 3);
+        	if(Bounce.force < 1)
+        		Bounce.force = 1;
+        }
+        if(properties.containsKey("bounce-ic-max-force"))
+        	Bounce.maxICForce = properties.getInt("bounce-ic-max-force", 8);
+        if(properties.containsKey("bounce-ic-blocks"))
+        {
+        	Bounce.allowedICBlocks = getICBlockList(properties.getString("bounce-ic-blocks", "all"));
+        	if(Bounce.allowedICBlocks.size() == 0)
+        		Bounce.allowedICBlocks = null;
+        }
         dropBookshelves = properties.getBoolean("drop-bookshelves", true);
         try {
             dropAppleChance = Double.parseDouble(properties.getString("apple-drop-chance", "0.5")) / 100.0;
@@ -1628,6 +1646,20 @@ public class MechanismListener extends CraftBookDelegateListener {
         }
     }
 
+    public void onPlayerMove(Player player, Location from, Location to)
+    {
+    	Bounce.bounce(player, from, to);
+    }
+    
+    public boolean onDamage(PluginLoader.DamageType type, BaseEntity attacker, BaseEntity defender, int amount)
+    {
+    	if(type == PluginLoader.DamageType.FALL)
+    	{
+    		return Bounce.fallProtected(defender, amount);
+    	}
+    	return false;
+    }
+    
     /**
      *
      * @param player

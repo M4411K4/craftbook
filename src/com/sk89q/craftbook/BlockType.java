@@ -149,6 +149,7 @@ public final class BlockType {
         blockDrops.put(17, 17);
         blockDrops.put(18, 18);
         blockDrops.put(19, 19);
+        blockDrops.put(20, 20);
         blockDrops.put(21, 351); //default type. needs color value with this, but no other block currently acts like this
         blockDrops.put(22, 22);
         blockDrops.put(23, 23);
