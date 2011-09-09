@@ -19,6 +19,7 @@
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -219,6 +220,20 @@ public class CraftBook extends Plugin {
             }
         }
         */
+    	
+    	OWorldServer[] oworlds = etc.getMCServer().e;
+        for(int i = 0; i < oworlds.length; i++)
+        {
+    		for(@SuppressWarnings("rawtypes")
+    		Iterator it = oworlds[i].b.iterator(); it.hasNext();)
+    		{
+    			Object obj = it.next();
+    			if(obj instanceof EntitySitting)
+    			{
+    				((EntitySitting)obj).J();
+    			}
+    		}
+        }
 
         SignPatch.removePatch();
         stateManager.save(pathToState);

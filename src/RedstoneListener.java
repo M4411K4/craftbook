@@ -243,6 +243,8 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX120", new MCX120(), ICType.SISO);
         internalRegisterIC("MCX121", new MCX121(), ICType.SISO);
         internalRegisterIC("MCX130", new MCX130(), ICType.SISO);
+        internalRegisterIC("MCX131", new MCX131(), ICType.SISO);
+        internalRegisterIC("MCX132", new MCX132(), ICType.SISO);
         internalRegisterIC("MCX200", new MCX200(), ICType.SISO);
         internalRegisterIC("MCX201", new MCX201(), ICType.SISO);
         internalRegisterIC("MCX202", new MCX202(), ICType.SISO);
@@ -272,8 +274,12 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCT246", new MCT246(), ICType._3ISO);
         
         internalRegisterIC("MCU113", new MCX113(), ICType.UISO);
+        internalRegisterIC("MCU131", new MCU131(), ICType.UISO);
+        internalRegisterIC("MCU132", new MCU132(), ICType.UISO);
         internalRegisterIC("MCU300", new MCX300(), ICType.UISO);
         internalRegisterIC("MCU301", new MCX301(), ICType.UISO);
+        internalRegisterIC("MCU302", new MCX302(), ICType.UISO);
+        internalRegisterIC("MCU303", new MCX303(), ICType.UISO);
         internalRegisterIC("MCU440", new MCX440(), ICType.UISO);
         internalRegisterIC("MCU700", new MCX700(), ICType.UISO);
         internalRegisterIC("MCU705", new MCX705(), ICType.UISO);
@@ -546,10 +552,11 @@ public class RedstoneListener extends CraftBookDelegateListener
                     	if(id.equals("MCX206") || id.equals("MCX207") || id.equals("MCX208") || id.equals("MCX209") || id.equals("MCX210"))
                     		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, listener.getBlockBag(worldType, pt));
                     	else if(id.equals("MCU440")
+                    			|| id.equals("MCU131") || id.equals("MCU132")
                     			|| id.equals("MCU700") || id.equals("MCU701") || id.equals("MCU702") || id.equals("MCU705")
                     			|| id.equals("MCU211") || id.equals("MCU212") || id.equals("MCU213") || id.equals("MCU214")
                     			|| id.equals("MCU217")
-                    			|| id.equals("MCU300") || id.equals("MCU301") )
+                    			|| id.equals("MCU300") || id.equals("MCU301") || id.equals("MCU302") || id.equals("MCU303") )
                     		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, thisListener);
                         else
                         	ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, null);

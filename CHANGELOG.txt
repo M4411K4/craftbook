@@ -1,3 +1,22 @@
+2.0extra11.4:
+- added [MCX131] & [MCU131] Hit Player Above
+    - thanks Jahmaican for the suggestion!
+- added [MCX132] & [MCU132] Hit Mob Above
+- added [MCU302] Repel floor
+- added [MCU303] Repel wall
+    - thanks thekeram007 for the suggestion!
+- added Sitting
+    - 3 new settings for the Sitting feature in the
+        craftbook.properties
+    - players must be given permission in the groups.txt server
+        file to use the /sit command
+    - by default, players need to be given /canrightclicksit 
+        permission to right click wooden or cobble stairs to
+        sit.
+- removed temporary command /kill248 since the blocks should
+    not exist any more. If you have the issue, you can still
+    use an older version for the command.
+
 2.0extra11.3:
 - added [MCX206] a copy of MC1207 Flexible Set IC that has more
     restrictions

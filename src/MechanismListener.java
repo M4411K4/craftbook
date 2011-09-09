@@ -24,7 +24,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -136,6 +135,12 @@ public class MechanismListener extends CraftBookDelegateListener {
         	if(Bounce.allowedICBlocks.size() == 0)
         		Bounce.allowedICBlocks = null;
         }
+        if(this.properties.containsKey("sitting-enabled"))
+			Sitting.enabled = this.properties.getBoolean("sitting-enabled", true);
+		if(this.properties.containsKey("require-permission-to-right-click-sit"))
+			Sitting.requireRightClickPermission = this.properties.getBoolean("require-permission-to-right-click-sit", true);
+		if(this.properties.containsKey("right-click-sit-on-any-stair"))
+			Sitting.requiresChairFormats = !this.properties.getBoolean("right-click-sit-on-any-stair", true);
         dropBookshelves = properties.getBoolean("drop-bookshelves", true);
         try {
             dropAppleChance = Double.parseDouble(properties.getString("apple-drop-chance", "0.5")) / 100.0;
@@ -600,6 +605,69 @@ public class MechanismListener extends CraftBookDelegateListener {
      */
     @Override
     public void onBlockRightClicked(Player player, Block blockClicked, Item item) {
+    	
+    	if(Sitting.enabled
+        	&& (item == null || item.getItemId() == 0)
+    		&& (!Sitting.requireRightClickPermission || player.canUseCommand("/canrightclicksit"))
+    		&& EntitySitting.isChairBlock(blockClicked.getType())
+    		&& (!Sitting.requiresChairFormats || Sitting.isChair(blockClicked)) )
+    	{
+        	OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
+        	World world = player.getWorld();
+    		int data = world.getBlockData(blockClicked.getX(), blockClicked.getY(), blockClicked.getZ());
+    		if(eplayer.aK != null)
+    		{
+    			switch(data)
+        		{
+    	    		case 0x0: //south
+    	    			Sitting.stand(eplayer, -0.8D, 0, 0);
+    	    			break;
+    	    		case 0x1: //north
+    	    			Sitting.stand(eplayer, 0.8D, 0, 0);
+    	    			break;
+    	    		case 0x2: //west
+    	    			Sitting.stand(eplayer, 0, 0, -0.8D);
+    	    			break;
+    	    		case 0x3: //east
+    	    			Sitting.stand(eplayer, 0, 0, 0.8D);
+    	    			break;
+    	    		default:
+    	    			Sitting.stand(eplayer, 0, 0, 0);
+        		}
+    		}
+    		else
+    		{
+    			float rotation;
+        		double x = blockClicked.getX() + 0.5D;
+        		double y = blockClicked.getY();
+        		double z = blockClicked.getZ() + 0.5D;
+        		
+        		switch(data)
+        		{
+    	    		case 0x0: //south
+    	    			rotation = 90F;
+    	    			x -= 0.2D;
+    	    			break;
+    	    		case 0x1: //north
+    	    			rotation = 270F;
+    	    			x += 0.2D;
+    	    			break;
+    	    		case 0x2: //west
+    	    			rotation = 180F;
+    	    			z -= 0.2D;
+    	    			break;
+    	    		case 0x3: //east
+    	    			rotation = 0F;
+    	    			z += 0.2D;
+    	    			break;
+    	    		default:
+    	    			rotation = 0F;
+        		}
+        		
+        		Sitting.sit(eplayer, player.getWorld(), x, y, z, rotation, 0.5D);
+    		}
+    	}
+    	
         try {
             // Discriminate against attempts that would actually place blocks
             boolean isPlacingBlock = item.getItemId() >= 1
@@ -910,7 +978,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             
             return true;
         }
-
+        
         return false;
     }
     
@@ -1080,33 +1148,27 @@ public class MechanismListener extends CraftBookDelegateListener {
 
             return true;
         }
-        else if(split[0].equalsIgnoreCase("/kill248") && player.canUseCommand("/kill248"))
+        else if(Sitting.enabled && split[0].equalsIgnoreCase("/sit") && player.canUseCommand("/sit"))
         {
-        	boolean found = false;
-        	for(int i = -1; i < 1; i++)
-        	{
-        		OWorldServer oworld = CraftBook.getOWorldServer(i);
-        		
-        		for(@SuppressWarnings("rawtypes")
-				Iterator it = oworld.b.iterator(); it.hasNext();)
-        		{
-        			Object obj = it.next();
-        			if(obj instanceof OEntityItem)
-        			{
-        				OEntityItem eitem = (OEntityItem) obj;
-        				if(eitem.a.c == 248)
-        				{
-        					found = true;
-        					eitem.J();
-        				}
-        			}
-        		}
-        	}
-        	if(found)
-        		player.sendMessage(Colors.Gold + "item 248 was found and set to be removed.");
-        	else
-        		player.sendMessage(Colors.Rose + "item 248 was not found.");
-        	
+        	OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
+			if(eplayer.aK != null)
+			{
+				Sitting.stand(eplayer, 0, eplayer.aK.m(), 0);
+			}
+			else
+			{
+				Sitting.sit(eplayer, player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getRotation(), -0.05D);
+			}
+			
+        	return true;
+        }
+        else if(Sitting.enabled && split[0].equalsIgnoreCase("/stand") && player.canUseCommand("/stand"))
+        {
+        	OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
+        	if(eplayer.aK == null)
+        		return true;
+        	Sitting.stand(eplayer, 0, eplayer.aK.m(), 0);
+			
         	return true;
         }
         else if(split[0].equalsIgnoreCase("/mcx120") && player.canUseCommand("/mcx120"))
@@ -1648,7 +1710,8 @@ public class MechanismListener extends CraftBookDelegateListener {
 
     public void onPlayerMove(Player player, Location from, Location to)
     {
-    	Bounce.bounce(player, from, to);
+    	if(!Bounce.bounce(player, from, to))
+    		Bounce.repel(player, from, to);
     }
     
     public boolean onDamage(PluginLoader.DamageType type, BaseEntity attacker, BaseEntity defender, int amount)

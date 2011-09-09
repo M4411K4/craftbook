@@ -195,7 +195,7 @@ public class MCX300 extends BaseIC {
     	Bounce.icAreas.remove(key);
     }
     
-    protected static BlockArea getBlockArea(ChipState chip, int data, int width, int length, int offx, int offy, int offz)
+    protected BlockArea getBlockArea(ChipState chip, int data, int width, int length, int offx, int offy, int offz)
     {
     	int wStart = width / 2;
         
