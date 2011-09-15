@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
 import com.sk89q.craftbook.*;
 import com.sk89q.craftbook.ic.MCX120;
 import com.sk89q.craftbook.ic.MCX121;
@@ -141,6 +142,36 @@ public class MechanismListener extends CraftBookDelegateListener {
 			Sitting.requireRightClickPermission = this.properties.getBoolean("require-permission-to-right-click-sit", true);
 		if(this.properties.containsKey("right-click-sit-on-any-stair"))
 			Sitting.requiresChairFormats = !this.properties.getBoolean("right-click-sit-on-any-stair", true);
+		Sitting.healWhileSitting = Sitting.HealingType.NONE;
+		if(this.properties.containsKey("heal-while-sitting"))
+		{
+			try
+			{
+				String type = this.properties.getString("heal-while-sitting", "NONE").toUpperCase();
+				Sitting.healWhileSitting = Sitting.HealingType.valueOf(type);
+			}
+			catch(IllegalArgumentException e)
+			{
+				Sitting.healWhileSitting = Sitting.HealingType.NONE;
+			}
+		}
+		Sitting.globalHealingRate = 20;
+		if(this.properties.containsKey("heal-while-sitting-rate"))
+		{
+			int rate = this.properties.getInt("heal-while-sitting-rate", 20);
+			if(rate < 2)
+			{
+				Sitting.globalHealingRate = 2;
+			}
+			else if(rate > 100)
+			{
+				Sitting.globalHealingRate = 100;
+			}
+			else
+			{
+				Sitting.globalHealingRate = rate;
+			}
+		}
         dropBookshelves = properties.getBoolean("drop-bookshelves", true);
         try {
             dropAppleChance = Double.parseDouble(properties.getString("apple-drop-chance", "0.5")) / 100.0;
@@ -590,6 +621,31 @@ public class MechanismListener extends CraftBookDelegateListener {
             } else {
                 player.sendMessage(Colors.Rose + "Doors are disabled on this server.");
             }
+        } else if(Sitting.enabled && sign.getBlock().getType() == 68 && Sitting.signHasSittingType(sign)) {
+        	
+    		sign.setText(1, sign.getText(1).toUpperCase());
+    		
+    		SittingType sittype = Sitting.getSittingTypeFromSign(sign);
+    		if(sittype == null || !player.canUseCommand(sittype.PERMISSION))
+    		{
+    			world.setBlockAt(0, sign.getX(), sign.getY(), sign.getZ());
+    			world.dropItem(sign.getX(), sign.getY(), sign.getZ(), 323);
+    			
+    			player.sendMessage(Colors.Rose+"You do not have permission to build that.");
+    			return true;
+    		}
+    		
+    		String valid = sittype.validate(sign);
+    		if(valid != null)
+    		{
+    			world.setBlockAt(0, sign.getX(), sign.getY(), sign.getZ());
+    			world.dropItem(sign.getX(), sign.getY(), sign.getZ(), 323);
+    			
+    			player.sendMessage(Colors.Rose+valid);
+    			return true;
+    		}
+    		
+    		sign.update();
         }
 
         return false;
@@ -609,11 +665,18 @@ public class MechanismListener extends CraftBookDelegateListener {
     	if(Sitting.enabled
         	&& (item == null || item.getItemId() == 0)
     		&& (!Sitting.requireRightClickPermission || player.canUseCommand("/canrightclicksit"))
-    		&& EntitySitting.isChairBlock(blockClicked.getType())
-    		&& (!Sitting.requiresChairFormats || Sitting.isChair(blockClicked)) )
+    		&& EntitySitting.isChairBlock(blockClicked.getType()) )
     	{
-        	OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
-        	World world = player.getWorld();
+    		Sign[] signs = Sitting.isChair(blockClicked);
+    		if(signs == null)
+    		{
+    			if(Sitting.requiresChairFormats)
+    				return;
+				signs = new Sign[0];
+    		}
+    		
+    		OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
+    		World world = player.getWorld();
     		int data = world.getBlockData(blockClicked.getX(), blockClicked.getY(), blockClicked.getZ());
     		if(eplayer.aK != null)
     		{
@@ -664,7 +727,33 @@ public class MechanismListener extends CraftBookDelegateListener {
     	    			rotation = 0F;
         		}
         		
-        		Sitting.sit(eplayer, player.getWorld(), x, y, z, rotation, 0.5D);
+        		SitType[] types = new SitType[signs.length + 1];
+        		
+        		boolean hasHealing = false;
+        		for(int i = 0; i < signs.length; i++)
+        		{
+        			SittingType sittype = Sitting.getSittingTypeFromSign(signs[i]);
+        			if(sittype == null)
+        				continue;
+        			
+        			types[i] = sittype.getType(signs[i]);
+        			if(sittype == SittingType.SIT_HEAL)
+        				hasHealing = true;
+        		}
+        		
+        		if(!hasHealing)
+        		{
+					switch(Sitting.healWhileSitting)
+					{
+						case ALL:
+						case CHAIRONLY:
+							types[types.length-1] = SittingType.SIT_HEAL.getType();
+							break;
+						default:
+							types[types.length-1] = null;
+					}
+        		}
+        		Sitting.sit(eplayer, types, player.getWorld(), x, y, z, rotation, 0.5D);
     		}
     	}
     	
@@ -1157,7 +1246,17 @@ public class MechanismListener extends CraftBookDelegateListener {
 			}
 			else
 			{
-				Sitting.sit(eplayer, player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getRotation(), -0.05D);
+				SitType[] types = new SitType[1];
+				switch(Sitting.healWhileSitting)
+				{
+					case ALL:
+					case SITCOMMANDONLY:
+						types[0] = SittingType.SIT_HEAL.getType();
+						break;
+					default:
+						types[0] = null;
+				}
+				Sitting.sit(eplayer, types, player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getRotation(), -0.05D);
 			}
 			
         	return true;
@@ -1169,6 +1268,283 @@ public class MechanismListener extends CraftBookDelegateListener {
         		return true;
         	Sitting.stand(eplayer, 0, eplayer.aK.m(), 0);
 			
+        	return true;
+        }
+        else if(split[0].equalsIgnoreCase("/cbwarp") && player.canUseCommand("/cbwarp"))
+        {
+        	if(split.length < 2 || (split.length == 2 && split[1].matches("[0-9]+")))
+        	{
+        		int set;
+        		if(split.length < 2)
+        			set = 1;
+        		else
+        		{
+        			try
+        			{
+        				set = Integer.parseInt(split[1]);
+        			}
+        			catch(NumberFormatException e)
+        			{
+        				//shouldn't reach here, but just incase
+        				player.sendMessage(Colors.Rose+"Invalid CBWarp page number");
+        				return true;
+        			}
+        		}
+        		
+        		String[] output = CBWarp.listWarps(set, false);
+        		
+        		for(String line : output)
+        		{
+        			if(line == null)
+        				break;
+        			player.sendMessage(line);
+        		}
+        	}
+        	else
+        	{
+        		if(split.length == 2)
+        		{
+        			CBWarp.WarpError error = CBWarp.warp(player, split[1], null);
+        			if(error != null)
+        			{
+        				player.sendMessage(error.MESSAGE);
+        			}
+        		}
+        		else
+        		{
+        			if(split[1].equalsIgnoreCase("set") || split[1].equalsIgnoreCase("add"))
+        			{
+        				if(!player.canUseCommand("/cbwarpadd"))
+        				{
+        					player.sendMessage(Colors.Rose+"you do not have permissions to add warps.");
+        					return true;
+        				}
+        				
+        				String title = "";
+        				if(split.length > 3)
+        					title = Util.joinString(split, " ", 3);
+        				CBWarp.WarpError error = CBWarp.addWarp(player, split[2], player.getLocation(), title, null);
+        				
+        				if(error != null)
+        				{
+        					player.sendMessage(error.MESSAGE);
+        				}
+        				else
+        				{
+        					player.sendMessage(Colors.Gold+"warp added");
+        				}
+        			}
+        			else if(split[1].equalsIgnoreCase("remove") || split[1].equalsIgnoreCase("rm")
+        				|| split[1].equalsIgnoreCase("delete") || split[1].equalsIgnoreCase("clear"))
+        			{
+        				if(!player.canUseCommand("/cbwarpremove"))
+        				{
+        					player.sendMessage(Colors.Rose+"you do not have permissions to remove warps.");
+        					return true;
+        				}
+        				
+        				CBWarp.WarpError error = CBWarp.removeWarp(player, split[2], null);
+        				if(error != null)
+        				{
+        					player.sendMessage(error.MESSAGE);
+        				}
+        				else
+        				{
+        					player.sendMessage(Colors.Gold+"warp removed");
+        				}
+        			}
+        			else if(split[1].equalsIgnoreCase("title") || split[1].equalsIgnoreCase("settitle")
+        				|| split[1].equalsIgnoreCase("info") || split[1].equalsIgnoreCase("setinfo")
+        				|| split[1].equalsIgnoreCase("description"))
+        			{
+        				if(!player.canUseCommand("/cbwarpeditinfo"))
+        				{
+        					player.sendMessage(Colors.Rose+"you do not have permissions to change warp titles.");
+        					return true;
+        				}
+        				
+        				String title = "";
+        				if(split.length > 3)
+        					title = Util.joinString(split, " ", 3);
+        				CBWarp.WarpError error = CBWarp.setTitle(player, split[2], title, null);
+        				if(error != null)
+        				{
+        					player.sendMessage(error.MESSAGE);
+        				}
+        				else
+        				{
+        					player.sendMessage(Colors.Gold+"title changed");
+        				}
+        			}
+        			else if(split[1].equalsIgnoreCase("message") || split[1].equalsIgnoreCase("setmessage")
+        				|| split[1].equalsIgnoreCase("msg") || split[1].equalsIgnoreCase("setmsg"))
+        			{
+        				if(!player.canUseCommand("/cbwarpeditinfo"))
+        				{
+        					player.sendMessage(Colors.Rose+"you do not have permissions to change warp messages.");
+        					return true;
+        				}
+        				
+        				String message = "";
+        				if(split.length > 3)
+        					message = Util.joinString(split, " ", 3);
+        				CBWarp.WarpError error = CBWarp.setMessage(player, split[2], message, null);
+        				if(error != null)
+        				{
+        					player.sendMessage(error.MESSAGE);
+        				}
+        				else
+        				{
+        					player.sendMessage(Colors.Gold+"message changed");
+        				}
+        			}
+        		}
+        	}
+        	return true;
+        }
+        else if(split[0].equalsIgnoreCase("/cbwarpx") && player.canUseCommand("/cbwarpx"))
+        {
+        	if(split.length < 3 || (split.length == 2 && split[1].matches("[0-9]+")))
+        	{
+        		int set;
+        		if(split.length < 2)
+        			set = 1;
+        		else
+        		{
+        			try
+        			{
+        				set = Integer.parseInt(split[1]);
+        			}
+        			catch(NumberFormatException e)
+        			{
+        				//shouldn't reach here, but just incase
+        				player.sendMessage(Colors.Rose+"Invalid CBWarp page number");
+        				return true;
+        			}
+        		}
+        		
+        		String[] output = CBWarp.listWarps(set, true);
+        		
+        		for(String line : output)
+        		{
+        			if(line == null)
+        				break;
+        			player.sendMessage(line);
+        		}
+        	}
+        	else
+        	{
+        		if(split.length == 3)
+        		{
+        			CBWarp.WarpError error = CBWarp.warp(player, split[1], split[2]);
+        			if(error != null)
+        			{
+        				player.sendMessage(error.MESSAGE);
+        			}
+        		}
+        		else
+        		{
+        			if(split[1].equalsIgnoreCase("set") || split[1].equalsIgnoreCase("add"))
+        			{
+        				if(!player.canUseCommand("/cbwarpadd"))
+        				{
+        					player.sendMessage(Colors.Rose+"you do not have permissions to add warps.");
+        					return true;
+        				}
+        				
+        				String title = "";
+        				if(split.length > 4)
+        					title = Util.joinString(split, " ", 4);
+        				CBWarp.WarpError error = CBWarp.addWarp(player, split[2], player.getLocation(), title, split[3]);
+        				
+        				if(error != null)
+        				{
+        					player.sendMessage(error.MESSAGE);
+        				}
+        				else
+        				{
+        					player.sendMessage(Colors.Gold+"warp added");
+        				}
+        			}
+        			else if(split[1].equalsIgnoreCase("remove") || split[1].equalsIgnoreCase("rm")
+        				|| split[1].equalsIgnoreCase("delete") || split[1].equalsIgnoreCase("clear"))
+        			{
+        				if(!player.canUseCommand("/cbwarpremove"))
+        				{
+        					player.sendMessage(Colors.Rose+"you do not have permissions to remove warps.");
+        					return true;
+        				}
+        				
+        				CBWarp.WarpError error = CBWarp.removeWarp(player, split[2], split[3]);
+        				if(error != null)
+        				{
+        					player.sendMessage(error.MESSAGE);
+        				}
+        				else
+        				{
+        					player.sendMessage(Colors.Gold+"warp removed");
+        				}
+        			}
+        			else if(split[1].equalsIgnoreCase("title") || split[1].equalsIgnoreCase("settitle")
+        				|| split[1].equalsIgnoreCase("info") || split[1].equalsIgnoreCase("setinfo")
+        				|| split[1].equalsIgnoreCase("description"))
+        			{
+        				if(!player.canUseCommand("/cbwarpeditinfo"))
+        				{
+        					player.sendMessage(Colors.Rose+"you do not have permissions to change warp titles.");
+        					return true;
+        				}
+        				
+        				String title = "";
+        				if(split.length > 4)
+        					title = Util.joinString(split, " ", 4);
+        				CBWarp.WarpError error = CBWarp.setTitle(player, split[2], title, split[3]);
+        				if(error != null)
+        				{
+        					player.sendMessage(error.MESSAGE);
+        				}
+        				else
+        				{
+        					player.sendMessage(Colors.Gold+"title changed");
+        				}
+        			}
+        			else if(split[1].equalsIgnoreCase("message") || split[1].equalsIgnoreCase("setmessage")
+        				|| split[1].equalsIgnoreCase("msg") || split[1].equalsIgnoreCase("setmsg"))
+        			{
+        				if(!player.canUseCommand("/cbwarpeditinfo"))
+        				{
+        					player.sendMessage(Colors.Rose+"you do not have permissions to change warp messages.");
+        					return true;
+        				}
+        				
+        				String message = "";
+        				if(split.length > 4)
+        					message = Util.joinString(split, " ", 4);
+        				CBWarp.WarpError error = CBWarp.setMessage(player, split[2], message, split[3]);
+        				if(error != null)
+        				{
+        					player.sendMessage(error.MESSAGE);
+        				}
+        				else
+        				{
+        					player.sendMessage(Colors.Gold+"message changed");
+        				}
+        			}
+        		}
+        	}
+        	return true;
+        }
+        else if(split[0].equalsIgnoreCase("/cbwarpreload") && player.canUseCommand("/cbwarpreload"))
+        {
+        	CBWarp.WarpError error = CBWarp.reload();
+        	if(error != null)
+			{
+				player.sendMessage(error.MESSAGE);
+			}
+			else
+			{
+				player.sendMessage(Colors.Gold+"cbwarp reloaded");
+			}
         	return true;
         }
         else if(split[0].equalsIgnoreCase("/mcx120") && player.canUseCommand("/mcx120"))

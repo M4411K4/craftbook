@@ -1,3 +1,37 @@
+2.0extra11.5:
+- added CBWarp which is a warp system that works similar to
+    the /warp command
+    - this is not meant to replace the default /warp system.
+        It is meant to give servers another warp list if
+        needed. Such as hidden warps.
+    - use /cbwarpx to create and use password protected warps
+        - NOTE: passwords will have little to no encryption
+        - server logs when players type in the incorrect
+            password
+            - this is to help show if a player is trying to
+                figure out a password by guessing.
+- added [MCX111] Warp - uses warps from the /warp command
+- added [MCX114] CBWarp - uses warps from /cbwarp
+- added [MCX115] CBWarp Pass - uses waprs from /cbwarpx
+    - NOTE: Once [MCX115] is placed, it can continue using
+        the warp even if the warp's password has changed.
+- added the ability to heal while sitting
+    - This is disabled by default
+    - This will not do anything if auto-heal is on.
+    - Change the "heal-while-sitting" craftbook.properties
+        setting to enable.
+    - thanks Loganvz for the suggestion!
+- added [Sit Heal] chair
+    - allows healing even if the "heal-while-sitting"
+        setting is disabled
+    - players require permission: /sittingcanbuildheal
+        to build [Sit Heal] signs.
+- fixed [MCX132] & [MCU132] hurting players
+    - thanks Mercerenies for the bug report!
+- fixed players staying seated when a sticky piston moves
+    a stair block
+    - thanks onicx4 for the bug report!
+
 2.0extra11.4:
 - added [MCX131] & [MCU131] Hit Player Above
     - thanks Jahmaican for the suggestion!

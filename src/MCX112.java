@@ -81,77 +81,96 @@ public class MCX112 extends BaseIC {
             	dest = new Location(dest.x+0.5, dest.y, dest.z+0.5, dest.rotX, dest.rotY);
             	dest.dimension = dimension;
             	
-            	Vector pos;
-            	World world = CraftBook.getWorld(chip.getWorldType());
-            	
-            	if(chip.getMode() == 'p' || chip.getMode() == 'P')
-            	{
-            		pos = Util.getWallSignBack(world, chip.getPosition(), -2);
-            		
-            		double newY = pos.getY() + 2;
-            		
-            		if(newY > 128)
-            			newY = 128;
-            		
-            		pos.setY(newY);
-            	}
-            	else
-            		pos = chip.getBlockPosition();
-            	
-                int x = pos.getBlockX();
-                int z = pos.getBlockZ();
-                
-                int y = getSafeY(world, pos);
-                
-                for(Player player: etc.getServer().getPlayerList())
-                {
-                	Location pLoc = player.getLocation();
-                	Vector pVec = new Vector(pLoc.x, pLoc.y, pLoc.z);
-                	
-                	if(player.getWorld() == world
-                	   && (pVec.getBlockX() == x || pVec.getBlockX() == x + 1 || pVec.getBlockX() == x - 1)
-                	   &&  pVec.getBlockY() == y
-                	   && (pVec.getBlockZ() == z || pVec.getBlockZ() == z + 1 || pVec.getBlockZ() == z - 1)
-                		)
-                	{
-                        dest.y = getSafeY(CraftBook.getWorld(dest.dimension), new Vector(dest.x, dest.y, dest.z)) + 1.0;
-                        
-                        String msg = chip.getText().getLine4();
-                		if(msg.length() == 0)
-                			msg = "Woosh!";
-                		player.sendMessage(Colors.Gold+msg);
-                        
-                		player.teleportTo(dest);
-                		
-                		if(chip.getMode() == 'P')
-                		{
-                			//force plate off
-	                		int bdata = CraftBook.getBlockID(world, pVec);
-	                		if(bdata == BlockType.STONE_PRESSURE_PLATE || bdata == BlockType.WOODEN_PRESSURE_PLATE)
-	                		{
-	                			OWorld oworld = player.getEntity().aL;
-	                			
-	                			int bx = pVec.getBlockX();
-	                			int by = pVec.getBlockY();
-	                			int bz = pVec.getBlockZ();
-	                			
-	                			oworld.c(bx, by, bz, 0);
-	                			oworld.h(bx, by, bz, bdata);
-	                			oworld.h(bx, by - 1, bz, bdata);
-	                			oworld.b(bx, by, bz, bx, by, bz);
-	                		}
-                		}
-                		
-                		chip.getOut(1).set(true);
-                		break;
-                	}
-                }
-            	
-                chip.getOut(1).set(false);
+            	String[] msg;
+        		if(chip.getText().getLine4().length() == 0)
+        			msg = new String[]{"Woosh!"};
+        		else
+        			msg = new String[]{chip.getText().getLine4()};
+        		
+        		chip.getOut(1).set(transport(chip, dest, true, msg));
             }
         } else {
             chip.getOut(1).set(false);
         }
+    }
+    
+    protected boolean transport(ChipState chip, Location dest, boolean useSafeY, String[] messages)
+    {
+    	if(dest == null)
+    		return false;
+    	
+    	Vector pos;
+    	World world = CraftBook.getWorld(chip.getWorldType());
+    	
+    	if(chip.getMode() == 'p' || chip.getMode() == 'P')
+    	{
+    		pos = Util.getWallSignBack(world, chip.getPosition(), -2);
+    		
+    		double newY = pos.getY() + 2;
+    		
+    		if(newY > 128)
+    			newY = 128;
+    		
+    		pos.setY(newY);
+    	}
+    	else
+    		pos = chip.getBlockPosition();
+    	
+        int x = pos.getBlockX();
+        int z = pos.getBlockZ();
+        
+        int y = getSafeY(world, pos);
+        
+        for(Player player: etc.getServer().getPlayerList())
+        {
+        	Location pLoc = player.getLocation();
+        	Vector pVec = new Vector(pLoc.x, pLoc.y, pLoc.z);
+        	
+        	if(player.getWorld() == world
+        	   && (pVec.getBlockX() == x || pVec.getBlockX() == x + 1 || pVec.getBlockX() == x - 1)
+        	   &&  pVec.getBlockY() == y
+        	   && (pVec.getBlockZ() == z || pVec.getBlockZ() == z + 1 || pVec.getBlockZ() == z - 1)
+        		)
+        	{
+        		if(useSafeY)
+        			dest.y = getSafeY(CraftBook.getWorld(dest.dimension), new Vector(dest.x, dest.y, dest.z)) + 1.0;
+                
+                if(messages != null)
+                {
+                	for(String message : messages)
+                	{
+                		if(message == null)
+                			break;
+                		player.sendMessage(Colors.Gold+message);
+                	}
+                }
+                
+        		player.teleportTo(dest);
+        		
+        		if(chip.getMode() == 'P')
+        		{
+        			//force plate off
+            		int bdata = CraftBook.getBlockID(world, pVec);
+            		if(bdata == BlockType.STONE_PRESSURE_PLATE || bdata == BlockType.WOODEN_PRESSURE_PLATE)
+            		{
+            			OWorld oworld = player.getEntity().aL;
+            			
+            			int bx = pVec.getBlockX();
+            			int by = pVec.getBlockY();
+            			int bz = pVec.getBlockZ();
+            			
+            			oworld.c(bx, by, bz, 0);
+            			oworld.h(bx, by, bz, bdata);
+            			oworld.h(bx, by - 1, bz, bdata);
+            			oworld.b(bx, by, bz, bx, by, bz);
+            		}
+        		}
+        		
+        		return true;
+        	}
+        }
+    	
+        return false;
     }
     
     private int getSafeY(World world, Vector pos)

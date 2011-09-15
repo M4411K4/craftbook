@@ -388,4 +388,42 @@ public class Util {
     	Vector point = getFrontPoint(rotation, x, y, z);
     	return CraftBook.getBlockID(world, point);
     }
+    
+    public static String locationToString(Location location)
+	{
+		return location.dimension
+				+","+location.x
+				+","+location.y
+				+","+location.z
+				+","+location.rotX
+				+","+location.rotY
+				;
+	}
+	
+	public static Location stringToLocation(String data)
+	{
+		String[] locData = data.split(",",6);
+		if(locData.length != 6)
+			return null;
+		
+		Location location = null;
+		try
+		{
+			int dimension = Integer.parseInt(locData[0]);
+			double x = Double.parseDouble(locData[1]);
+			double y = Double.parseDouble(locData[2]);
+			double z = Double.parseDouble(locData[3]);
+			float rotation = Float.parseFloat(locData[4]);
+			float pitch = Float.parseFloat(locData[5]);
+			
+			location = new Location(x, y, z, rotation, pitch);
+			location.dimension = dimension;
+		}
+		catch(NumberFormatException e)
+		{
+			return null;
+		}
+		
+		return location;
+	}
 }

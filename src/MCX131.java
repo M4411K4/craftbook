@@ -151,7 +151,7 @@ public class MCX131 extends BaseIC {
     	for(Object obj: list)
         {
     		BaseEntity entity = (BaseEntity)obj;
-    		if(!isNamed || ((entity.isMob() || entity.isAnimal()) && entity instanceof Mob) )
+    		if(entity != null && (entity.isMob() || entity.isAnimal()) && entity instanceof Mob)
     		{
 	        	Vector pVec = new Vector(entity.getX(), entity.getY(), entity.getZ());
 	        	

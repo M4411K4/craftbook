@@ -156,6 +156,8 @@ public class CraftBook extends Plugin {
         
         stateThread.setName("StateManager");
         stateThread.start();
+        
+        CBWarp.reload();
     }
 
     /**
