@@ -1,3 +1,21 @@
+2.0extra11.6:
+- added ability to spawn saddled pigs with [MCX200]
+    - 3rd line of the sign needs to be
+        Pig:1
+    - thanks IWEK91 for the suggestion!
+- added ability to right-click self-updating ICs to restart
+    them. This will help with self-updating ICs that break
+    from server restarts.
+    - players require permission to:
+        /cbrightclicksignupdate
+    - recommended only for server admins
+    - must right click sign with empty hand.
+    - thanks Loganvz for the suggestion!
+- fixed bug with repel ICs [MCU302] & [MCU303] not limiting
+    the push force for negative values.
+- fixed permissions for adding, removing, and editing
+    password protected CBWarps.
+
 2.0extra11.5:
 - added CBWarp which is a warp system that works similar to
     the /warp command

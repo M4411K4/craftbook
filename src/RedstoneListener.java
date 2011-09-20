@@ -732,6 +732,42 @@ public class RedstoneListener extends CraftBookDelegateListener
     }
     
     /**
+     * Called when a block is being attempted to be placed.
+     * 
+     * @param player
+     * @param blockClicked
+     * @param itemInHand
+     * @return
+     */
+    @Override
+    public void onBlockRightClicked(Player player, Block blockClicked, Item item)
+    {
+    	if( (item == null || item.getItemId() == 0)
+    		&& player.canUseCommand("/cbrightclicksignupdate")
+    		&& blockClicked != null
+    		&& blockClicked.getType() == BlockType.WALL_SIGN)
+    	{
+    		World world = player.getWorld();
+        	
+        	Sign sign = (Sign)world.getComplexBlock(blockClicked);
+        	
+        	String line2 = sign.getText(1);
+        	if(!line2.startsWith("[MC") || line2.length() < 8)
+            	return;
+        	
+        	String id = line2.substring(1, 7).toUpperCase();
+        	RegisteredIC ic = icList.get(id);
+            if (ic == null)
+            	return;
+            
+            if(!ic.type.isSelfTriggered)
+            	return;
+            
+            onSignAdded(world.getType().getId(), sign);
+    	}
+    }
+    
+    /**
      * Called when a command is run
      *
      * @param player

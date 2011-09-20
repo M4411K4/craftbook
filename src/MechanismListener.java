@@ -1446,7 +1446,7 @@ public class MechanismListener extends CraftBookDelegateListener {
         		{
         			if(split[1].equalsIgnoreCase("set") || split[1].equalsIgnoreCase("add"))
         			{
-        				if(!player.canUseCommand("/cbwarpadd"))
+        				if(!player.canUseCommand("/cbwarpxadd"))
         				{
         					player.sendMessage(Colors.Rose+"you do not have permissions to add warps.");
         					return true;
@@ -1469,7 +1469,7 @@ public class MechanismListener extends CraftBookDelegateListener {
         			else if(split[1].equalsIgnoreCase("remove") || split[1].equalsIgnoreCase("rm")
         				|| split[1].equalsIgnoreCase("delete") || split[1].equalsIgnoreCase("clear"))
         			{
-        				if(!player.canUseCommand("/cbwarpremove"))
+        				if(!player.canUseCommand("/cbwarpxremove"))
         				{
         					player.sendMessage(Colors.Rose+"you do not have permissions to remove warps.");
         					return true;
@@ -1489,7 +1489,7 @@ public class MechanismListener extends CraftBookDelegateListener {
         				|| split[1].equalsIgnoreCase("info") || split[1].equalsIgnoreCase("setinfo")
         				|| split[1].equalsIgnoreCase("description"))
         			{
-        				if(!player.canUseCommand("/cbwarpeditinfo"))
+        				if(!player.canUseCommand("/cbwarpxeditinfo"))
         				{
         					player.sendMessage(Colors.Rose+"you do not have permissions to change warp titles.");
         					return true;
@@ -1511,7 +1511,7 @@ public class MechanismListener extends CraftBookDelegateListener {
         			else if(split[1].equalsIgnoreCase("message") || split[1].equalsIgnoreCase("setmessage")
         				|| split[1].equalsIgnoreCase("msg") || split[1].equalsIgnoreCase("setmsg"))
         			{
-        				if(!player.canUseCommand("/cbwarpeditinfo"))
+        				if(!player.canUseCommand("/cbwarpxeditinfo"))
         				{
         					player.sendMessage(Colors.Rose+"you do not have permissions to change warp messages.");
         					return true;

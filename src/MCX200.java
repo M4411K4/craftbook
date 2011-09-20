@@ -212,6 +212,14 @@ public class MCX200 extends BaseIC {
     		OEntityWolf wolf = (OEntityWolf)entity;
     		wolf.aa().b(16, (byte)color);
     	}
+    	else if(entity instanceof OEntityPig)
+    	{
+    		if(color != 1)
+    			return;
+    		
+    		OEntityPig pig = (OEntityPig)entity;
+    		pig.a(true);
+    	}
 	}
     
     private boolean isValidColorMob(String mob)
@@ -219,6 +227,7 @@ public class MCX200 extends BaseIC {
     	if( mob.equals("Sheep")
     		|| mob.equals("Creeper")
     		|| mob.equals("Wolf")
+    		|| mob.equals("Pig")
     		)
     	{
     		return true;

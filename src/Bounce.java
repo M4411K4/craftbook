@@ -141,10 +141,16 @@ public class Bounce
 						{
 							if(applyForce[0] > maxICForce)
 								applyForce[0] = maxICForce;
+							else if(applyForce[0] < -maxICForce)
+								applyForce[0] = -maxICForce;
 							if(applyForce[1] > maxICForce)
 								applyForce[1] = maxICForce;
+							else if(applyForce[1] < -maxICForce)
+								applyForce[1] = -maxICForce;
 							if(applyForce[2] > maxICForce)
 								applyForce[2] = maxICForce;
+							else if(applyForce[2] < -maxICForce)
+								applyForce[2] = -maxICForce;
 						}
 					}
 					else
