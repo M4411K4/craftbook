@@ -67,13 +67,13 @@ public class SignPatch extends OBlockSign {
      * Should not be called.
      */
     @Deprecated
-    public void b(OWorld world, int x, int y, int z) {
+    public void d(OWorld world, int x, int y, int z) {
     	if(!(world instanceof OWorldServer))
     		return;
     	
         ExtensionListener[] tasks = LISTENERS.toArray(new ExtensionListener[0]);
         for(int i=0;i<tasks.length;i++) tasks[i].onSignAdded(new World((OWorldServer)world), x,y,z);
-        super.b(world,x,y,z);
+        super.d(world,x,y,z);
     }
     
     /**

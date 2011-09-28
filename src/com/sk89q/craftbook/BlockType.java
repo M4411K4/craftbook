@@ -124,6 +124,19 @@ public final class BlockType {
     public static final int REDSTONE_REPEATER_OFF = 93;
     public static final int REDSTONE_REPEATER_ON = 94;
     public static final int TRAPDOOR = 96;
+    public static final int SILVERFISH_BLOCK = 97;
+    public static final int STONE_BRICKS = 98;
+    public static final int HUGE_BROWN_MUSHROOM = 99;
+    public static final int HUGE_RED_MUSHROOM = 100;
+    public static final int IRON_BARS = 101;
+    public static final int GLASS_PANE = 102;
+    public static final int MELON = 103;
+    public static final int PUMPKIN_STEM = 104;
+    public static final int MELON_STEM = 105;
+    public static final int VINES = 106;
+    public static final int FENCE_GATE = 107;
+    public static final int BRICK_STAIRS = 108;
+    public static final int STONE_BRICK_STAIRS = 109;
 
     /**
      * Stores a list of dropped blocks for blocks.
@@ -219,6 +232,19 @@ public final class BlockType {
         blockDrops.put(93, 356);
         blockDrops.put(94, 356);
         blockDrops.put(96, 96);
+        blockDrops.put(97, 97);
+        blockDrops.put(98, 98);
+        blockDrops.put(99, 99);
+        blockDrops.put(100, 100);
+        blockDrops.put(101, 101);
+        blockDrops.put(102, 102);
+        blockDrops.put(103, 103);
+        blockDrops.put(104, 104);
+        blockDrops.put(105, 105);
+        blockDrops.put(106, 106);
+        blockDrops.put(107, 107);
+        blockDrops.put(108, 108);
+        blockDrops.put(109, 109);
     }
 
     /**
@@ -292,7 +318,8 @@ public final class BlockType {
                 || id == SNOW
                 || id == CACTUS
                 || id == REED
-                || id == PORTAL;
+                || id == PORTAL
+                || id == FENCE_GATE;
     }
 
     /**
@@ -331,7 +358,10 @@ public final class BlockType {
                 || id == SNOW
                 || id == REED
                 || id == WEB
-                || id == PORTAL;
+                || id == PORTAL
+                || id == PUMPKIN_STEM
+                || id == MELON_STEM
+                || id == VINES;
     }
 
     /**
@@ -377,7 +407,15 @@ public final class BlockType {
                 || id == LOG
                 || id == DOUBLE_STEP
                 || id == STEP
-                || id == CACTUS;
+                || id == CACTUS
+                || id == SILVERFISH_BLOCK
+                || id == STONE_BRICKS
+                || id == HUGE_BROWN_MUSHROOM
+                || id == HUGE_RED_MUSHROOM
+        		|| id == PUMPKIN_STEM
+                || id == MELON_STEM
+                || id == VINES
+                || id == FENCE_GATE;
     }
 
     /**
@@ -437,7 +475,8 @@ public final class BlockType {
                 || id == STEP
                 || id == LOG
                 || id == SAPLING
-                || id == TALL_GRASS;
+                || id == TALL_GRASS
+                || id == STONE_BRICKS;
     }
 
     /**

@@ -161,6 +161,9 @@ public class MCX203 extends BaseIC {
         {
         	dist = Double.parseDouble(chip.getText().getLine4());
         }
+        if(dist > RedstoneListener.chestCollectorMaxRange)
+        	dist = RedstoneListener.chestCollectorMaxRange;
+        
         dist = dist * dist;
         
         OWorldServer oworld = CraftBook.getOWorldServer(chip.getWorldType());
@@ -171,18 +174,18 @@ public class MCX203 extends BaseIC {
         
         boolean found = false;
 		for(@SuppressWarnings("rawtypes")
-		Iterator it = oworld.b.iterator(); it.hasNext();)
+		Iterator it = oworld.g.iterator(); it.hasNext();)
 		{
 			Object obj = it.next();
 			if(obj instanceof OEntityItem)
 			{
 				OEntityItem eitem = (OEntityItem) obj;
 				
-				if(!eitem.bh && eitem.a.a > 0 && (item == -1 || (eitem.a.c == item && (color < 0 || eitem.a.h() == color) )))
+				if(!eitem.bx && eitem.a.a > 0 && (item == -1 || (eitem.a.c == item && (color < 0 || eitem.a.h() == color) )))
 				{
-    				double diffX = x - eitem.aP;
-    				double diffY = y - eitem.aQ;
-    				double diffZ = z - eitem.aR;
+    				double diffX = x - eitem.bf;
+    				double diffY = y - eitem.bg;
+    				double diffZ = z - eitem.bh;
     				
     				if(((diffX * diffX + diffY * diffY + diffZ * diffZ) < dist)
     					&& source.hasAvailableSlotSpace(eitem.a.c, (byte)eitem.a.h(), eitem.a.a))
@@ -190,7 +193,7 @@ public class MCX203 extends BaseIC {
     					found = true;
     					
     					//kill
-    					eitem.J();
+    					eitem.N();
     					
     					//store
     					try {

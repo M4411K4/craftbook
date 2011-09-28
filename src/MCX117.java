@@ -60,7 +60,7 @@ public class MCX117 extends MCX116 {
     		}
     		else
     		{
-    			explodeTNT(player.getEntity().aL, player.getX(), player.getY(), player.getZ());
+    			explodeTNT(player.getEntity().bb, player.getX(), player.getY(), player.getZ());
     			
     			chip.getOut(1).set(true);
     		}
@@ -77,7 +77,7 @@ public class MCX117 extends MCX116 {
     protected void explodeTNT(OWorld oworld, double x, double y, double z) {
         // Make TNT explode
     	OEntityTNTPrimed tnt = new OEntityTNTPrimed(oworld);
-        tnt.a(x, y, z);
-        tnt.m_();
+        tnt.c(x, y, z);
+        tnt.s_();
     }
 }

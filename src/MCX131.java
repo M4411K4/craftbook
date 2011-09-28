@@ -166,13 +166,13 @@ public class MCX131 extends BaseIC {
 	        			Mob mob = (Mob)entity;
 	        			if(mob.getName().equalsIgnoreCase(id))
 	        			{
-	        				mob.getEntity().a((OEntity)null, damage);
+	        				mob.getEntity().a(ODamageSource.j, damage);
 	        				damaged = true;
 	        			}
 	        		}
 	        		else
 	        		{
-	        			entity.getEntity().a((OEntity)null, damage);
+	        			entity.getEntity().a(ODamageSource.j, damage);
 	        			damaged = true;
 	        		}
 	        	}

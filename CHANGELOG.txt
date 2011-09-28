@@ -1,3 +1,11 @@
+2.0extra12.0:
+- updated to minecraft 1.8.1
+- added ability to limit max range for [MCX203] & [MCZ203]
+    Chest Collectors
+    - In the craftbook.properties, change the value of
+        ic-chest-collector-max-range=
+    - thanks Riot for the suggestion!
+
 2.0extra11.6:
 - added ability to spawn saddled pigs with [MCX200]
     - 3rd line of the sign needs to be

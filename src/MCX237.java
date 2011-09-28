@@ -87,11 +87,11 @@ public class MCX237 extends BaseIC {
     	
     	OPacket70Bed packet;
     	if(chip.getIn(1).is())
-    		packet = new OPacket70Bed(2);
+    		packet = new OPacket70Bed(2, 0);
     	else if(!CraftBook.getWorld(chip.getWorldType()).isRaining())
     		return;
     	else
-    		packet = new OPacket70Bed(1);
+    		packet = new OPacket70Bed(1, 0);
     	
     	boolean out = chip.getIn(1).is();
     	switch(type)

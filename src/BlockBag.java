@@ -136,7 +136,11 @@ public abstract class BlockBag {
                                 || id == BlockType.LIGHTSTONE
                                 || id == BlockType.PORTAL
                                 || id == BlockType.BED
-                                || id == BlockType.CAKE_BLOCK) {
+                                || id == BlockType.CAKE_BLOCK
+                                || id == BlockType.SILVERFISH_BLOCK
+                                || id == BlockType.PUMPKIN_STEM
+                                || id == BlockType.MELON_STEM
+                                ) {
                             return false;
                         }
 

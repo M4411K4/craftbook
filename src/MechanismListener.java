@@ -678,7 +678,7 @@ public class MechanismListener extends CraftBookDelegateListener {
     		OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
     		World world = player.getWorld();
     		int data = world.getBlockData(blockClicked.getX(), blockClicked.getY(), blockClicked.getZ());
-    		if(eplayer.aK != null)
+    		if(eplayer.ba != null)
     		{
     			switch(data)
         		{
@@ -1240,9 +1240,9 @@ public class MechanismListener extends CraftBookDelegateListener {
         else if(Sitting.enabled && split[0].equalsIgnoreCase("/sit") && player.canUseCommand("/sit"))
         {
         	OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
-			if(eplayer.aK != null)
+			if(eplayer.ba != null)
 			{
-				Sitting.stand(eplayer, 0, eplayer.aK.m(), 0);
+				Sitting.stand(eplayer, 0, eplayer.ba.n(), 0);
 			}
 			else
 			{
@@ -1264,9 +1264,9 @@ public class MechanismListener extends CraftBookDelegateListener {
         else if(Sitting.enabled && split[0].equalsIgnoreCase("/stand") && player.canUseCommand("/stand"))
         {
         	OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
-        	if(eplayer.aK == null)
+        	if(eplayer.ba == null)
         		return true;
-        	Sitting.stand(eplayer, 0, eplayer.aK.m(), 0);
+        	Sitting.stand(eplayer, 0, eplayer.ba.n(), 0);
 			
         	return true;
         }

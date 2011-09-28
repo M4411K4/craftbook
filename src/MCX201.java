@@ -176,9 +176,9 @@ public class MCX201 extends BaseIC {
     
     protected void dropColorItem(OWorld oworld, double x, double y, double z, int itemId, int quantity, int color)
     {
-    	double d1 = oworld.r.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
-    	double d2 = oworld.r.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
-    	double d3 = oworld.r.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
+    	double d1 = oworld.w.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
+    	double d2 = oworld.w.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
+    	double d3 = oworld.w.nextFloat() * 0.7F + (1.0F - 0.7F) * 0.5D;
     	
     	OEntityItem localgl = new OEntityItem(oworld, x + d1, y + d2, z + d3, new OItemStack(itemId, quantity, color));
     	localgl.c = 10;

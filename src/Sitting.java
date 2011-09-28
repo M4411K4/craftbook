@@ -19,25 +19,25 @@ public class Sitting
 	
 	protected static void sit(OEntityPlayerMP eplayer, SitType[] types, World world, double x, double y, double z, float rotation, double offsety)
 	{
-		eplayer.aP = x;
-		eplayer.aQ = y;
-		eplayer.aR = z;
-		eplayer.aV = rotation;
+		eplayer.bf = x;
+		eplayer.bg = y;
+		eplayer.bh = z;
+		eplayer.bl = rotation;
 		
 		OWorldServer oworld = world.getWorld();
-		EntitySitting esitting = new EntitySitting(types, oworld, eplayer.aP, eplayer.aQ, eplayer.aR, offsety);
+		EntitySitting esitting = new EntitySitting(types, oworld, eplayer.bf, eplayer.bg, eplayer.bh, offsety);
 		oworld.b(esitting);
-		eplayer.b(esitting);
+		eplayer.a(esitting);
 	}
 	
 	protected static void stand(OEntityPlayerMP eplayer, double offsetx, double offsety, double offsetz)
 	{
-		if(!(eplayer.aK instanceof EntitySitting))
+		if(!(eplayer.ba instanceof EntitySitting))
 			return;
 		
 		OEntity nullEnt = null;
-		eplayer.b(nullEnt);
-		eplayer.a.a(eplayer.aP+offsetx, eplayer.aQ+offsety, eplayer.aR+offsetz, eplayer.aV, eplayer.aW);
+		eplayer.a(nullEnt);
+		eplayer.a.a(eplayer.bf+offsetx, eplayer.bg+offsety, eplayer.bh+offsetz, eplayer.bl, eplayer.bm);
 	}
 	
 	/*

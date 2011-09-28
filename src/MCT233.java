@@ -75,14 +75,14 @@ public class MCT233 extends BaseIC {
 	    		duration = 24000;
 	    		
 	    		if(!world.isRaining())
-	    			etc.getMCServer().f.a(new OPacket70Bed(1));
+	    			etc.getMCServer().f.a(new OPacket70Bed(1, 0));
 	    	}
 	    	else
 	    	{
 	    		duration = 0;
 	    		
 	    		if(world.isRaining())
-	    			etc.getMCServer().f.a(new OPacket70Bed(2));
+	    			etc.getMCServer().f.a(new OPacket70Bed(2, 0));
 	    	}
 	    	
 	    	world.setRainTime(duration);

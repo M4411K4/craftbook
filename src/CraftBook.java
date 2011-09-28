@@ -228,12 +228,12 @@ public class CraftBook extends Plugin {
         for(int i = 0; i < oworlds.length; i++)
         {
     		for(@SuppressWarnings("rawtypes")
-    		Iterator it = oworlds[i].b.iterator(); it.hasNext();)
+    		Iterator it = oworlds[i].g.iterator(); it.hasNext();)
     		{
     			Object obj = it.next();
     			if(obj instanceof EntitySitting)
     			{
-    				((EntitySitting)obj).J();
+    				((EntitySitting)obj).N();
     			}
     		}
         }

@@ -74,6 +74,8 @@ public class RedstoneListener extends CraftBookDelegateListener
     
     private boolean updateSelfTriggeredICList = false;
     
+    protected static int chestCollectorMaxRange = 64;
+    
     /**
      * Construct the object.
      * 
@@ -109,6 +111,15 @@ public class RedstoneListener extends CraftBookDelegateListener
         
         if(properties.containsKey("chunk-updated-self-triggered-ic-list"))
         	updateSelfTriggeredICList = properties.getBoolean("chunk-updated-self-triggered-ic-list",false);
+        
+        if(properties.containsKey("ic-chest-collector-max-range"))
+        {
+        	chestCollectorMaxRange = properties.getInt("ic-chest-collector-max-range", 64);
+        	if(chestCollectorMaxRange < 1)
+        		chestCollectorMaxRange = 1;
+        	else if(chestCollectorMaxRange > 64)
+        		chestCollectorMaxRange = 64;
+        }
 
         icList.clear();
         

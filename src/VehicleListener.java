@@ -193,14 +193,14 @@ public class VehicleListener extends CraftBookDelegateListener {
         }
         else if(split[0].equalsIgnoreCase("/cbgo") &&
         		player.getEntity() != null &&
-        		player.getEntity().aK instanceof OEntityMinecart
+        		player.getEntity().ba instanceof OEntityMinecart
         		)
         {
         	World world = player.getWorld();
         	
-        	OEntityMinecart eminecart = (OEntityMinecart)player.getEntity().aK;
+        	OEntityMinecart eminecart = (OEntityMinecart)player.getEntity().ba;
         	
-        	Vector blockpt = new Vector((int)Math.floor(eminecart.aP), (int)Math.floor(eminecart.aQ), (int)Math.floor(eminecart.aR));
+        	Vector blockpt = new Vector((int)Math.floor(eminecart.bf), (int)Math.floor(eminecart.bg), (int)Math.floor(eminecart.bh));
         	
         	int under = CraftBook.getBlockID(world, blockpt.getBlockX(), blockpt.getBlockY() - 1, blockpt.getBlockZ());
         	int underColor = CraftBook.getBlockData(world, blockpt.getBlockX(), blockpt.getBlockY() - 1, blockpt.getBlockZ());
@@ -216,9 +216,9 @@ public class VehicleListener extends CraftBookDelegateListener {
     			else
     			{
     				eminecart.b(point.getX(), point.getY(), point.getZ(), player.getRotation(), 0);
-        			eminecart.aS = (point.getX() - blockpt.getBlockX()) * minecartBoostLaunch;
-    				eminecart.aT = 0.0;
-    				eminecart.aU = (point.getZ() - blockpt.getBlockZ()) * minecartBoostLaunch;
+        			eminecart.bi = (point.getX() - blockpt.getBlockX()) * minecartBoostLaunch;
+    				eminecart.bj = 0.0;
+    				eminecart.bk = (point.getZ() - blockpt.getBlockZ()) * minecartBoostLaunch;
     			}
         		
         		return true;
@@ -729,8 +729,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             loc.z = loc.z + 0.5;
                             loc.dimension = player.getWorld().getType().getId();
 
-                            OEntity nullEntity = null; //to eject
-                            player.getEntity().b(nullEntity);
+                            player.getEntity().a((OEntity)null); //to eject
                             player.teleportTo(loc);
                         }
                     }
@@ -804,95 +803,6 @@ public class VehicleListener extends CraftBookDelegateListener {
                     }
 
                     return;
-                } else if (under == minecartDirectionBlock[0] && underColor == minecartDirectionBlock[1]
-                           && minecart.getPassenger() != null) {
-	                Boolean test = Redstone.testAnyInput(world, underPt);
-	
-	                if (test == null || test)
-	                {
-	                	if(minecart.getMotionX() != 0.0 || minecart.getMotionZ() != 0.0)
-	                	{
-		                	Player player = minecart.getPassenger();
-		                	player.sendMessage(Colors.Gold+"Face the direction you want to go, then type: "+Colors.White+"/cbgo");
-		                	
-		                	minecart.setMotionX(0);
-		                    minecart.setMotionZ(0);
-		                    
-		                    //don't return so we can print any message sign.
-	                	}
-	                	else
-	                	{
-	                		//return so we dont print message again.
-	                		return;
-	                	}
-	                }
-                } else if (under == minecartLaunchBlock[0] && underColor == minecartLaunchBlock[1]) {
-                	
-                	Sign sign = getControllerSign(world, blockX, blockY - 1, blockZ, "[Launch]");
-                	if(sign != null)
-                	{
-		                Boolean test = Redstone.testAnyInput(world, underPt);
-		                
-		                if (test == null || test)
-		                {
-		                	Boolean launch = null;
-		                	
-		                	if(sign.getText(2).length() == 0 && sign.getText(3).length() == 0)
-		                	{
-		                		launch = !minecart.isEmpty();
-		                	}
-		                	else if(satisfiesCartSort(sign.getText(2), minecart,
-                                    new Vector(blockX, blockY, blockZ)))
-		                	{
-		                		launch = true;
-		                	}
-		                	else if(satisfiesCartSort(sign.getText(3), minecart,
-                                    new Vector(blockX, blockY, blockZ)))
-		                	{
-		                		launch = false;
-		                	}
-		                	else if(sign.getText(2).length() == 0)
-		                	{
-		                		launch = true;
-		                	}
-		                	else if(sign.getText(3).length() == 0)
-		                	{
-		                		launch = false;
-		                	}
-		                	
-		                	//Do nothing for launch == null i guess...
-		                	if(launch == null)
-		                		return;
-		                	
-		                	if(launch)
-		                	{
-		                		int data = CraftBook.getBlockData(world, sign.getX(), sign.getY(), sign.getZ());
-		                		
-		                		Vector motion = null;
-		                		if (data == 0x0) {
-		        	                motion = new Vector(0, 0, -minecartBoostLaunch);
-		        	            } else if (data == 0x4) {
-		        	                motion = new Vector(minecartBoostLaunch, 0, 0);
-		        	            } else if (data == 0x8) {
-		        	                motion = new Vector(0, 0, minecartBoostLaunch);
-		        	            } else if (data == 0xC) {
-		        	                motion = new Vector(-minecartBoostLaunch, 0, 0);
-		        	            } else {
-		        	                return;
-		        	            }
-		                		
-		                		if(motion != null)
-		                			minecart.setMotion(motion.getX(), motion.getY(), motion.getZ());
-		                	}
-		                	else
-		                	{
-		                		minecart.setMotionX(0);
-			                    minecart.setMotionZ(0);
-		                	}
-		                	
-		                	return;
-		                }
-                	}
                 } else if (minecartEnableLoadBlock
                 			&& under == minecartLoadBlock[0] && underColor == minecartLoadBlock[1]
                             && minecart.isEmpty()
@@ -914,17 +824,17 @@ public class VehicleListener extends CraftBookDelegateListener {
                         	int data = CraftBook.getBlockData(world, sign.getX(), sign.getY(), sign.getZ());
                         	
                         	double closeDist = -1.0D;
-                        	OWorld oworld = eminecart.aL;
-                        	for(int i = 0; i < oworld.d.size(); i++)
+                        	OWorld oworld = eminecart.bb;
+                        	for(int i = 0; i < oworld.i.size(); i++)
                         	{
-                        		OEntityPlayer tmpplayer = (OEntityPlayer) oworld.d.get(i);
-                        		double d2 = tmpplayer.e(eminecart.aP, eminecart.aQ, eminecart.aR);
+                        		OEntityPlayer tmpplayer = (OEntityPlayer) oworld.i.get(i);
+                        		double d2 = tmpplayer.e(eminecart.bf, eminecart.bg, eminecart.bh);
                         		
                         		if( (d2 < DIST * DIST) && ((closeDist == -1.0D) || (d2 < closeDist))
-                        			&& ( (data == 0x0 && tmpplayer.aR >= eminecart.aR)
-                        				|| (data == 0x4 && tmpplayer.aP <= eminecart.aP)
-                        				|| (data == 0x8 && tmpplayer.aR <= eminecart.aR)
-                        				|| (data == 0xC && tmpplayer.aP >= eminecart.aP)
+                        			&& ( (data == 0x0 && tmpplayer.bh >= eminecart.bh)
+                        				|| (data == 0x4 && tmpplayer.bf <= eminecart.bf)
+                        				|| (data == 0x8 && tmpplayer.bh <= eminecart.bh)
+                        				|| (data == 0xC && tmpplayer.bf >= eminecart.bf)
                         					)
                         			)
                         		{
@@ -935,12 +845,12 @@ public class VehicleListener extends CraftBookDelegateListener {
                         }
                         else
                         {
-                        	eplayer = eminecart.aL.a(eminecart, DIST);
+                        	eplayer = eminecart.bb.a(eminecart, DIST);
                         }
                         
                         if (eplayer != null)
                     	{
-                    		eplayer.b(eminecart);
+                    		eplayer.a((OEntity)eminecart);
                     	}
 	                }
                 }
@@ -986,7 +896,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                 }
             }
 
-            if (minecartDispensers && !minecart.getEntity().bh) {
+            if (minecartDispensers && !minecart.getEntity().bx) {
                 Vector pt = new Vector(blockX, blockY, blockZ);
                 Vector depositPt = null;
 
@@ -1086,11 +996,11 @@ public class VehicleListener extends CraftBookDelegateListener {
             {
             	OEntityMinecart ecart = minecart.getEntity();
             	@SuppressWarnings("rawtypes")
-				List localList = ecart.aL.b(ecart, ecart.aZ.b(0.2000000029802322D, 0.0D, 0.2000000029802322D));
+				List localList = ecart.bb.b(ecart, ecart.bp.b(0.2000000029802322D, 0.0D, 0.2000000029802322D));
                 if ((localList != null) && (localList.size() > 0))
                     for (int i3 = 0; i3 < localList.size(); i3++) {
                         OEntity localOEntity = (OEntity) localList.get(i3);
-                        if ((localOEntity != ecart.aJ) && (localOEntity.d_()) && ((localOEntity instanceof OEntityMinecart)))
+                        if ((localOEntity != ecart.aZ) && (localOEntity.g()) && ((localOEntity instanceof OEntityMinecart)))
                         {
                         	vehicleCollision(vehicle, localOEntity);
                         }
@@ -1178,9 +1088,9 @@ public class VehicleListener extends CraftBookDelegateListener {
                 	if (test == null || test)
                 	{
                 		OEntityMinecart eminecart = minecart.getEntity();
-                		if(OMathHelper.b(eminecart.aM) == OMathHelper.b(eminecart.aP)
-                		   && OMathHelper.b(eminecart.aN) == OMathHelper.b(eminecart.aQ)
-                		   && OMathHelper.b(eminecart.aO) == OMathHelper.b(eminecart.aR))
+                		if(OMathHelper.b(eminecart.bc) == OMathHelper.b(eminecart.bf)
+                		   && OMathHelper.b(eminecart.bd) == OMathHelper.b(eminecart.bg)
+                		   && OMathHelper.b(eminecart.be) == OMathHelper.b(eminecart.bh))
                 			return;
                 		
                 		Vector signPos = new Vector(blockX, blockY - 2, blockZ);
@@ -1216,6 +1126,98 @@ public class VehicleListener extends CraftBookDelegateListener {
                         
                         return;
                 	}
+                }
+                else if (under == minecartDirectionBlock[0] && underColor == minecartDirectionBlock[1]
+                        && minecart.getPassenger() != null)
+                {
+					Boolean test = Redstone.testAnyInput(world, underPt);
+					
+					if (test == null || test)
+					{
+						if(minecart.getMotionX() != 0.0 || minecart.getMotionZ() != 0.0)
+						{
+							Player player = minecart.getPassenger();
+							player.sendMessage(Colors.Gold+"Face the direction you want to go, then type: "+Colors.White+"/cbgo");
+							
+							minecart.setMotionX(0);
+							minecart.setMotionZ(0);
+							
+							//don't return so we can print any message sign.
+						}
+						else
+						{
+							//return so we dont print message again.
+							return;
+						}
+					}
+				}
+				else if (under == minecartLaunchBlock[0] && underColor == minecartLaunchBlock[1])
+				{
+					Sign sign = getControllerSign(world, blockX, blockY - 1, blockZ, "[Launch]");
+					if(sign != null)
+					{
+						Boolean test = Redstone.testAnyInput(world, underPt);
+						
+						if (test == null || test)
+						{
+							Boolean launch = null;
+							
+							if(sign.getText(2).length() == 0 && sign.getText(3).length() == 0)
+							{
+								launch = !minecart.isEmpty();
+							}
+							else if(satisfiesCartSort(sign.getText(2), minecart,
+									new Vector(blockX, blockY, blockZ)))
+							{
+								launch = true;
+							}
+							else if(satisfiesCartSort(sign.getText(3), minecart,
+									new Vector(blockX, blockY, blockZ)))
+							{
+								launch = false;
+							}
+							else if(sign.getText(2).length() == 0)
+							{
+								launch = true;
+							}
+							else if(sign.getText(3).length() == 0)
+							{
+								launch = false;
+							}
+							
+							//Do nothing for launch == null i guess...
+							if(launch == null)
+								return;
+							
+							if(launch)
+							{
+								int data = CraftBook.getBlockData(world, sign.getX(), sign.getY(), sign.getZ());
+								
+								Vector motion = null;
+								if (data == 0x0) {
+									motion = new Vector(0, 0, -minecartBoostLaunch);
+								} else if (data == 0x4) {
+									motion = new Vector(minecartBoostLaunch, 0, 0);
+								} else if (data == 0x8) {
+									motion = new Vector(0, 0, minecartBoostLaunch);
+								} else if (data == 0xC) {
+									motion = new Vector(-minecartBoostLaunch, 0, 0);
+								} else {
+									return;
+							}
+							
+							if(motion != null)
+								minecart.setMotion(motion.getX(), motion.getY(), motion.getZ());
+							}
+							else
+							{
+								minecart.setMotionX(0);
+								minecart.setMotionZ(0);
+							}
+							
+							return;
+						}
+					}
                 }
                 else if(under == minecartLiftBlock[0] && underColor == minecartLiftBlock[1])
                 {
@@ -1355,8 +1357,8 @@ public class VehicleListener extends CraftBookDelegateListener {
                             else
                             {
                             	//spams... remove after this is no longer a new feature
-                            	if(player != null)
-                            		player.sendMessage(Colors.Rose+"No connected track found at lift.");
+                            	//if(player != null)
+                            		//player.sendMessage(Colors.Rose+"No connected track found at lift.");
                             }
                             return;
                         }
@@ -1903,18 +1905,18 @@ public class VehicleListener extends CraftBookDelegateListener {
             	OEntityMinecart ecart = (OEntityMinecart)vehicle.getEntity();
             	if(vehicle.getPassenger() != null)
                 {
-            		ecart.bj = 0.98F;
-            		ecart.bk = 0.7F;
+            		ecart.bz = 0.98F;
+            		ecart.bA = 0.7F;
                 }
             	else
             	{
-            		ecart.bj = 0.001F;
-            		ecart.bk = 0.001F;
+            		ecart.bz = 0.001F;
+            		ecart.bA = 0.001F;
             	}
     		}
             
             
-            if (minecartDestroyOnExit && vehicle.getPassenger() != null && !vehicle.getEntity().bh) {
+            if (minecartDestroyOnExit && vehicle.getPassenger() != null && !vehicle.getEntity().bx) {
                 vehicle.destroy();
                 
                 if (minecartDropOnExit) {
@@ -1954,8 +1956,8 @@ public class VehicleListener extends CraftBookDelegateListener {
     	
     	if(vehicle instanceof Minecart && collisioner instanceof OEntityMinecart)
     	{
-    		if((collisioner.aJ == null && vehicle.getPassenger() != null)
-    			|| (vehicle.isEmpty() && collisioner.aJ != null && BaseEntity.isPlayer(collisioner.aJ))
+    		if((collisioner.aZ == null && vehicle.getPassenger() != null)
+    			|| (vehicle.isEmpty() && collisioner.aZ != null && BaseEntity.isPlayer(collisioner.aZ))
     			)
     		{
                 OEntity eplayercart;
@@ -1972,38 +1974,38 @@ public class VehicleListener extends CraftBookDelegateListener {
                 	eemptycart = collisioner;
                 }
     			
-                double s = eplayercart.aS * eplayercart.aS + eplayercart.aU * eplayercart.aU;
+                double s = eplayercart.bi * eplayercart.bi + eplayercart.bk * eplayercart.bk;
                 if(s > 0.0)
                 {
-                	double es = eemptycart.aS * eemptycart.aS + eemptycart.aU * eemptycart.aU;
+                	double es = eemptycart.bi * eemptycart.bi + eemptycart.bk * eemptycart.bk;
                 	if(s > es)
                 	{
                 		if(minecartCollisionType == 1)
                 		{
-                			OAxisAlignedBB bb = eemptycart.aZ.b(0.2000000029802322D, 0.0D, 0.2000000029802322D);
+                			OAxisAlignedBB bb = eemptycart.bp.b(0.2000000029802322D, 0.0D, 0.2000000029802322D);
                     		
-                    		if(eplayercart.aS != 0)
+                    		if(eplayercart.bi != 0)
                     		{
-                    			if(eplayercart.aS < 0)
-                    				eplayercart.aP = bb.a + eemptycart.aS;
+                    			if(eplayercart.bi < 0)
+                    				eplayercart.bf = bb.a + eemptycart.bi;
                     			else
-                    				eplayercart.aP = bb.d + eemptycart.aS;
+                    				eplayercart.bf = bb.d + eemptycart.bi;
                     		}
-                    		if(eplayercart.aU != 0)
+                    		if(eplayercart.bk != 0)
                     		{
-                    			if(eplayercart.aU < 0)
-                    				eplayercart.aR = bb.c + eemptycart.aU;
+                    			if(eplayercart.bk < 0)
+                    				eplayercart.bh = bb.c + eemptycart.bk;
                     			else
-                    				eplayercart.aR = bb.f + eemptycart.aU;
+                    				eplayercart.bh = bb.f + eemptycart.bk;
                     		}
                 		}
-                		else if(minecartCollisionType == 2 && !eemptycart.bh && ((OEntityMinecart)eemptycart).d != 1)
+                		else if(minecartCollisionType == 2 && !eemptycart.bx && ((OEntityMinecart)eemptycart).d != 1)
                 		{
                 			int item = ItemType.MINECART;
                 			if(((OEntityMinecart)eemptycart).d == 2)
                 				item = ItemType.POWERED_MINECART;
                 			
-                			eemptycart.J();
+                			eemptycart.N();
                 			if(vehicle.isEmpty())
                 			{
                 				World world = vehicle.getWorld();
@@ -2024,7 +2026,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                 				vehicle.getPassenger().giveItem(new Item(item, 1));
                 			}
                 			
-                			eemptycart.aZ.c(0, 0, 0, 0, 0, 0);
+                			eemptycart.bp.c(0, 0, 0, 0, 0, 0);
                 		}
                 	}
                 	
@@ -2134,13 +2136,13 @@ public class VehicleListener extends CraftBookDelegateListener {
         }
         
         if (line.equalsIgnoreCase("Animal")
-                && minecart.getEntity().aJ instanceof OEntityAnimal) {
+                && minecart.getEntity().aZ instanceof OEntityAnimal) {
             return true;
         }
         
         if (line.equalsIgnoreCase("Mob")
-                && (minecart.getEntity().aJ instanceof OEntityMob
-                        || minecart.getEntity().aJ instanceof OEntityPlayer)) {
+                && (minecart.getEntity().aZ instanceof OEntityMob
+                        || minecart.getEntity().aZ instanceof OEntityPlayer)) {
             return true;
         }
         
@@ -2165,7 +2167,7 @@ public class VehicleListener extends CraftBookDelegateListener {
             	if(info == null)
             		return false;
             	
-            	OItemStack iStack = player.getEntity().i.b();
+            	OItemStack iStack = player.getEntity().j.b();
             	if(iStack != null && player.getItemInHand() >= 0
             	   && contentEqualsItem(player.getItemInHand(), iStack.h(), iStack.a, info))
             	{
@@ -2224,8 +2226,8 @@ public class VehicleListener extends CraftBookDelegateListener {
             } else if (parts[0].equalsIgnoreCase("Mob")) {
                 String testMob = parts[1];
 
-                if (minecart.getEntity().aJ instanceof OEntityLiving) {
-                    Mob mob = new Mob((OEntityLiving)minecart.getEntity().aJ);
+                if (minecart.getEntity().aZ instanceof OEntityLiving) {
+                    Mob mob = new Mob((OEntityLiving)minecart.getEntity().aZ);
                     if (testMob.equalsIgnoreCase(mob.getName())) {
                         return true;
                     }

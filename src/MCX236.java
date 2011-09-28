@@ -110,7 +110,7 @@ public class MCX236 extends BaseIC {
 	    			if(exists == null)
 	    			{
 	    				players.put(player, new WorldBlockVector(chip.getWorldType(), cPos));
-	    				player.getEntity().a.b(new OPacket70Bed(1));
+	    				player.getEntity().a.b(new OPacket70Bed(1, 0));
 	    				if(chip.getText().getLine4().length() > 0)
 	    					player.sendMessage(chip.getText().getLine4());
 	    			}
@@ -119,7 +119,7 @@ public class MCX236 extends BaseIC {
 	    		{
 	    			players.remove(player);
 	    			if(!CraftBook.getWorld(chip.getWorldType()).isRaining())
-	    				player.getEntity().a.b(new OPacket70Bed(2));
+	    				player.getEntity().a.b(new OPacket70Bed(2, 0));
 	    		}
 	        }
     	}
@@ -133,7 +133,7 @@ public class MCX236 extends BaseIC {
 				if(!isSameCoord(item.getValue(), chip.getWorldType(), cPos))
 					continue;
 				if(!CraftBook.getWorld(chip.getWorldType()).isRaining())
-					item.getKey().getEntity().a.b(new OPacket70Bed(2));
+					item.getKey().getEntity().a.b(new OPacket70Bed(2, 0));
 				it.remove();
     	    }
     	}
