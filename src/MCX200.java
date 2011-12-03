@@ -199,7 +199,7 @@ public class MCX200 extends BaseIC {
     			return;
     		
     		OEntityCreeper creeper = (OEntityCreeper)entity;
-    		creeper.al().b(17, (byte)1);
+    		creeper.au().b(17, (byte)1);
     	}
     	else if(entity instanceof OEntityWolf)
     	{
@@ -210,7 +210,7 @@ public class MCX200 extends BaseIC {
     			return;
     		
     		OEntityWolf wolf = (OEntityWolf)entity;
-    		wolf.al().b(16, (byte)color);
+    		wolf.au().b(16, (byte)color);
     	}
     	else if(entity instanceof OEntityPig)
     	{

@@ -49,7 +49,7 @@ public class MCX130 extends MCX119 {
     	if(type == 0)
     	{
     		//entity.destroy();
-    		entity.getEntity().N();
+    		entity.getEntity().S();
     		return null;
     	}
     	else if(type == 1 && (entity.isMob() || entity.isAnimal()) && entity instanceof Mob)
@@ -58,7 +58,7 @@ public class MCX130 extends MCX119 {
 			if(chip.getText().getLine3().isEmpty() || mob.getName().equalsIgnoreCase(chip.getText().getLine3()))
 			{
 				//entity.destroy();
-				entity.getEntity().N();
+				entity.getEntity().S();
 				return null;
 			}
     	}

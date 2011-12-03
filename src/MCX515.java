@@ -17,23 +17,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.sk89q.craftbook.SignText;
-import com.sk89q.craftbook.Vector;
+import com.sk89q.craftbook.*;
 import com.sk89q.craftbook.ic.*;
 
 /**
- * Time control.
+ * Dispenser.
  *
  * @author sk89q
  */
-public class MCT233 extends BaseIC {
+public class MCX515 extends BaseIC {
     /**
      * Get the title of the IC.
      *
      * @return
      */
     public String getTitle() {
-        return "WEATHER CONTROL";
+        return "SERVER LOG";
     }
 
     /**
@@ -45,54 +44,36 @@ public class MCT233 extends BaseIC {
         return true;
     }
 
+    /**
+     * Validates the IC's environment. The position of the sign is given.
+     * Return a string in order to state an error message and deny
+     * creation, otherwise return null to allow.
+     *
+     * @param sign
+     * @return
+     */
     public String validateEnvironment(int worldType, Vector pos, SignText sign) {
-        if (sign.getLine3().length() != 0) {
-        	return "Third line needs to be blank";
-        }
-
-        if (sign.getLine4().length() != 0) {
-            return "Fourth line needs to be blank";
+        if(sign.getLine3().isEmpty() && sign.getLine4().isEmpty())
+        {
+        	return "A message on the 3rd or 4th line is required.";
         }
 
         return null;
     }
-    
+
     /**
      * Think.
      *
      * @param chip
      */
     public void think(ChipState chip) {
-    	
-    	if (chip.getIn(1).isTriggered() && chip.getIn(1).is())
-    	{
-    		World world = CraftBook.getWorld(chip.getWorldType());
-    		
-	    	int duration;
-	    	
-	    	if(chip.getIn(2).is())
-	    	{
-	    		duration = 24000;
-	    		
-	    		if(!world.isRaining())
-	    			etc.getMCServer().h.a(new OPacket70Bed(1, 0));
-	    	}
-	    	else
-	    	{
-	    		duration = 0;
-	    		
-	    		if(world.isRaining())
-	    			etc.getMCServer().h.a(new OPacket70Bed(2, 0));
-	    	}
-	    	
-	    	world.setRainTime(duration);
-	    	world.setRaining(chip.getIn(2).is());
-	    	
-	    	if(!chip.getIn(3).is())
-	    		duration = 0;
-	    	
-	    	world.setThunderTime(duration);
-	    	world.setThundering(chip.getIn(3).is());
-    	}
+        if (!chip.getIn(1).is()) {
+        	chip.getOut(1).set(false);
+            return;
+        }
+        
+        CraftBookListener.logger.info("[CB!] "+chip.getText().getLine3()+""+chip.getText().getLine4());
+
+        chip.getOut(1).set(true);
     }
 }

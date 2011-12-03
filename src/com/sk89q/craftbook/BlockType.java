@@ -137,6 +137,19 @@ public final class BlockType {
     public static final int FENCE_GATE = 107;
     public static final int BRICK_STAIRS = 108;
     public static final int STONE_BRICK_STAIRS = 109;
+    public static final int MYCELIUM = 110;
+    public static final int LILY_PAD = 111;
+    public static final int NETHER_BRICK = 112;
+    public static final int NETHER_BRICK_FENCE = 113;
+    public static final int NETHER_BRICK_STAIRS = 114;
+    public static final int NETHER_WART = 115;
+    public static final int ENCHANTMENT_TABLE = 116;
+    public static final int BREWING_STAND = 117;
+    public static final int CAULDRON = 118;
+    public static final int END_PORTAL = 119;
+    public static final int END_PORTAL_FRAME = 120;
+    public static final int END_STONE = 121;
+    public static final int DRAGON_EGG = 122;
 
     /**
      * Stores a list of dropped blocks for blocks.
@@ -148,7 +161,7 @@ public final class BlockType {
      */
     static {
         blockDrops.put(1, 4);
-        blockDrops.put(2, 5);
+        blockDrops.put(2, 3);
         blockDrops.put(3, 3);
         blockDrops.put(4, 4);
         blockDrops.put(5, 5);
@@ -245,6 +258,19 @@ public final class BlockType {
         blockDrops.put(107, 107);
         blockDrops.put(108, 108);
         blockDrops.put(109, 109);
+        blockDrops.put(110, 110);
+        blockDrops.put(111, 111);
+        blockDrops.put(112, 112);
+        blockDrops.put(113, 113);
+        blockDrops.put(114, 114);
+        blockDrops.put(115, 115);
+        blockDrops.put(116, 116);
+        blockDrops.put(117, 117);
+        blockDrops.put(118, 118);
+        blockDrops.put(119, -1);
+        blockDrops.put(120, -1);
+        blockDrops.put(121, 121);
+        blockDrops.put(122, 122);
     }
 
     /**
@@ -261,6 +287,8 @@ public final class BlockType {
                 || id == RED_MUSHROOM
                 || id == TALL_GRASS
                 || id == DEAD_SHRUBS
+                || id == LILY_PAD
+                || id == NETHER_WART
                 || id == TORCH
                 || id == REDSTONE_WIRE
                 || id == CROPS
@@ -293,6 +321,8 @@ public final class BlockType {
                 || id == RED_MUSHROOM
                 || id == TALL_GRASS
                 || id == DEAD_SHRUBS
+        		|| id == LILY_PAD
+                || id == NETHER_WART
                 || id == TORCH
                 || id == FIRE
                 || id == REDSTONE_WIRE
@@ -337,6 +367,7 @@ public final class BlockType {
                 || id == RED_MUSHROOM
                 || id == TALL_GRASS
                 || id == DEAD_SHRUBS
+                || id == NETHER_WART
                 || id == TORCH
                 || id == FIRE
                 || id == REDSTONE_WIRE
@@ -359,6 +390,7 @@ public final class BlockType {
                 || id == REED
                 || id == WEB
                 || id == PORTAL
+                || id == END_PORTAL
                 || id == PUMPKIN_STEM
                 || id == MELON_STEM
                 || id == VINES;
@@ -389,6 +421,9 @@ public final class BlockType {
                 || id == POWERED_RAIL
                 || id == DETECTOR_RAIL
                 || id == COBBLESTONE_STAIRS
+                || id == BRICK_STAIRS
+                || id == STONE_BRICK_STAIRS
+                || id == NETHER_BRICK_STAIRS
                 || id == WALL_SIGN
                 || id == LEVER
                 || id == STONE_PRESSURE_PLATE
@@ -415,7 +450,11 @@ public final class BlockType {
         		|| id == PUMPKIN_STEM
                 || id == MELON_STEM
                 || id == VINES
-                || id == FENCE_GATE;
+                || id == NETHER_WART
+                || id == FENCE_GATE
+                || id == BREWING_STAND
+                || id == CAULDRON
+                || id == END_PORTAL_FRAME;
     }
 
     /**

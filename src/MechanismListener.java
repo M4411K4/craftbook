@@ -286,19 +286,37 @@ public class MechanismListener extends CraftBookDelegateListener {
             final String line2 = sign.getText(1);
             final int worldIndex = CraftBook.getWorldIndex(worldType);
 
-            // Gate
-            if (useGates && redstoneGates
-                    && (line2.equalsIgnoreCase("[Gate]")
-                    || line2.equalsIgnoreCase("[DGate]"))) {
-                BlockBag bag = getBlockBag(worldType, pt);
-                bag.addSourcePosition(worldType, pt);
-
-                // A gate may toggle or not
-                try {
-                    GateSwitch.setGateState(worldType, pt, bag, isOn,
-                            line2.equalsIgnoreCase("[DGate]"));
-                } catch (BlockSourceException e) {
-                }
+            if(useGates && redstoneGates
+            		&& (   line2.equalsIgnoreCase("[Gate]")
+            			|| line2.equalsIgnoreCase("[DGate]")
+            			|| line2.equalsIgnoreCase("[GlassGate]")
+            			|| line2.equalsIgnoreCase("[GlassDGate]")
+            			|| line2.equalsIgnoreCase("[IronGate]")
+            			|| line2.equalsIgnoreCase("[IronDGate]")
+            			)
+            		)
+            {
+            	BlockBag bag = getBlockBag(worldType, pt);
+            	bag.addSourcePosition(worldType, pt);
+            	
+            	// A gate may toggle or not
+            	try
+            	{
+            		int blockType;
+            		if(line2.equalsIgnoreCase("[GlassGate]") || line2.equalsIgnoreCase("[GlassDGate]"))
+            			blockType = BlockType.GLASS_PANE;
+            		else if(line2.equalsIgnoreCase("[IronGate]") || line2.equalsIgnoreCase("[IronDGate]"))
+            			blockType = BlockType.IRON_BARS;
+            		else
+            			blockType = BlockType.FENCE;
+            		
+            		boolean dgate = line2.equalsIgnoreCase("[GlassDGate]")
+            						|| line2.equalsIgnoreCase("[IronDGate]")
+            						|| line2.equalsIgnoreCase("[DGate]");
+            		
+            		GateSwitch.setGateState(blockType, worldType, pt, bag, isOn, dgate);
+            	}
+            	catch(BlockSourceException e){}
 
             // Bridges
             } else if (useBridges != false
@@ -461,7 +479,13 @@ public class MechanismListener extends CraftBookDelegateListener {
         String line2 = sign.getText(1);
         
         // Gate
-        if (line2.equalsIgnoreCase("[Gate]") || line2.equalsIgnoreCase("[DGate]")) {
+        if (line2.equalsIgnoreCase("[Gate]")
+        	|| line2.equalsIgnoreCase("[DGate]")
+        	|| line2.equalsIgnoreCase("[GlassGate]")
+        	|| line2.equalsIgnoreCase("[GlassDGate]")
+        	|| line2.equalsIgnoreCase("[IronGate]")
+        	|| line2.equalsIgnoreCase("[IronDGate]")
+        	) {
             if (checkCreatePermissions && !player.canUseCommand("/makegate")) {
                 player.sendMessage(Colors.Rose
                         + "You don't have permission to make gates.");
@@ -469,7 +493,15 @@ public class MechanismListener extends CraftBookDelegateListener {
                 return true;
             }
             
-            sign.setText(1, line2.equalsIgnoreCase("[Gate]") ? "[Gate]" : "[DGate]");
+            String setLine;
+            if(line2.equalsIgnoreCase("[GlassGate]") || line2.equalsIgnoreCase("[GlassDGate]"))
+            	setLine = line2.equalsIgnoreCase("[GlassGate]") ? "[GlassGate]" : "[GlassDGate]";
+            else if(line2.equalsIgnoreCase("[IronGate]") || line2.equalsIgnoreCase("[IronDGate]"))
+            	setLine = line2.equalsIgnoreCase("[IronGate]") ? "[IronGate]" : "[IronDGate]";
+            else
+            	setLine = line2.equalsIgnoreCase("[Gate]") ? "[Gate]" : "[DGate]";
+            
+            sign.setText(1, setLine);
             sign.update();
             
             listener.informUser(player);
@@ -678,7 +710,7 @@ public class MechanismListener extends CraftBookDelegateListener {
     		OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
     		World world = player.getWorld();
     		int data = world.getBlockData(blockClicked.getX(), blockClicked.getY(), blockClicked.getZ());
-    		if(eplayer.ba != null)
+    		if(eplayer.be != null)
     		{
     			switch(data)
         		{
@@ -928,8 +960,13 @@ public class MechanismListener extends CraftBookDelegateListener {
 
                 // Gate
                 if (useGates
-                        && (line2.equalsIgnoreCase("[Gate]")
-                                || line2.equalsIgnoreCase("[DGate]"))
+                        && (   line2.equalsIgnoreCase("[Gate]")
+                            || line2.equalsIgnoreCase("[DGate]")
+                            || line2.equalsIgnoreCase("[GlassGate]")
+                            || line2.equalsIgnoreCase("[GlassDGate]")
+                            || line2.equalsIgnoreCase("[IronGate]")
+                            || line2.equalsIgnoreCase("[IronDGate]")
+                            )
                         && checkPermission(player, "/gate")) {
                 	
                 	
@@ -939,9 +976,20 @@ public class MechanismListener extends CraftBookDelegateListener {
                     BlockBag bag = getBlockBag(worldType, pt);
                     bag.addSourcePosition(worldType, pt);
 
+                    int gateType;
+            		if(line2.equalsIgnoreCase("[GlassGate]") || line2.equalsIgnoreCase("[GlassDGate]"))
+            			gateType = BlockType.GLASS_PANE;
+            		else if(line2.equalsIgnoreCase("[IronGate]") || line2.equalsIgnoreCase("[IronDGate]"))
+            			gateType = BlockType.IRON_BARS;
+            		else
+            			gateType = BlockType.FENCE;
+            		
+            		boolean dgate = line2.equalsIgnoreCase("[GlassDGate]")
+            						|| line2.equalsIgnoreCase("[IronDGate]")
+            						|| line2.equalsIgnoreCase("[DGate]");
+                    
                     // A gate may toggle or not
-                    if (GateSwitch.toggleGates(worldType, pt, bag,
-                            line2.equalsIgnoreCase("[DGate]"))) {
+                    if (GateSwitch.toggleGates(gateType, worldType, pt, bag, dgate)) {
                         player.sendMessage(Colors.Gold + "*screeetch* Gate moved!");
                     } else {
                         player.sendMessage(Colors.Rose + "No nearby gate to toggle.");
@@ -1240,9 +1288,9 @@ public class MechanismListener extends CraftBookDelegateListener {
         else if(Sitting.enabled && split[0].equalsIgnoreCase("/sit") && player.canUseCommand("/sit"))
         {
         	OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
-			if(eplayer.ba != null)
+			if(eplayer.be != null)
 			{
-				Sitting.stand(eplayer, 0, eplayer.ba.n(), 0);
+				Sitting.stand(eplayer, 0, eplayer.be.q(), 0);
 			}
 			else
 			{
@@ -1264,9 +1312,9 @@ public class MechanismListener extends CraftBookDelegateListener {
         else if(Sitting.enabled && split[0].equalsIgnoreCase("/stand") && player.canUseCommand("/stand"))
         {
         	OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
-        	if(eplayer.ba == null)
+        	if(eplayer.be == null)
         		return true;
-        	Sitting.stand(eplayer, 0, eplayer.ba.n(), 0);
+        	Sitting.stand(eplayer, 0, eplayer.be.q(), 0);
 			
         	return true;
         }

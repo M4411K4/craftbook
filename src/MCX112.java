@@ -153,7 +153,7 @@ public class MCX112 extends BaseIC {
             		int bdata = CraftBook.getBlockID(world, pVec);
             		if(bdata == BlockType.STONE_PRESSURE_PLATE || bdata == BlockType.WOODEN_PRESSURE_PLATE)
             		{
-            			OWorld oworld = player.getEntity().bb;
+            			OWorld oworld = player.getEntity().bf;
             			
             			int bx = pVec.getBlockX();
             			int by = pVec.getBlockY();

@@ -17,27 +17,31 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-import com.sk89q.craftbook.ic.ChipState;
+import com.sk89q.craftbook.ic.*;
 
 /**
- * Wireless transmitter.
+ * Dispenser.
  *
  * @author sk89q
  */
-public class MCX117 extends MCX116 {
-    
-
+public class MCX517 extends MCX516 {
+	
+	private final String TITLE = "S-LOG NEARBY+";
+	
     /**
      * Get the title of the IC.
      *
      * @return
      */
     public String getTitle() {
-        return "PLAYER MINE";
+        return TITLE+distance;
     }
-    
+
+    /**
+     * Returns true if this IC requires permission to use.
+     *
+     * @return
+     */
     public boolean requiresPermission() {
         return true;
     }
@@ -48,36 +52,18 @@ public class MCX117 extends MCX116 {
      * @param chip
      */
     public void think(ChipState chip) {
-    	
-    	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
-    	{
-    		World world = CraftBook.getWorld(chip.getWorldType());
-    		Player player = playerAbove(world, chip.getBlockPosition(), chip.getText().getLine3());
-    		
-    		if(player == null || player.getEntity().bB)
-    		{
-    			chip.getOut(1).set(false);
-    		}
-    		else
-    		{
-    			explodeTNT(player.getEntity().bf, player.getX(), player.getY(), player.getZ());
-    			
-    			chip.getOut(1).set(true);
-    		}
-    	}
-    }
-    
-    /**
-     * Makes TNT go boom.
-     * 
-     * @param x
-     * @param y
-     * @param z
-     */
-    protected void explodeTNT(OWorld oworld, double x, double y, double z) {
-        // Make TNT explode
-    	OEntityTNTPrimed tnt = new OEntityTNTPrimed(oworld);
-        tnt.c(x, y, z);
-        tnt.w_();
+        if (!chip.getIn(1).is()) {
+        	chip.getOut(1).set(false);
+            return;
+        }
+        
+        processMessage(chip.getText().getLine3()+""+chip.getText().getLine4(),
+        				chip.getBlockPosition(),
+        				chip.getWorldType(),
+        				Integer.parseInt(chip.getText().getLine1().substring(TITLE.length())),
+        				chip.getMode() == '+',
+        				true);
+
+        chip.getOut(1).set(true);
     }
 }

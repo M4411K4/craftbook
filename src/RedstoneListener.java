@@ -75,6 +75,7 @@ public class RedstoneListener extends CraftBookDelegateListener
     private boolean updateSelfTriggeredICList = false;
     
     protected static int chestCollectorMaxRange = 64;
+    protected static int icMessageMaxRange = 64;
     
     /**
      * Construct the object.
@@ -119,6 +120,15 @@ public class RedstoneListener extends CraftBookDelegateListener
         		chestCollectorMaxRange = 1;
         	else if(chestCollectorMaxRange > 64)
         		chestCollectorMaxRange = 64;
+        }
+        
+        if(properties.containsKey("ic-message-max-range"))
+        {
+        	icMessageMaxRange = properties.getInt("ic-message-max-range", 64);
+        	if(icMessageMaxRange < 1)
+        		icMessageMaxRange = 1;
+        	else if(icMessageMaxRange > 64)
+        		icMessageMaxRange = 64;
         }
 
         icList.clear();
@@ -283,6 +293,10 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX246", new MCX246(), ICType.SISO);
         internalRegisterIC("MCX255", new MCX255(), ICType.SISO);
         internalRegisterIC("MCX256", new MCX256(), ICType.SISO);
+        internalRegisterIC("MCX512", new MCX512(), ICType.SISO);
+        internalRegisterIC("MCX515", new MCX515(), ICType.SISO);
+        internalRegisterIC("MCX516", new MCX516(), ICType.SISO);
+        internalRegisterIC("MCX517", new MCX517(), ICType.SISO);
         
         internalRegisterIC("MCT233", new MCT233(), ICType._3ISO);
         internalRegisterIC("MCT246", new MCT246(), ICType._3ISO);

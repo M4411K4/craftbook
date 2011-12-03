@@ -1,3 +1,68 @@
+2.0extra13.0:
+- updated to minecraft 1.0.1 (previous were alpha/beta versions of minecraft)
+    - thanks darkdiplomat for making temporary unofficial versions of my
+        unofficial version in my absence!
+- added ability to create Iron Bar gates and Glass Pane gates.
+    - They are created exactly like [Gate] or [DGate], but instead of typing
+        [Gate] or [DGate] you type:
+            [IronGate]
+            [IronDGate]
+            [GlassGate]
+            [GlassDGate]
+    - You must use Iron bars for [IronGate] and [IronDGate], and glass panes
+        for [GlassGate] and [GlassDGate]
+    - thanks Shadow386 for the suggestion!
+- added [MCX512] MessageNearby - Similar to [MC1512], but a max range can be
+    set in the craftbook.properties file, in addition to using both the 3rd
+    and 4th lines for the message instead of just the 4th line.
+    - type the range on the FIRST line of the sign (default max is 64)
+    - type a message on the 3rd and 4th lines
+    - the message can use:
+        %p    which will be replaced with the player's name
+                - example "hello %p" will become "hello PLAYERNAME"
+        /n    which will start a new line for the message (5 lines max)
+        - Must use lower case letters for %p and /n
+- added [MCX515] Server Log - which logs the message on the 3rd and 4th lines
+    - this has no special characters to use
+    - logged messages will use the default Minecraft.CraftBook logger and also
+        be marked with [CB!]
+- added [MCX516] S-Log Nearby - logs messages typed on the 3rd and 4th lines
+    when activated.
+    - type the range on the FIRST line of the sign (default max is 64)
+        - the max range is shared with [MCX512] and [MCX517]
+    - type a message on the 3rd and 4th lines
+    - messages can use:
+        %p    which will be replaced with the closest player within the set
+                range. If no player is found, [NONE_FOUND] will be used instead
+        /n    which will start a new line for the message (5 lines max)
+        - Must use lower case letters for %p and /n
+    - If a nearby player is found, and %p is used, you can send them the same
+        message being logged to the server
+        - This could be used as a sort of courtesy to let players know they're
+            being logged or to test the message being logged.
+        - To use this, on the second line of the sign type
+            [MCX516]+
+- added [MCX517] S-Log Nearby+ - works just like [MCX516] except it also allows
+    messages to use:
+        %a    which will be replaced with a list all players found within the
+                set range and their distance.
+        - Must use lower case letter for %a
+    - the + mode [MCX517]+ will send the logged message to each of the players
+        listed with %a.
+    - thanks Riot for the suggestions for [MCX515], [MCX516], & [MCX517]
+- added Minecart Station clearing block, which removes a player's set
+    /st station
+    - default block is brown wool
+    - no sign is used
+    - can be powered on/off with redstone
+    - thanks healthyuncle for the suggestion!
+- fixed bug with [MCX117] & [MCZ117] where the explosions would continue until
+    the dead player finally respawned or left.
+    - thanks Riot for the bug report!
+- fixed bug with [Bridge] (and similar) turning grass into wood planks
+    - no idea why sk89q had it that way
+    - thanks Hummtaro for the bug report!
+
 2.0extra12.0:
 - updated to minecraft 1.8.1
 - added ability to limit max range for [MCX203] & [MCZ203]
@@ -10,7 +75,7 @@
 - added ability to spawn saddled pigs with [MCX200]
     - 3rd line of the sign needs to be
         Pig:1
-    - thanks IWEK91 for the suggestion!
+    - thanks Emppu for the suggestion!
 - added ability to right-click self-updating ICs to restart
     them. This will help with self-updating ICs that break
     from server restarts.

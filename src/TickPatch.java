@@ -81,11 +81,11 @@ public class TickPatch extends OEntityTracker {
         int i = 0;
         {
 	        try {
-	            s.k[i].getClass().getDeclaredField("HP_PATCH_APPLIED");
+	            s.m[i].getClass().getDeclaredField("HP_PATCH_APPLIED");
 	        } catch (SecurityException e) {
 	            throw new RuntimeException("unexpected error: cannot use reflection");
 	        } catch (NoSuchFieldException e) {
-	            s.k[i] = new TickPatch(s,s.k[i],i);
+	            s.m[i] = new TickPatch(s,s.m[i],i);
 	        }
         }
     }
@@ -95,7 +95,7 @@ public class TickPatch extends OEntityTracker {
     public static void addTask(Runnable r, int worldIndex) {
     	MinecraftServer s = etc.getServer().getMCServer();
     	
-    	if(worldIndex < 0 || worldIndex >= s.k.length)
+    	if(worldIndex < 0 || worldIndex >= s.m.length)
     		return;
     	
     	getTaskList(worldIndex).add(r);
@@ -111,7 +111,7 @@ public class TickPatch extends OEntityTracker {
     	
         MinecraftServer s = etc.getServer().getMCServer();
         try {
-            return (CopyOnWriteArrayList<Runnable>) s.k[index].getClass().getField("TASK_LIST").get(null);
+            return (CopyOnWriteArrayList<Runnable>) s.m[index].getClass().getField("TASK_LIST").get(null);
         } catch (SecurityException e) {
             throw new RuntimeException("unexpected error: cannot use reflection");
         } catch (NoSuchFieldException e) {

@@ -39,7 +39,7 @@ public class GateSwitch {
      * @param smallSearchSize
      * @return
      */
-    public static boolean toggleGates(int worldType, Vector pt, BlockBag bag,
+    public static boolean toggleGates(int blockType, int worldType, Vector pt, BlockBag bag,
             boolean smallSearchSize) throws BlockSourceException {
         int x = pt.getBlockX();
         int y = pt.getBlockY();
@@ -56,7 +56,7 @@ public class GateSwitch {
             for (int x1 = x - 1; x1 <= x + 1; x1++) {
                 for (int y1 = y - 2; y1 <= y + 1; y1++) {
                     for (int z1 = z - 1; z1 <= z + 1; z1++) {
-                        if (recurseColumn(world, new Vector(x1, y1, z1), visitedColumns,
+                        if (recurseColumn(blockType, world, new Vector(x1, y1, z1), visitedColumns,
                                 null, bag)) {
                             foundGate = true;
                         }
@@ -68,7 +68,7 @@ public class GateSwitch {
             for (int x1 = x - 3; x1 <= x + 3; x1++) {
                 for (int y1 = y - 3; y1 <= y + 6; y1++) {
                     for (int z1 = z - 3; z1 <= z + 3; z1++) {
-                        if (recurseColumn(world, new Vector(x1, y1, z1), visitedColumns,
+                        if (recurseColumn(blockType, world, new Vector(x1, y1, z1), visitedColumns,
                                 null, bag)) {
                             foundGate = true;
                         }
@@ -91,7 +91,7 @@ public class GateSwitch {
      * @param searchSize
      * @return
      */
-    public static boolean setGateState(int worldType, Vector pt, BlockBag bag, boolean close,
+    public static boolean setGateState(int blockType, int worldType, Vector pt, BlockBag bag, boolean close,
             boolean smallSearchSize) throws BlockSourceException {
         int x = pt.getBlockX();
         int y = pt.getBlockY();
@@ -108,7 +108,7 @@ public class GateSwitch {
             for (int x1 = x - 1; x1 <= x + 1; x1++) {
                 for (int y1 = y - 2; y1 <= y + 1; y1++) {
                     for (int z1 = z - 1; z1 <= z + 1; z1++) {
-                        if (recurseColumn(world, new Vector(x1, y1, z1), visitedColumns,
+                        if (recurseColumn(blockType, world, new Vector(x1, y1, z1), visitedColumns,
                                 close, bag)) {
                             foundGate = true;
                         }
@@ -120,7 +120,7 @@ public class GateSwitch {
             for (int x1 = x - 3; x1 <= x + 3; x1++) {
                 for (int y1 = y - 3; y1 <= y + 6; y1++) {
                     for (int z1 = z - 3; z1 <= z + 3; z1++) {
-                        if (recurseColumn(world, new Vector(x1, y1, z1), visitedColumns,
+                        if (recurseColumn(blockType, world, new Vector(x1, y1, z1), visitedColumns,
                                 close, bag)) {
                             foundGate = true;
                         }
@@ -144,12 +144,12 @@ public class GateSwitch {
      * @param state
      * @return
      */
-    private static boolean recurseColumn(World world, Vector pt, Set<BlockVector> visitedColumns,
+    private static boolean recurseColumn(int blockType, World world, Vector pt, Set<BlockVector> visitedColumns,
             Boolean close, BlockBag bag)
             throws BlockSourceException {
         if (visitedColumns.size() > 14) { return false; }
         if (visitedColumns.contains(pt.setY(0).toBlockVector())) { return false; }
-        if (CraftBook.getBlockID(world, pt) != BlockType.FENCE) { return false; }
+        if (CraftBook.getBlockID(world, pt) != blockType) { return false; }
         
         int x = pt.getBlockX();
         int y = pt.getBlockY();
@@ -159,7 +159,7 @@ public class GateSwitch {
 
         // Find the top most fence
         for (int y1 = y + 1; y1 <= y + 12; y1++) {
-            if (CraftBook.getBlockID(world, x, y1, z) == BlockType.FENCE) {
+            if (CraftBook.getBlockID(world, x, y1, z) == blockType) {
                 y = y1;
             } else {
                 break;
@@ -175,12 +175,12 @@ public class GateSwitch {
         if (close == null) {
             // Close the gate if the block below does not exist as a fence
             // block, otherwise open the gate
-            close = CraftBook.getBlockID(world, x, y - 1, z) != BlockType.FENCE;
+            close = CraftBook.getBlockID(world, x, y - 1, z) != blockType;
         }
 
         // Recursively go to connected fence blocks of the same level
         // and 'close' or 'open' them
-        toggleColumn(world, new BlockVector(x, y, z), close, visitedColumns, bag);
+        toggleColumn(blockType, world, new BlockVector(x, y, z), close, visitedColumns, bag);
 
         return true;
     }
@@ -192,7 +192,7 @@ public class GateSwitch {
      * @param close
      * @param visitedColumns
      */
-    private static void toggleColumn(World world, Vector topPoint, boolean close,
+    private static void toggleColumn(int blockType, World world, Vector topPoint, boolean close,
             Set<BlockVector> visitedColumns, BlockBag bag)
             throws BlockSourceException {
 
@@ -212,30 +212,41 @@ public class GateSwitch {
                     && cur != BlockType.STATIONARY_WATER
                     && cur != BlockType.LAVA
                     && cur != BlockType.STATIONARY_LAVA
-                    && cur != BlockType.FENCE
+                    && cur != blockType
                     && cur != 0) {
                 break;
             }
 
-            bag.setBlockID(world, x, y1, z, close ? BlockType.FENCE : 0);
+            bag.setBlockID(world, x, y1, z, close ? blockType : 0);
 
             Vector pt = new Vector(x, y1, z);
-            recurseColumn(world, pt.add(1, 0, 0), visitedColumns, close, bag);
-            recurseColumn(world, pt.add(-1, 0, 0), visitedColumns, close, bag);
-            recurseColumn(world, pt.add(0, 0, 1), visitedColumns, close, bag);
-            recurseColumn(world, pt.add(0, 0, -1), visitedColumns, close, bag);
+            recurseColumn(blockType, world, pt.add(1, 0, 0), visitedColumns, close, bag);
+            recurseColumn(blockType, world, pt.add(-1, 0, 0), visitedColumns, close, bag);
+            recurseColumn(blockType, world, pt.add(0, 0, 1), visitedColumns, close, bag);
+            recurseColumn(blockType, world, pt.add(0, 0, -1), visitedColumns, close, bag);
         }
 
-        recurseColumn(world, topPoint.add(1, 0, 0), visitedColumns, close, bag);
-        recurseColumn(world, topPoint.add(-1, 0, 0), visitedColumns, close, bag);
-        recurseColumn(world, topPoint.add(0, 0, 1), visitedColumns, close, bag);
-        recurseColumn(world, topPoint.add(0, 0, -1), visitedColumns, close, bag);
+        recurseColumn(blockType, world, topPoint.add(1, 0, 0), visitedColumns, close, bag);
+        recurseColumn(blockType, world, topPoint.add(-1, 0, 0), visitedColumns, close, bag);
+        recurseColumn(blockType, world, topPoint.add(0, 0, 1), visitedColumns, close, bag);
+        recurseColumn(blockType, world, topPoint.add(0, 0, -1), visitedColumns, close, bag);
     }
     
     public static boolean isOpen(Sign sign) {
     	
     	String line2 = sign.getText(1);
-    	boolean smallSearchSize = line2.equalsIgnoreCase("[DGate]");
+    	
+    	int blockType;
+    	if(line2.equalsIgnoreCase("[GlassGate]") || line2.equalsIgnoreCase("[GlassDGate]"))
+    		blockType = BlockType.GLASS_PANE;
+    	else if(line2.equalsIgnoreCase("[IronGate]") || line2.equalsIgnoreCase("[IronDGate]"))
+    		blockType = BlockType.IRON_BARS;
+    	else
+    		blockType = BlockType.FENCE;
+    	
+    	boolean smallSearchSize = line2.equalsIgnoreCase("[GlassDGate]")
+    							  || line2.equalsIgnoreCase("[IronDGate]")
+    							  || line2.equalsIgnoreCase("[DGate]");
     	
         int x = sign.getX();
         int y = sign.getY();
@@ -252,7 +263,7 @@ public class GateSwitch {
             for (int x1 = x - 1; x1 <= x + 1; x1++) {
                 for (int y1 = y - 2; y1 <= y + 1; y1++) {
                     for (int z1 = z - 1; z1 <= z + 1; z1++) {
-                        if (testColumn(world, new Vector(x1, y1, z1), visitedColumns)) {
+                        if (testColumn(blockType, world, new Vector(x1, y1, z1), visitedColumns)) {
                             foundGate = true;
                         }
                     }
@@ -263,7 +274,7 @@ public class GateSwitch {
             for (int x1 = x - 3; x1 <= x + 3; x1++) {
                 for (int y1 = y - 3; y1 <= y + 6; y1++) {
                     for (int z1 = z - 3; z1 <= z + 3; z1++) {
-                        if (testColumn(world, new Vector(x1, y1, z1), visitedColumns)) {
+                        if (testColumn(blockType, world, new Vector(x1, y1, z1), visitedColumns)) {
                             foundGate = true;
                         }
                     }
@@ -274,11 +285,11 @@ public class GateSwitch {
         return foundGate;
     }
     
-    private static boolean testColumn(World world, Vector pt, Set<BlockVector> visitedColumns)
+    private static boolean testColumn(int blockType, World world, Vector pt, Set<BlockVector> visitedColumns)
     {
         if (visitedColumns.size() > 14) { return false; }
         if (visitedColumns.contains(pt.setY(0).toBlockVector())) { return false; }
-        if (CraftBook.getBlockID(world, pt) != BlockType.FENCE) { return false; }
+        if (CraftBook.getBlockID(world, pt) != blockType) { return false; }
         
         int x = pt.getBlockX();
         int y = pt.getBlockY();
@@ -288,7 +299,7 @@ public class GateSwitch {
 
         // Find the top most fence
         for (int y1 = y + 1; y1 <= y + 12; y1++) {
-            if (CraftBook.getBlockID(world, x, y1, z) == BlockType.FENCE) {
+            if (CraftBook.getBlockID(world, x, y1, z) == blockType) {
                 y = y1;
             } else {
                 break;
@@ -303,7 +314,7 @@ public class GateSwitch {
 
         // Close the gate if the block below does not exist as a fence
         // block, otherwise open the gate
-        boolean close = CraftBook.getBlockID(world, x, y - 1, z) != BlockType.FENCE;
+        boolean close = CraftBook.getBlockID(world, x, y - 1, z) != blockType;
 
         return close;
     }

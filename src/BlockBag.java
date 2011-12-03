@@ -123,7 +123,6 @@ public abstract class BlockBag {
                                 || id == BlockType.IRON_ORE
                                 || id == BlockType.COAL_ORE
                                 || id == BlockType.DIAMOND_ORE
-                                || id == BlockType.LEAVES
                                 || id == BlockType.TALL_GRASS
                                 || id == BlockType.DEAD_SHRUBS
                                 || id == BlockType.TNT
@@ -140,6 +139,8 @@ public abstract class BlockBag {
                                 || id == BlockType.SILVERFISH_BLOCK
                                 || id == BlockType.PUMPKIN_STEM
                                 || id == BlockType.MELON_STEM
+                                || id == BlockType.END_PORTAL
+                                || id == BlockType.END_PORTAL_FRAME
                                 ) {
                             return false;
                         }

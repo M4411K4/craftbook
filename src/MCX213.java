@@ -582,11 +582,11 @@ public class MCX213 extends BaseIC {
 	        			packet.e = data;
 	        		}
 	        		
-	        		etc.getMCServer().f.a(x, y, z, 64.0D, worldType, packet);
+	        		etc.getMCServer().h.a(x, y, z, 64.0D, worldType, packet);
 	        		
 	        		if(!clear)
 	        		{
-	        			etc.getMCServer().f.a(x, y, z, 64.0D, worldType,
+	        			etc.getMCServer().h.a(x, y, z, 64.0D, worldType,
 	        					new OPacket54PlayNoteBlock(x, y, z, 0, data));
 	        		}
 	        	}
@@ -639,12 +639,12 @@ public class MCX213 extends BaseIC {
     
     private static int[] increaseRow(int data, int[] coords)
     {
-    	coords[0] += OPistonBlockTextures.b[data];
-    	coords[1] += OPistonBlockTextures.c[data];
-    	coords[2] += OPistonBlockTextures.d[data];
-    	coords[3] += OPistonBlockTextures.b[data];
-    	coords[4] += OPistonBlockTextures.c[data];
-    	coords[5] += OPistonBlockTextures.d[data];
+    	coords[0] += OFacing.b[data];
+    	coords[1] += OFacing.c[data];
+    	coords[2] += OFacing.d[data];
+    	coords[3] += OFacing.b[data];
+    	coords[4] += OFacing.c[data];
+    	coords[5] += OFacing.d[data];
     	
     	return coords;
     }

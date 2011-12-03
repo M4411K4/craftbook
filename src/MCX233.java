@@ -95,12 +95,12 @@ public class MCX233 extends BaseIC {
     		else
     			duration = 24000;
     		
-    		etc.getMCServer().f.a(new OPacket70Bed(1, 0));
+    		etc.getMCServer().h.a(new OPacket70Bed(1, 0));
     	}
     	else
     	{
     		duration = 0;
-    		etc.getMCServer().f.a(new OPacket70Bed(2, 0));
+    		etc.getMCServer().h.a(new OPacket70Bed(2, 0));
     	}
     	
     	world.setRainTime(duration);
