@@ -148,8 +148,15 @@ public class MCX209 extends BaseIC {
     	{
     		out[1] = getItem(id);
     		
-    		if((out[1] >= 26 && out[1] <= 34) || out[1] == 36 || out[1] > 92)
-    			out[1] = -2;
+    		switch(out[1])
+    		{
+	    		case BlockType.BED:
+	    		case BlockType.PISTON_EXTENSION:
+	    		case BlockType.PISTON_MOVED_BLOCK:
+	    		case BlockType.END_PORTAL:
+	    			out[1] = -2;
+	    			break;
+    		}
     	}
     	
     	if(color.length() > 0)

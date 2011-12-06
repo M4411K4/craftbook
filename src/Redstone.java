@@ -342,9 +342,8 @@ public class Redstone {
             }
 
             if (newData != data) {
-                CraftBook.setBlockData(world, pos, newData);
-                world.updateBlockPhysics(
-                        pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), newData);
+            	
+            	OBlock.aL.a(world.getWorld(), pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), (OEntityPlayer)null);
             }
         }
     }

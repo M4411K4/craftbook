@@ -1,3 +1,32 @@
+2.0extra13.1:
+- added [Map] map item changer ability
+    - changes a map item to a specified index
+    - to create:
+        - players must first be given permission to the command:
+            /makemapchanger
+        - after given proper permissions, place a sign on a bookshelf block
+        - on the first line type the map index number that maps should change
+            to.
+        - on the second line type [Map]
+        - the third and forth lines are optional messages to display to the
+            players when they have changed their map item. If these lines are
+            left blank, a default message will be used.
+        - Example:
+            line1:    6
+            line2:    [Map]
+            line3:
+            line4:
+            This will change maps to: map_6
+            If map_6 does not exist, the maps will not change, and an error
+            message will be sent to the player.
+        - all players can *use* the map changer, but players need permissions
+            to *create* the map changers.
+- fixed bug with incorrect block limits placed on door/bridge ICs.
+    - thanks Riot for the bug report!
+- fixed bug with redstone levers activated by ICs not updating nearby
+    redstone.
+    - thanks lacrosse1991 and Emppu for the bug report!
+
 2.0extra13.0:
 - updated to minecraft 1.0.1 (previous were alpha/beta versions of minecraft)
     - thanks darkdiplomat for making temporary unofficial versions of my

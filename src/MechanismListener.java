@@ -70,6 +70,7 @@ public class MechanismListener extends CraftBookDelegateListener {
     private int pageMaxCharacters = 400;
     private int maxPages = 20;
     private boolean usePageSwitches = true;
+    private boolean useMapChanger = true;
 
     /**
      * Construct the object.
@@ -98,6 +99,8 @@ public class MechanismListener extends CraftBookDelegateListener {
         	maxPages = properties.getInt("max-pages", 20);
         if(properties.containsKey("page-hidden-switches-enable"))
         	usePageSwitches = properties.getBoolean("page-hidden-switches-enable", true);
+        if(properties.containsKey("map-changer-enable"))
+        	useMapChanger = properties.getBoolean("map-changer-enable", true);
 
         useBookshelves = properties.getBoolean("bookshelf-enable", true);
         bookReadLine = properties.getString("bookshelf-read-text", "You pick out a book...");
@@ -638,6 +641,59 @@ public class MechanismListener extends CraftBookDelegateListener {
                 ply.printError("Page readers are disabled on this server.");
             }
             
+         // Map Changer
+        } else if (line2.equalsIgnoreCase("[Map]")) {
+        	listener.informUser(player);
+        	
+        	if(useMapChanger)
+        	{
+        		if(ply.hasPermission("makemapchanger"))
+				{
+        			
+					Vector bPt = Util.getWallSignBack(world, pt, 1);
+					if(CraftBook.getBlockID(world, pt) == BlockType.WALL_SIGN && CraftBook.getBlockID(world, bPt) == BlockType.BOOKCASE)
+					{
+						if(signText.getLine1().isEmpty())
+						{
+							ply.printError("A map index number must be on line 1.");
+							CraftBook.dropSign(world, pt);
+						}
+						else
+						{
+		    				try
+		    				{
+		    					int mapIndex = Integer.parseInt(signText.getLine1());
+		    					if(mapIndex < 0 || mapIndex >= 65536)
+		    					{
+		    						ply.printError("Invalid map index on line 1.");
+		    						CraftBook.dropSign(world, pt);
+		    					}
+		    				}
+		    				catch(NumberFormatException e)
+		    				{
+		    					ply.printError("A map index number must be on line 1.");
+		    					CraftBook.dropSign(world, pt);
+		    				}
+						}
+					}
+					else
+					{
+						ply.printError("[Map] sign must be on a Bookshelf.");
+						CraftBook.dropSign(world, pt);
+					}
+				}
+        		else
+				{
+					ply.printError("You do not have permission to make that.");
+					CraftBook.dropSign(world, pt);
+				}
+        	}
+        	else
+        	{
+        		player.sendMessage(Colors.Rose + "Map changers are disabled on this server.");
+        	}
+        	
+        	
         // Doors
         } else if (line2.equalsIgnoreCase("[Door Up]")
                 || line2.equalsIgnoreCase("[Door Down]")) {
@@ -882,6 +938,45 @@ public class MechanismListener extends CraftBookDelegateListener {
         int plyX = (int)Math.floor(player.getLocation().x);
         int plyY = (int)Math.floor(player.getLocation().y);
         int plyZ = (int)Math.floor(player.getLocation().z);
+        
+        // Map Changing
+        if(useMapChanger
+        	&& itemInHand == 358 //map
+        	&& blockType == BlockType.BOOKCASE)
+        {
+        	Sign sign = Util.getWallSignNextTo(world, blockClicked.getX(), blockClicked.getY(), blockClicked.getZ());
+        	
+        	if(sign != null && sign.getText(1).equalsIgnoreCase("[Map]"))
+        	{
+        		Item handItem = player.getItemStackInHand();
+        		int index;
+        		try
+        		{
+        			index = Integer.parseInt(sign.getText(0));
+        		}
+        		catch(NumberFormatException e)
+        		{
+        			return false;
+        		}
+        		
+        		OMapData mapData = (OMapData)world.getWorld().a(OMapData.class, "map_" + index);
+        		if(mapData == null)
+        		{
+        			player.sendMessage(Colors.Rose+"map_"+index+" does not exist");
+        			return false;
+        		}
+        		
+        		handItem.setDamage(index);
+        		player.getInventory().update();
+        		
+        		String msg = sign.getText(2) + sign.getText(3);
+        		if(msg.isEmpty())
+        			msg = "Your map has changed to "+mapData.a;
+        		player.sendMessage(Colors.Gold+msg);
+        		
+        		return false;
+        	}
+        }
         
         // Page reading
         if(usePageReader
