@@ -191,6 +191,7 @@ public class MechanismListener extends CraftBookDelegateListener {
         enableAmmeter = properties.getBoolean("ammeter", true);
 
         loadCauldron();
+        loadMinecartCraftRecipes();
     }
     
     private ArrayList<Integer> getICBlockList(String arg)
@@ -242,6 +243,33 @@ public class MechanismListener extends CraftBookDelegateListener {
             }
         } else {
             cauldronModule = null;
+        }
+    }
+    
+    private void loadMinecartCraftRecipes() {
+        if (!properties.containsKey("minecart-craft-enable") || properties.getBoolean("minecart-craft-enable", true)) {
+            try {
+                CauldronCookbook recipes = readCauldronRecipes("cb-cartcraft-recipes.txt");
+
+                if (recipes.size() != 0) {
+                	VehicleListener.craftBlockRecipes = recipes;
+                    logger.info(recipes.size()
+                            + " minecart craft recipe(s) loaded");
+                } else {
+                    logger.warning("cb-cartcraft-recipes.txt had no recipes");
+                }
+            } catch (FileNotFoundException e) {
+                logger.info("cb-cartcraft-recipes.txt not found: " + e.getMessage());
+                try {
+                    logger.info("Looked in: " + (new File(".")).getCanonicalPath());
+                } catch (IOException ioe) {
+                    // Eat error
+                }
+            } catch (IOException e) {
+                logger.warning("cb-cartcraft-recipes.txt not loaded: " + e.getMessage());
+            }
+        } else {
+        	VehicleListener.craftBlockRecipes = null;
         }
     }
 

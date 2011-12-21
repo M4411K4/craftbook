@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
+import java.util.List;
 
 import com.sk89q.craftbook.*;
 import com.sk89q.craftbook.ic.*;
@@ -166,45 +166,44 @@ public class MCX203 extends BaseIC {
         
         dist = dist * dist;
         
-        OWorldServer oworld = CraftBook.getOWorldServer(chip.getWorldType());
-        
         double x = chip.getPosition().getX();
         double y = chip.getPosition().getY();
         double z = chip.getPosition().getZ();
         
         boolean found = false;
-		for(@SuppressWarnings("rawtypes")
-		Iterator it = oworld.g.iterator(); it.hasNext();)
-		{
-			Object obj = it.next();
-			if(obj instanceof OEntityItem)
+        
+        List<ItemEntity> items = CraftBook.getWorld(chip.getWorldType()).getItemList();
+        
+        if(items == null)
+        	return;
+        
+        for(ItemEntity itemEnt : items)
+        {
+        	OEntityItem eitem = itemEnt.getEntity();
+        	
+        	if(!eitem.bB && eitem.a.a > 0 && (item == -1 || (eitem.a.c == item && (color < 0 || eitem.a.h() == color) )))
 			{
-				OEntityItem eitem = (OEntityItem) obj;
+				double diffX = x - itemEnt.getX();
+				double diffY = y - itemEnt.getY();
+				double diffZ = z - itemEnt.getZ();
 				
-				if(!eitem.bB && eitem.a.a > 0 && (item == -1 || (eitem.a.c == item && (color < 0 || eitem.a.h() == color) )))
+				if(((diffX * diffX + diffY * diffY + diffZ * diffZ) < dist)
+					&& source.hasAvailableSlotSpace(eitem.a.c, (byte)eitem.a.h(), eitem.a.a))
 				{
-    				double diffX = x - eitem.bj;
-    				double diffY = y - eitem.bk;
-    				double diffZ = z - eitem.bl;
-    				
-    				if(((diffX * diffX + diffY * diffY + diffZ * diffZ) < dist)
-    					&& source.hasAvailableSlotSpace(eitem.a.c, (byte)eitem.a.h(), eitem.a.a))
-    				{
-    					found = true;
-    					
-    					//kill
-    					eitem.S();
-    					
-    					//store
-    					try {
-                            source.storeBlock(eitem.a.c, (byte)eitem.a.h(), eitem.a.a);
-                        } catch (BlockSourceException e) {
-                            break;
-                        }
-    				}
+					found = true;
+					
+					//kill
+					itemEnt.destroy();
+					
+					//store
+					try {
+                        source.storeBlock(eitem.a.c, (byte)eitem.a.h(), eitem.a.a);
+                    } catch (BlockSourceException e) {
+                        break;
+                    }
 				}
 			}
-		}
+        }
     	
     	chip.getOut(1).set(found);
     }

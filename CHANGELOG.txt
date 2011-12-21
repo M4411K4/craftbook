@@ -1,3 +1,27 @@
+2.0extra13.2:
+- added Minecart Craft block
+    - adds the ability to craft items through storage carts
+    - recipes are placed in the cb-cartcraft-recipes.txt server file
+        - recipes are configured just like Cauldron recipes, but does not
+            use groups, since storage carts do not have groups
+    - default block is dark grey wool (# 7)
+    - no sign is used
+    - thanks healthyuncle for the suggestion!
+- added [MCX207] & [MCZ207] Between Time IC
+    - detects if the server/day time is between the two times placed on
+        lines 3 and 4 of the sign
+        - if only 1 time is set, then it will detect if the current server
+            time is past the set time.
+    - thanks healthyuncle for the suggestion!
+- added = mode for [MCX205] & [MCZ205] detect block
+    - sets the IC to detect the specified block 'exactly' at the specified
+        UP or DOWN position
+    - requires a number after UP or DOWN
+- fixed issue with [MCX203] & [MCZ203] check collector trying to access
+    entities that were altered by other sources
+    - this fix may require changes from Canary as it now uses their function
+    - thanks Riot for the bug report!
+
 2.0extra13.1:
 - added [Map] map item changer ability
     - changes a map item to a specified index

@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,8 @@ public class VehicleListener extends CraftBookDelegateListener {
         FORWARD, LEFT, RIGHT
     }
     
+    protected static CauldronCookbook craftBlockRecipes = null;
+    
     // Settings
     private boolean minecartControlBlocks = true;
     private boolean slickPressurePlates = false;
@@ -83,6 +86,7 @@ public class VehicleListener extends CraftBookDelegateListener {
     private int[] minecartDelayBlock = new int[]{BlockType.CLOTH, 4};
     private int[] minecartLoadBlock = new int[]{BlockType.CLOTH, 9};
     private int[] minecartStationClearBlock = new int[]{BlockType.CLOTH, 12};
+    private int[] minecartCraftBlock = new int[]{BlockType.CLOTH, 7};
     
     private int minecartCollisionType = 0;
     
@@ -135,6 +139,7 @@ public class VehicleListener extends CraftBookDelegateListener {
         minecartDelayBlock = StringUtil.getPropColorInt(properties.getString("minecart-delay-block"), BlockType.CLOTH, 4);
         minecartLoadBlock = StringUtil.getPropColorInt(properties.getString("minecart-load-block"), BlockType.CLOTH, 9);
         minecartStationClearBlock = StringUtil.getPropColorInt(properties.getString("minecart-station-clear-block"), BlockType.CLOTH, 12);
+        minecartCraftBlock = StringUtil.getPropColorInt(properties.getString("minecart-craft-block"), BlockType.CLOTH, 7);
         
         if(properties.containsKey("minecart-max-speed"))
         	minecartMaxSpeed = properties.getInt("minecart-max-speed", 100);
@@ -812,6 +817,124 @@ public class VehicleListener extends CraftBookDelegateListener {
                         }
                     }
 
+                    return;
+                } else if (craftBlockRecipes != null && under == minecartCraftBlock[0] && underColor == minecartCraftBlock[1]) {
+                    Boolean test = Redstone.testAnyInput(world, underPt);
+
+                    if (test == null || test) {
+                        if (minecart.getType() == Minecart.Type.StorageCart && minecart.getStorage() != null) {
+                        	
+                        	ItemArray<?> cartStorage = minecart.getStorage();
+                        	Item[] cartItems = cartStorage.getContents();
+                        	
+                        	Map<Integer,Integer> contents = new HashMap<Integer,Integer>();
+                        	
+                        	for(int i = 0; i < cartItems.length; i++)
+                        	{
+                        		Item item = cartItems[i];
+                        		if(item == null || item.getAmount() <= 0)
+                        			continue;
+                        		
+                        		if(!contents.containsKey(item.getItemId()))
+                        		{
+                        			contents.put(item.getItemId(), item.getAmount());
+                        		}
+                        		else
+                        		{
+                        			contents.put(item.getItemId(), contents.get(item.getItemId()) + item.getAmount());
+                        		}
+                        	}
+                        	
+                        	CauldronRecipe recipe = craftBlockRecipes.find(contents);
+
+                            if(recipe != null)
+                            {
+                            	List<Integer> ingredients = new ArrayList<Integer>(recipe.getIngredients());
+                            	
+                            	boolean itemsFound = true;
+                            	ingredientLoop:
+                            	for(int i = 0; i < ingredients.size(); i++)
+                            	{
+                            		if(ingredients.get(i) == null)
+                            			continue;
+                            		
+                            		int itemType = ingredients.get(i);
+                            		
+                            		for(int j = 0; j < cartItems.length; j++)
+                                	{
+                                		Item cartItem = cartItems[j];
+                                		
+                                		if (cartItem == null || cartItem.getAmount() <= 0
+                            				|| itemType != cartItem.getItemId()
+                            				)
+                                		{
+                                			continue;
+                                		}
+                                		
+                                		if(cartItem.getAmount() == 1)
+                                		{
+                                			cartItems[j] = null;
+                                		}
+                                		else
+                                		{
+                                			cartItems[j].setAmount(cartItem.getAmount() - 1);
+                                		}
+                                		
+                                		continue ingredientLoop;
+                                	}
+                            		
+                            		itemsFound = false;
+                            		
+                            		//item not found? did something change to the minecart storage inventory?
+                            		
+                            		break;
+                            	}
+                            	
+                            	if(itemsFound)
+                            	{
+                            		for(Integer id : recipe.getResults())
+                            		{
+                            			boolean found = false;
+                            			for(int i = 0; i < cartItems.length; i++)
+                                    	{
+                            				if(cartItems[i] != null
+                            					&& cartItems[i].getItemId() == id
+                            					&& cartItems[i].getAmount() > 0
+                            					&& cartItems[i].getAmount() < ItemArrayUtil.getStackMax(cartItems[i])
+                            					)
+                            				{
+                            					cartItems[i].setAmount(cartItems[i].getAmount() + 1);
+                            					found = true;
+                            					break;
+                            				}
+                                    	}
+                            			
+                            			if(!found)
+                        				{
+                            				for(int i = 0; i < cartItems.length; i++)
+                                        	{
+                            					if(cartItems[i] == null)
+                            					{
+                            						cartItems[i] = new Item(id, 1, i);
+                            						found = true;
+                            						break;
+                            					}
+                                        	}
+                        				}
+                            			
+                            			if(!found)
+                            			{
+                            				//no space to add!
+                            				return;
+                            			}
+                                    }
+                            		
+                            		ItemArrayUtil.setContents(cartStorage, cartItems);
+                            	}
+                            }
+                        }
+                    }
+                    
                     return;
                 } else if (minecartEnableLoadBlock
                 			&& under == minecartLoadBlock[0] && underColor == minecartLoadBlock[1]
@@ -1662,6 +1785,8 @@ public class VehicleListener extends CraftBookDelegateListener {
                 }
             } else if (minecartControlBlocks && under == minecartStationClearBlock[0] && underColor == minecartStationClearBlock[1]) {
             	player.sendMessage(Colors.Gold + "Minecart station clearing block created.");
+            } else if (minecartControlBlocks && under == minecartCraftBlock[0] && underColor == minecartCraftBlock[1]) {
+            	player.sendMessage(Colors.Gold + "Minecart craft block created.");
             } else if (minecartControlBlocks && minecartEnableLoadBlock && under == minecartLoadBlock[0]
                        && underColor == minecartLoadBlock[1]) {
             	player.sendMessage(Colors.Gold + "Minecart load block created.");

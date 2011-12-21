@@ -132,11 +132,36 @@ public class MCX205 extends BaseIC {
         
         World world = CraftBook.getWorld(chip.getWorldType());
         
-        int y = searchForBlock(item, world,
+        char mode;
+        if(chip.inputAmount() == 0)
+        {
+        	//since self-updates don't get mode, we need to get it
+    		mode = ' ';
+    		if(chip.getText().getLine2().length() > 8)
+    			mode = chip.getText().getLine2().charAt(8);
+        }
+        else
+        {
+        	mode = chip.getMode();
+        }
+        
+        int y;
+        if(direction.length > 1 && mode == '=')
+        {
+        	y = searchForBlock(item, world,
+				        		chip.getBlockPosition().getBlockX(),
+				        		chip.getBlockPosition().getBlockZ(),
+				        		direction[0].equalsIgnoreCase("up") ? distance - 1 : distance + 1,
+				        		direction[0].equalsIgnoreCase("up") ? distance + 1 : distance);
+        }
+        else
+        {
+        	y = searchForBlock(item, world,
 				        		chip.getBlockPosition().getBlockX(),
 				        		chip.getBlockPosition().getBlockZ(),
 				        		chip.getBlockPosition().getBlockY(),
 				        		distance);
+        }
 
         chip.getOut(1).set(y != -1);
     }
