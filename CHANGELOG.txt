@@ -17,6 +17,7 @@
     - sets the IC to detect the specified block 'exactly' at the specified
         UP or DOWN position
     - requires a number after UP or DOWN
+    - thanks lacrosse1991 for the suggestion!
 - fixed issue with [MCX203] & [MCZ203] check collector trying to access
     entities that were altered by other sources
     - this fix may require changes from Canary as it now uses their function
