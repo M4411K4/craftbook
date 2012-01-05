@@ -12,6 +12,10 @@
 # items table). If you need multiple copies of one item or block, use
 # * followed by the multiplier, so 1*4 means 4 of item 1 (stone).
 #
+# To add color/damage values, place an @ symbol after the item ID and then
+# the color/damage value.
+# Ex: 35@1*4 means 4 of item 35 (wool) colored 1 (orange)
+#
 # If one recipe's ingredients are a subset of another, it should go below
 # the other recipe.
 #

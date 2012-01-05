@@ -90,13 +90,14 @@ public class MCX027 extends BaseIC {
         	if(!chip.getText().getLine4().isEmpty())
         		timeEnd = Integer.parseInt(chip.getText().getLine4());
         	
+        	long worldTime = chip.getTime() % 24000;
         	if(time <= timeEnd)
         	{
-        		chip.getOut(1).set(chip.getTime() >= time && chip.getTime() <= timeEnd);
+        		chip.getOut(1).set(worldTime >= time && worldTime <= timeEnd);
         	}
         	else
         	{
-        		chip.getOut(1).set(chip.getTime() >= time || chip.getTime() <= timeEnd);
+        		chip.getOut(1).set(worldTime >= time || worldTime <= timeEnd);
         	}
         }
     }

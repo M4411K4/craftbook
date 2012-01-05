@@ -36,16 +36,16 @@ public final class CauldronRecipe {
     /**
      * Stores a list of ingredients.
      */
-    private final List<Integer> ingredients;
+    private final List<CraftBookItem> ingredients;
     /**
      * Stores a list of ingredients.
      */
-    private final Map<Integer,Integer> ingredientLookup
-            = new HashMap<Integer,Integer>();
+    private final Map<CraftBookItem,Integer> ingredientLookup
+            = new HashMap<CraftBookItem,Integer>();
     /**
      * List of resulting items or blocks.
      */
-    private final List<Integer> results;
+    private final List<CraftBookItem> results;
     /**
      * List of groups that can use this recipe. This may be null.
      */
@@ -57,15 +57,16 @@ public final class CauldronRecipe {
      * @param ingredients
      * @param results
      */
-    public CauldronRecipe(String name, List<Integer> ingredients,
-            List<Integer> results, String[] groups) {
+    public CauldronRecipe(String name, List<CraftBookItem> ingredients,
+            List<CraftBookItem> results, String[] groups) {
         this.name = name;
         this.ingredients = Collections.unmodifiableList(ingredients);
         this.results = Collections.unmodifiableList(results);
         this.groups = groups;
 
         // Make a list of required ingredients by item ID
-        for (Integer id : ingredients) {
+        for (CraftBookItem id : ingredients) {
+        	
             if (ingredientLookup.containsKey(id)) {
                 ingredientLookup.put(id, ingredientLookup.get(id) + 1);
             } else {
@@ -84,7 +85,7 @@ public final class CauldronRecipe {
     /**
      * @return the ingredients
      */
-    public List<Integer> getIngredients() {
+    public List<CraftBookItem> getIngredients() {
         return ingredients;
     }
 
@@ -101,9 +102,9 @@ public final class CauldronRecipe {
      * @param check
      * @return
      */
-    public boolean hasAllIngredients(Map<Integer,Integer> check) {
-        for (Map.Entry<Integer,Integer> entry : ingredientLookup.entrySet()) {
-            int id = entry.getKey();
+    public boolean hasAllIngredients(Map<CraftBookItem,Integer> check) {
+        for (Map.Entry<CraftBookItem,Integer> entry : ingredientLookup.entrySet()) {
+            CraftBookItem id = entry.getKey();
             if (!check.containsKey(id)) {
                 return false;
             } else if (check.get(id) < entry.getValue()) {
@@ -116,7 +117,7 @@ public final class CauldronRecipe {
     /**
      * @return the results
      */
-    public List<Integer> getResults() {
+    public List<CraftBookItem> getResults() {
         return results;
     }
 }

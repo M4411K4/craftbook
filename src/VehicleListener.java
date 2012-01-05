@@ -827,7 +827,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                         	ItemArray<?> cartStorage = minecart.getStorage();
                         	Item[] cartItems = cartStorage.getContents();
                         	
-                        	Map<Integer,Integer> contents = new HashMap<Integer,Integer>();
+                        	Map<CraftBookItem,Integer> contents = new HashMap<CraftBookItem,Integer>();
                         	
                         	for(int i = 0; i < cartItems.length; i++)
                         	{
@@ -835,13 +835,14 @@ public class VehicleListener extends CraftBookDelegateListener {
                         		if(item == null || item.getAmount() <= 0)
                         			continue;
                         		
-                        		if(!contents.containsKey(item.getItemId()))
+                        		CraftBookItem cbItem = new CraftBookItem(item.getItemId(), item.getDamage());
+                        		if(!contents.containsKey(cbItem))
                         		{
-                        			contents.put(item.getItemId(), item.getAmount());
+                        			contents.put(cbItem, item.getAmount());
                         		}
                         		else
                         		{
-                        			contents.put(item.getItemId(), contents.get(item.getItemId()) + item.getAmount());
+                        			contents.put(cbItem, contents.get(cbItem) + item.getAmount());
                         		}
                         	}
                         	
@@ -849,7 +850,7 @@ public class VehicleListener extends CraftBookDelegateListener {
 
                             if(recipe != null)
                             {
-                            	List<Integer> ingredients = new ArrayList<Integer>(recipe.getIngredients());
+                            	List<CraftBookItem> ingredients = new ArrayList<CraftBookItem>(recipe.getIngredients());
                             	
                             	boolean itemsFound = true;
                             	ingredientLoop:
@@ -858,14 +859,15 @@ public class VehicleListener extends CraftBookDelegateListener {
                             		if(ingredients.get(i) == null)
                             			continue;
                             		
-                            		int itemType = ingredients.get(i);
+                            		CraftBookItem itemType = ingredients.get(i);
                             		
                             		for(int j = 0; j < cartItems.length; j++)
                                 	{
                                 		Item cartItem = cartItems[j];
                                 		
                                 		if (cartItem == null || cartItem.getAmount() <= 0
-                            				|| itemType != cartItem.getItemId()
+                            				|| itemType.id() != cartItem.getItemId()
+                            				|| itemType.color() != cartItem.getDamage()
                             				)
                                 		{
                                 			continue;
@@ -892,13 +894,14 @@ public class VehicleListener extends CraftBookDelegateListener {
                             	
                             	if(itemsFound)
                             	{
-                            		for(Integer id : recipe.getResults())
+                            		for(CraftBookItem cbItem : recipe.getResults())
                             		{
                             			boolean found = false;
                             			for(int i = 0; i < cartItems.length; i++)
                                     	{
                             				if(cartItems[i] != null
-                            					&& cartItems[i].getItemId() == id
+                            					&& cartItems[i].getItemId() == cbItem.id()
+                            					&& cartItems[i].getDamage() == cbItem.color()
                             					&& cartItems[i].getAmount() > 0
                             					&& cartItems[i].getAmount() < ItemArrayUtil.getStackMax(cartItems[i])
                             					)
@@ -915,7 +918,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                                         	{
                             					if(cartItems[i] == null)
                             					{
-                            						cartItems[i] = new Item(id, 1, i);
+                            						cartItems[i] = new Item(cbItem.id(), 1, i, cbItem.safeColor());
                             						found = true;
                             						break;
                             					}
@@ -1661,21 +1664,21 @@ public class VehicleListener extends CraftBookDelegateListener {
                 String dir = etc.getCompassPointForDirection(rot);
                 
                 if (dir.equals("N")) {
-                    vehicle.setMotion(-minecartBoostFromRider, 0, 0);
-                } else if(dir.equals("NE")) {
-                    vehicle.setMotion(-minecartBoostFromRider, 0, -minecartBoostFromRider);
-                } else if(dir.equals("E")) {
-                    vehicle.setMotion(0, 0, -minecartBoostFromRider);
-                } else if(dir.equals("SE")) {
-                    vehicle.setMotion(minecartBoostFromRider, 0, -minecartBoostFromRider);
-                } else if(dir.equals("S")) {
-                    vehicle.setMotion(minecartBoostFromRider, 0, 0);
-                } else if(dir.equals("SW")) {
-                    vehicle.setMotion(minecartBoostFromRider, 0, minecartBoostFromRider);
-                } else if(dir.equals("W")) {
                     vehicle.setMotion(0, 0, minecartBoostFromRider);
-                } else if(dir.equals("NW")) {
+                } else if(dir.equals("NE")) {
                     vehicle.setMotion(-minecartBoostFromRider, 0, minecartBoostFromRider);
+                } else if(dir.equals("E")) {
+                    vehicle.setMotion(-minecartBoostFromRider, 0, 0);
+                } else if(dir.equals("SE")) {
+                    vehicle.setMotion(-minecartBoostFromRider, 0, -minecartBoostFromRider);
+                } else if(dir.equals("S")) {
+                    vehicle.setMotion(0, 0, -minecartBoostFromRider);
+                } else if(dir.equals("SW")) {
+                    vehicle.setMotion(minecartBoostFromRider, 0, -minecartBoostFromRider);
+                } else if(dir.equals("W")) {
+                    vehicle.setMotion(minecartBoostFromRider, 0, 0);
+                } else if(dir.equals("NW")) {
+                    vehicle.setMotion(minecartBoostFromRider, 0, minecartBoostFromRider);
                 }
             }
 

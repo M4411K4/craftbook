@@ -2155,8 +2155,8 @@ public class MechanismListener extends CraftBookDelegateListener {
                             + file.getName() + ": '" + line + "'");
                 } else {
                     String name = parts[0];
-                    List<Integer> ingredients = parseCauldronItems(parts[1]);
-                    List<Integer> results = parseCauldronItems(parts[2]);
+                    List<CraftBookItem> ingredients = parseCauldronItems(parts[1]);
+                    List<CraftBookItem> results = parseCauldronItems(parts[2]);
                     String[] groups = null;
                     
                     if (parts.length >= 4 && parts[3].trim().length() > 0) {
@@ -2186,13 +2186,14 @@ public class MechanismListener extends CraftBookDelegateListener {
      * @param list
      * @return
      */
-    private static List<Integer> parseCauldronItems(String list) {
+    private static List<CraftBookItem> parseCauldronItems(String list) {
         String[] parts = list.split(",");
 
-        List<Integer> out = new ArrayList<Integer>();
+        List<CraftBookItem> out = new ArrayList<CraftBookItem>();
 
         for (String part : parts) {
             int multiplier = 1;
+            int color = 0;
 
             try {
                 // Multiplier
@@ -2201,18 +2202,33 @@ public class MechanismListener extends CraftBookDelegateListener {
                     multiplier = Integer.parseInt(
                             part.substring(at + 1, part.length()));
                     part = part.substring(0, at);
+                    String[] item = part.split("@",2);
+                    if(item.length > 1)
+                    {
+                    	part = item[0];
+                    	try
+                    	{
+                    		color = Integer.parseInt(item[1]);
+                    		if(color > 15)
+                    			color = 15;
+                    	}
+                    	catch(NumberFormatException e)
+                    	{
+                    		color = 0;
+                    	}
+                    }
                 }
 
                 try {
                     for (int i = 0; i < multiplier; i++) {
-                        out.add(Integer.valueOf(part));
+                        out.add(new CraftBookItem(Integer.valueOf(part), color));
                     }
                 } catch (NumberFormatException e) {
                     int item = etc.getDataSource().getItem(part);
 
                     if (item > 0) {
                         for (int i = 0; i < multiplier; i++) {
-                            out.add(item);
+                            out.add(new CraftBookItem(item, color));
                         }
                     } else {
                         logger.log(Level.WARNING, "Cauldron: Unknown item " + part);

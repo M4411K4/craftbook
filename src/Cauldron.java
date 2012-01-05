@@ -105,7 +105,7 @@ public class Cauldron {
         int rootY = pt.getBlockY();
 
         // Used to store cauldron blocks -- walls are counted
-        Map<BlockVector,Integer> visited = new HashMap<BlockVector,Integer>();
+        Map<BlockVector,CraftBookItem> visited = new HashMap<BlockVector,CraftBookItem>();
 
         World world = player.getWorld();
         
@@ -122,12 +122,12 @@ public class Cauldron {
             }
 
             // Key is the block ID and the value is the amount
-            Map<Integer,Integer> contents = new HashMap<Integer,Integer>();
+            Map<CraftBookItem,Integer> contents = new HashMap<CraftBookItem,Integer>();
 
             // Now we have to ignore stone blocks so that we get the real
             // contents of the cauldron
-            for (Map.Entry<BlockVector,Integer> entry : visited.entrySet()) {
-                if (entry.getValue() != BlockType.STONE) {
+            for (Map.Entry<BlockVector,CraftBookItem> entry : visited.entrySet()) {
+                if (entry.getValue().id() != BlockType.STONE) {
                     if (!contents.containsKey(entry.getValue())) {
                         contents.put(entry.getValue(), 1);
                     } else {
@@ -162,19 +162,19 @@ public class Cauldron {
                 player.sendMessage(Colors.Gold + "In a poof of smoke, you've made "
                         + recipe.getName() + ".");
 
-                List<Integer> ingredients =
-                        new ArrayList<Integer>(recipe.getIngredients());
+                List<CraftBookItem> ingredients =
+                        new ArrayList<CraftBookItem>(recipe.getIngredients());
                 
                 List<BlockVector> removeQueue = new ArrayList<BlockVector>();
 
                 // Get rid of the blocks in world
-                for (Map.Entry<BlockVector,Integer> entry : visited.entrySet()) {
+                for (Map.Entry<BlockVector,CraftBookItem> entry : visited.entrySet()) {
                     // This is not a fast operation, but we should not have
                     // too many ingredients
                     if (ingredients.contains(entry.getValue())) {
                         // Some blocks need to removed first otherwise they will
                         // drop an item, so let's remove those first
-                        if (!BlockType.isBottomDependentBlock(entry.getValue())) {
+                        if (!BlockType.isBottomDependentBlock(entry.getValue().id())) {
                             removeQueue.add(entry.getKey());
                         } else {
                             CraftBook.setBlockID(world, entry.getKey(), 0);
@@ -188,8 +188,8 @@ public class Cauldron {
                 }
 
                 // Give results
-                for (Integer id : recipe.getResults()) {
-                    player.giveItem(id, 1);
+                for (CraftBookItem item : recipe.getResults()) {
+                    player.giveItem(new Item(item.id(), 1, -1, item.color()));
                 }
             // Didn't find a recipe
             } else {
@@ -214,7 +214,7 @@ public class Cauldron {
      * @throws Cauldron.NotACauldronException
      */
     public void findCauldronContents(World world, BlockVector pt, int minY, int maxY,
-            Map<BlockVector,Integer> visited) throws NotACauldronException {
+            Map<BlockVector,CraftBookItem> visited) throws NotACauldronException {
 
         // Don't want to go too low or high
         if (pt.getBlockY() < minY) { return; }
@@ -229,6 +229,7 @@ public class Cauldron {
         if (visited.containsKey(pt)) { return; }
 
         int type = CraftBook.getBlockID(world, pt);
+        int data = CraftBook.getBlockData(world, pt);
 
         // Make water work reliably
         if (type == 9) {
@@ -240,7 +241,7 @@ public class Cauldron {
             type = 10;
         }
         
-        visited.put(pt, type);
+        visited.put(pt, new CraftBookItem(type, data));
 
         // It's a wall -- we only needed to remember that we visited it but
         // we don't need to recurse

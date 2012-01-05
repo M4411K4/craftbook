@@ -26,13 +26,16 @@ import com.sk89q.craftbook.ic.*;
  * @author sk89q
  */
 public class MCX200 extends BaseIC {
+	
+	private final String TITLE = "MOB";
+	protected String settings = "";
     /**
      * Get the title of the IC.
      *
      * @return
      */
     public String getTitle() {
-        return "MOB SPAWNER CLR";
+        return settings;
     }
 
     /**
@@ -53,9 +56,36 @@ public class MCX200 extends BaseIC {
      * @return
      */
     public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    	String settings[] = sign.getLine1().split(":",2);
         String id = sign.getLine3();
         String rider = sign.getLine4();
-
+        
+        this.settings = TITLE;
+        
+        if(!settings[0].isEmpty())
+        {
+        	try
+        	{
+        		int amount = Integer.parseInt(settings[0]);
+        		if(amount < 0 || amount > 9)
+        			return "Amount must be a number from 1 to 9, or 0 for 10";
+        		
+        		this.settings += ":"+amount;
+        		if(settings.length == 2 && sign.getLine2().contains("[MCU200]"))
+        		{
+        			int ticks = Integer.parseInt(settings[1]);
+        			if(ticks < 5 || ticks > 999)
+        				return "Rate must be a number from 5 to 999";
+        			
+        			this.settings = "^"+this.settings+":"+ticks+":0";
+        		}
+        	}
+        	catch(NumberFormatException e)
+        	{
+        		return "Line 1 must contain numbers split with :";
+        	}
+        }
+        
         if (id.length() == 0) {
             return "Specify a mob type on the third line.";
         }
@@ -89,36 +119,104 @@ public class MCX200 extends BaseIC {
      *
      * @param chip
      */
-    public void think(ChipState chip) {
-        if (chip.getIn(1).is()) {
-            String id = chip.getText().getLine3();
-            String rider = chip.getText().getLine4();
-            
-            String[] args = id.split(":", 2);
-            int color = getColor(args);
-            
-            if(color >= 0)
-            	id = args[0];
-            
-            String[] args2 = rider.split(":", 2);
-            int colorRider = getColor(args2);
-            if(colorRider >= 0)
-            	rider = args2[0];
-            
-            if (Mob.isValid(id)) {
-                Vector pos = chip.getBlockPosition();
-                int maxY = Math.min(128, pos.getBlockY() + 10);
-                int x = pos.getBlockX();
-                int z = pos.getBlockZ();
+    public void think(ChipState chip)
+    {
+    	if(chip.inputAmount() == 0)
+    	{
+    		String[] args = chip.getText().getLine1().split(":", 4);
+    		if(args.length == 4)
+    		{
+    			int ticks = Integer.parseInt(args[2]);
+    			int curTick = Integer.parseInt(args[3]);
+    			
+    			boolean spn = false;
+    			curTick++;
+    			if(curTick >= ticks)
+    			{
+    				spn = true;
+    				curTick = 0;
+    			}
+    			
+    			chip.getText().setLine1(args[0]+":"+args[1]+":"+args[2]+":"+curTick);
+    			chip.getText().supressUpdate();
+    			
+    			if(spn)
+    			{
+    				spawnThink(chip);
+    			}
+    		}
+    		else
+    			return;
+    	}
+    	else
+    	{
+    		if(chip.getText().getLine1().charAt(0) == '^' || chip.getText().getLine1().charAt(0) == '%')
+    		{
+    			if(chip.getIn(1).isTriggered())
+    			{
+    				if(chip.getIn(1).is() && chip.getText().getLine1().charAt(0) == '^')
+    				{
+    					chip.getText().setLine1("%"+chip.getText().getLine1().substring(1));
+    					chip.getText().supressUpdate();
+    					
+    					RedstoneListener listener = (RedstoneListener) chip.getExtra();
+    					listener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    				}
+    				else if(!chip.getIn(1).is() && chip.getText().getLine1().charAt(0) == '%')
+    				{
+    					String[] args = chip.getText().getLine1().split(":", 4);
+    					chip.getText().setLine1("^"+args[0].substring(1)+":"+args[1]+":"+args[2]+":0");
+    					chip.getText().supressUpdate();
+    				}
+    			}
+    		}
+    		else if(chip.getIn(1).is())
+    		{
+    			spawnThink(chip);
+    		}
+    	}
+    }
+    
+    private void spawnThink(ChipState chip)
+    {
+    	String[] args = chip.getText().getLine1().split(":", 4);
+    	
+    	int amount = 1;
+    	if(args.length > 1)
+    	{
+    		amount = Integer.parseInt(args[1]);
+    	}
+    	
+    	String id = chip.getText().getLine3();
+        String rider = chip.getText().getLine4();
+        
+        args = id.split(":", 2);
+        int color = getColor(args);
+        
+        if(color >= 0)
+        	id = args[0];
+        
+        String[] args2 = rider.split(":", 2);
+        int colorRider = getColor(args2);
+        if(colorRider >= 0)
+        	rider = args2[0];
+        
+        if (Mob.isValid(id)) {
+            Vector pos = chip.getBlockPosition();
+            int maxY = Math.min(128, pos.getBlockY() + 10);
+            int x = pos.getBlockX();
+            int z = pos.getBlockZ();
 
-                for (int y = pos.getBlockY() + 1; y <= maxY; y++)
+            for (int y = pos.getBlockY() + 1; y <= maxY; y++)
+            {
+            	int blockId = CraftBook.getBlockID(chip.getWorldType(), x, y, z);
+                if (BlockType.canPassThrough(blockId) || BlockType.isWater(blockId))
                 {
-                	int blockId = CraftBook.getBlockID(chip.getWorldType(), x, y, z);
-                    if (BlockType.canPassThrough(blockId) || BlockType.isWater(blockId))
+                    Location loc = new Location(x, y, z);
+                    loc.dimension = chip.getWorldType();
+                    
+                    for(int i = 0; i < amount; i++)
                     {
-                        Location loc = new Location(x, y, z);
-                        loc.dimension = chip.getWorldType();
-                        
                         Mob mob = new Mob(id, loc);
                         if (rider.length() != 0 && Mob.isValid(rider)) {
                         	Mob mobRider = new Mob(rider);
@@ -135,9 +233,9 @@ public class MCX200 extends BaseIC {
                         
                         if(color >= 0)
                         	setMobColor(mob.getEntity(), color);
-                        
-                        return;
                     }
+                    
+                    return;
                 }
             }
         }

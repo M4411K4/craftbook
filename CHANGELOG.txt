@@ -1,3 +1,49 @@
+2.0extra13.3:
+- added ability for Cauldron and Minecart Craft to recognize colors
+    ...or possibly broke both
+    - values are strict on color/damage values
+        - if no color/damage value was added, it will be defaulted to
+            value 0 (zero).
+        - there is currently no value that will accept all of the same
+            type and ignore the color.
+    - specify colors with an @ symbol after the item ID, followed by the
+        color.
+        Ex: 35@1*4 will require 4 of 35 (wool) colored 1 (orange)
+    - thanks Riot for the suggestion!
+- added [MCU200] Mob
+    - can spawn a set amount of Mobs every set amount of ticks when
+        turned on.
+    - Example:
+        line1:    2:300
+        line2:    [MCU200]
+        line3:    Pig
+        line4:
+        This will spawn 2 Pigs every 300 ticks, while on.
+    - The rest of the settings are exactly like [MCX200]
+    - thanks Riot for the suggestion!
+- added ability to specify spawn amount for [MCX200]
+    - Example:
+        line1:    2
+        line2:    [MCX200]
+        line3:    Pig
+        line4:
+        This will spawn 2 Pigs when toggled on.
+    - [MCX200] has also now been renamed to: MOB
+        - this is to better fit the new settings within 15 characters
+    - thanks Riot for the suggestion!
+- fixed Minecart motion when the rider hits the Minecart to make it go
+    in a certain direction.
+    - there is still some issues when rotating too fast, but this is
+        likely due to the client not sending the server the rotation
+        value quickly.
+    - thanks Glacksy for the bug report!
+- fixed [MCX027] & [MCZ027] not recognizing correct time.
+    - thanks Riot for the bug report!
+- making another attempt to fix the issue with [MCX203] & [MCZ203]
+    - fix might not do anything without changes from Canary, but it is
+        worth a try!
+    - thanks Riot for the bug report!
+
 2.0extra13.2:
 - added Minecart Craft block
     - adds the ability to craft items through storage carts

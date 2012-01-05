@@ -57,7 +57,7 @@ public class CauldronCookbook {
      *
      * @param ingredients
      */
-    public CauldronRecipe find(Map<Integer,Integer> ingredients) {
+    public CauldronRecipe find(Map<CraftBookItem,Integer> ingredients) {
         for (CauldronRecipe recipe : recipes) {
             if (recipe.hasAllIngredients(ingredients)) {
                 return recipe;

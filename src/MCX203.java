@@ -170,41 +170,80 @@ public class MCX203 extends BaseIC {
         double y = chip.getPosition().getY();
         double z = chip.getPosition().getZ();
         
-        boolean found = false;
-        
-        List<ItemEntity> items = CraftBook.getWorld(chip.getWorldType()).getItemList();
-        
-        if(items == null)
-        	return;
-        
-        for(ItemEntity itemEnt : items)
+        World world = CraftBook.getWorld(chip.getWorldType());
+        synchronized(world.getWorld().g)
         {
-        	OEntityItem eitem = itemEnt.getEntity();
-        	
-        	if(!eitem.bB && eitem.a.a > 0 && (item == -1 || (eitem.a.c == item && (color < 0 || eitem.a.h() == color) )))
-			{
-				double diffX = x - itemEnt.getX();
-				double diffY = y - itemEnt.getY();
-				double diffZ = z - itemEnt.getZ();
-				
-				if(((diffX * diffX + diffY * diffY + diffZ * diffZ) < dist)
-					&& source.hasAvailableSlotSpace(eitem.a.c, (byte)eitem.a.h(), eitem.a.a))
-				{
-					found = true;
-					
-					//kill
-					itemEnt.destroy();
-					
-					//store
-					try {
-                        source.storeBlock(eitem.a.c, (byte)eitem.a.h(), eitem.a.a);
-                    } catch (BlockSourceException e) {
-                        break;
-                    }
-				}
-			}
+        	ItemChestCollector chestCollector = new ItemChestCollector(world, source, dist, item, color, x, y, z);
+        	(new Thread(chestCollector)).start();
         }
+    }
+    
+    public class ItemChestCollector implements Runnable
+    {
+    	private final World world;
+    	private final NearbyChestBlockBag source;
+    	private final double distance;
+    	private final int item;
+    	private final int color;
+    	private final double x;
+    	private final double y;
+    	private final double z;
     	
-    	chip.getOut(1).set(found);
+    	public ItemChestCollector(World world, NearbyChestBlockBag source, double distance, int item, int color, double x, double y, double z)
+    	{
+    		this.world = world;
+    		this.source = source;
+    		this.distance = distance;
+    		this.item = item;
+    		this.color = color;
+    		this.x = x;
+    		this.y = y;
+    		this.z = z;
+    	}
+    	
+		@Override
+		public void run()
+		{
+			try
+			{
+				List<ItemEntity> items = this.world.getItemList();
+				
+				if(items == null)
+		        	return;
+		        
+				//boolean found = false;
+		        for(ItemEntity itemEnt : items)
+		        {
+		        	OEntityItem eitem = itemEnt.getEntity();
+		        	
+		        	if(!eitem.bB && eitem.a.a > 0 && (item == -1 || (eitem.a.c == item && (color < 0 || eitem.a.h() == color) )))
+					{
+						double diffX = x - itemEnt.getX();
+						double diffY = y - itemEnt.getY();
+						double diffZ = z - itemEnt.getZ();
+						
+						if(((diffX * diffX + diffY * diffY + diffZ * diffZ) < distance)
+							&& source.hasAvailableSlotSpace(eitem.a.c, (byte)eitem.a.h(), eitem.a.a))
+						{
+							//found = true;
+							
+							//kill
+							itemEnt.destroy();
+							
+							//store
+							try {
+		                        source.storeBlock(eitem.a.c, (byte)eitem.a.h(), eitem.a.a);
+		                    } catch (BlockSourceException e) {
+		                        break;
+		                    }
+						}
+					}
+		        }
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
     }
 }
