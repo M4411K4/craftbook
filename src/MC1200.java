@@ -90,7 +90,7 @@ public class MC1200 extends BaseIC {
                         
                         Mob mob = new Mob(id, loc);
                         if (rider.length() != 0 && Mob.isValid(rider)) {
-                            mob.spawn(new Mob(rider));
+                            mob.spawn(new Mob(rider, loc.getWorld()));
                         } else {
                             mob.spawn();
                         }

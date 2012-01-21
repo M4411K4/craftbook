@@ -92,7 +92,7 @@ public class Bounce
 		if(applyForce != 0)
 		{
 			OEntity oentity = entity.getEntity();
-			oentity.bn = applyForce;
+			oentity.bq = applyForce;
 			etc.getMCServer().h.a(new OPacket28EntityVelocity(oentity), worldType);
 			return true;
 		}
@@ -166,9 +166,9 @@ public class Bounce
 			if(applyForce != null)
 			{
 				OEntity oentity = entity.getEntity();
-				oentity.bm = applyForce[0];
-				oentity.bn = applyForce[1];
-				oentity.bo = applyForce[2];
+				oentity.bp = applyForce[0];
+				oentity.bq = applyForce[1];
+				oentity.br = applyForce[2];
 				etc.getMCServer().h.a(new OPacket28EntityVelocity(oentity), worldType);
 			}
 		}

@@ -28,7 +28,7 @@ import com.sk89q.craftbook.ic.ChipState;
  *
  * @author sk89q
  */
-public class MCX119 extends MCX118 {
+public class MCX133 extends MCX119 {
     
 
     /**
@@ -37,7 +37,7 @@ public class MCX119 extends MCX118 {
      * @return
      */
     public String getTitle() {
-        return "MOB NEAR?";
+        return "HUMANS ONLY";
     }
     
     public boolean requiresPermission() {
@@ -53,19 +53,12 @@ public class MCX119 extends MCX118 {
      * @return
      */
     public String validateEnvironment(int worldType, Vector pos, SignText sign) {
-        String id = sign.getLine3();
-
-        if (id.length() != 0)
-        {
-            if(!id.equalsIgnoreCase("mob") && !id.equalsIgnoreCase("mobs")
-            	&& !id.equalsIgnoreCase("animal") && !id.equalsIgnoreCase("animals")
-            	&& !Mob.isValid(id))
-            {
-            	return "Invalid mob name or type on 3rd line.";
-            }
-        }
-        
-        if (sign.getLine4().length() != 0) {
+    	if(!sign.getLine3().isEmpty())
+    	{
+    		sign.setLine3("");
+    	}
+    	
+    	if (sign.getLine4().length() != 0) {
             try
             {
             	double dist = Double.parseDouble(sign.getLine4());
@@ -77,10 +70,10 @@ public class MCX119 extends MCX118 {
             	return "4th line must be a number.";
             }
         }
-        
-        return null;
+    	
+    	return null;
     }
-
+    
     /**
      * Think.
      *
@@ -97,18 +90,18 @@ public class MCX119 extends MCX118 {
     		Vector lever = Util.getWallSignBack(chip.getWorldType(), chip.getPosition(), 2);
     		World world = CraftBook.getWorld(chip.getWorldType());
     		
-    		String id = chip.getText().getLine3();
-    		int type;
-    		if(id.equalsIgnoreCase("mob") || id.equalsIgnoreCase("mobs"))
-    			type = 1;
-    		else if(id.equalsIgnoreCase("animal") || id.equalsIgnoreCase("animals"))
-    			type = 2;
-    		else
-    			type = 3;
+    		//since self-updates don't get mode, we need to get it
+    		char mode = ' ';
+    		if(chip.getText().getLine2().length() > 8)
+    			mode = chip.getText().getLine2().charAt(8);
+    		
+    		int type = 4;
+    		if(mode == '-')
+    			type = 5;
     		
             synchronized(world.getWorld().g)
             {
-            	NearbyEntityFinder nearbyFinder = new NearbyEntityFinder(world, chip.getBlockPosition(), lever, dist, id, type, false);
+            	NearbyEntityFinder nearbyFinder = new NearbyEntityFinder(world, chip.getBlockPosition(), lever, dist, "", type, true);
             	(new Thread(nearbyFinder)).start();
             }
     	}

@@ -19,6 +19,8 @@
 
 
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.sk89q.craftbook.SignText;
@@ -91,54 +93,173 @@ public class MCX118 extends BaseIC {
     	
     	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
     	{
-    		chip.getOut(1).set( findEntitiesInRange(chip, etc.getServer().getPlayerList(), (byte)0) );
+    		double dist = 5;
+    		if(!chip.getText().getLine4().isEmpty())
+    			dist = Double.parseDouble(chip.getText().getLine4());
+    		dist *= dist;
+    		Vector lever = Util.getWallSignBack(chip.getWorldType(), chip.getPosition(), 2);
+    		World world = CraftBook.getWorld(chip.getWorldType());
+    		
+            synchronized(world.getWorld().g)
+            {
+            	NearbyEntityFinder nearbyFinder = new NearbyEntityFinder(world, chip.getBlockPosition(), lever, dist, chip.getText().getLine3(), 0, false);
+            	(new Thread(nearbyFinder)).start();
+            }
     	}
     }
     
-    protected Boolean entityInRange(ChipState chip, BaseEntity entity, byte type)
+    public class NearbyEntityFinder implements Runnable
     {
-    	Player player = (Player) entity;
+    	private final World WORLD;
+    	private final Vector BLOCK;
+    	private final Vector LEVER;
+    	private final double DISTANCE;
+    	private final String SETTINGS;
+    	private final int TYPE;
+    	private final boolean DESTROY;
     	
-    	String args = chip.getText().getLine3();
+    	public NearbyEntityFinder(World world, Vector block, Vector lever, double distance, String settings, int type, boolean destroy)
+    	{
+    		WORLD = world;
+    		BLOCK = block;
+    		LEVER = lever;
+    		DISTANCE = distance;
+    		SETTINGS = settings;
+    		TYPE = type;
+    		DESTROY = destroy;
+    	}
     	
-    	return args.isEmpty()
-    			|| (args.charAt(0) == 'g' && player.isInGroup(args.substring(2)))
-    			|| (args.charAt(0) == 'p' && player.getName().equalsIgnoreCase(args.substring(2)));
-    }
-    
-    @SuppressWarnings("rawtypes")
-	protected boolean findEntitiesInRange(ChipState chip, List entities, byte type)
-    {
-    	int x = chip.getBlockPosition().getBlockX();
-		int y = chip.getBlockPosition().getBlockY();
-		int z = chip.getBlockPosition().getBlockZ();
-		double dist = 5;
-		if(!chip.getText().getLine4().isEmpty())
-			dist = Double.parseDouble(chip.getText().getLine4());
-		dist *= dist;
-		
-		boolean found = false;
-		
-		for(Object obj: entities)
+		@Override
+		public void run()
 		{
-			BaseEntity entity = (BaseEntity)obj;
-			if(entity.getWorld().getType().getId() != chip.getWorldType())
-				continue;
+			@SuppressWarnings("rawtypes")
+			List entities = null;
 			
-			double diffX = x - entity.getX();
-			double diffY = y - entity.getY();
-			double diffZ = z - entity.getZ();
-			
-			if(diffX * diffX + diffY * diffY + diffZ * diffZ < dist)
+			switch(TYPE)
 			{
-				Boolean result = entityInRange(chip, entity, type);
-				if(result == null)
-					found = true;
-				else if(result == true)
-					return true;
+				case 0:
+					entities = etc.getServer().getPlayerList();
+					break;
+				case 1:
+					entities = this.WORLD.getMobList();
+					break;
+				case 2:
+					entities = this.WORLD.getAnimalList();
+					break;
+				case 3:
+					entities = this.WORLD.getLivingEntityList();
+					break;
+				case 4:
+					entities = entitiesExceptPlayers(this.WORLD.getWorld());
+					break;
+				case 5:
+					entities = entitiesExceptPlayersItems(this.WORLD.getWorld());
+					break;
 			}
+			
+			if(entities == null)
+				return;
+			
+			boolean found = false;
+			
+			for(Object obj: entities)
+			{
+				BaseEntity entity = (BaseEntity)obj;
+				if(entity.getWorld().getType().getId() != WORLD.getType().getId())
+					continue;
+				
+				double diffX = BLOCK.getBlockX() - entity.getX();
+				double diffY = BLOCK.getBlockY() - entity.getY();
+				double diffZ = BLOCK.getBlockZ() - entity.getZ();
+				
+				if(diffX * diffX + diffY * diffY + diffZ * diffZ < DISTANCE)
+				{
+					boolean result = entityInRange(entity);
+					if(result)
+					{
+						found = true;
+						if(DESTROY)
+						{
+							entity.destroy();
+						}
+						else
+						{
+							break;
+						}
+					}
+				}
+			}
+			
+			Redstone.setOutput(WORLD, LEVER, found);
 		}
 		
-		return found;
+		private boolean entityInRange(BaseEntity entity)
+	    {
+			switch(TYPE)
+			{
+				case 0:
+					Player player = (Player) entity;
+			    	
+			    	return SETTINGS.isEmpty()
+			    			|| (SETTINGS.charAt(0) == 'g' && player.isInGroup(SETTINGS.substring(2)))
+			    			|| (SETTINGS.charAt(0) == 'p' && player.getName().equalsIgnoreCase(SETTINGS.substring(2)));
+				case 1:
+				case 2:
+					return true;
+				case 3:
+					if((entity.isMob() || entity.isAnimal()) && entity instanceof Mob)
+					{
+						Mob mob = (Mob) entity;
+						if(SETTINGS.isEmpty() || mob.getName().equalsIgnoreCase(SETTINGS))
+							return true;
+					}
+				case 4:
+				case 5:
+					return true;
+			}
+			
+	    	return false;
+	    }
+		
+		private List<BaseEntity> entitiesExceptPlayers(OWorld oworld)
+		{
+			List<BaseEntity> entities = new ArrayList<BaseEntity>();
+			
+			for(@SuppressWarnings("rawtypes")
+    		Iterator it = oworld.g.iterator(); it.hasNext();)
+    		{
+    			Object obj = it.next();
+    			if(!(obj instanceof OEntityPlayerMP))
+    			{
+    				entities.add(new BaseEntity((OEntity)obj));
+    			}
+    		}
+			
+			return entities;
+		}
+		
+		private List<BaseEntity> entitiesExceptPlayersItems(OWorld oworld)
+		{
+			List<BaseEntity> entities = new ArrayList<BaseEntity>();
+			
+			for(@SuppressWarnings("rawtypes")
+    		Iterator it = oworld.g.iterator(); it.hasNext();)
+    		{
+    			Object obj = it.next();
+    			if(!(obj instanceof OEntityPlayerMP)
+    				&& !(obj instanceof OEntityItem)
+    				&& !(obj instanceof OEntityMinecart)
+    				&& !(obj instanceof OEntityBoat)
+    				&& !(obj instanceof OEntityEnderEye)
+    				&& !(obj instanceof OEntityFishHook)
+    				&& (!(obj instanceof OEntityWolf) || ((OEntityWolf)obj).z().isEmpty() )
+    				)
+    			{
+    				entities.add(new BaseEntity((OEntity)obj));
+    			}
+    		}
+			
+			return entities;
+		}
     }
 }

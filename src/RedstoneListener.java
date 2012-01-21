@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -193,6 +194,7 @@ public class RedstoneListener extends CraftBookDelegateListener
             internalRegisterIC("MCZ120", new MCX120(), ICType.ZISO);
             internalRegisterIC("MCZ121", new MCX121(), ICType.ZISO);
             internalRegisterIC("MCZ130", new MCX130(), ICType.ZISO);
+            internalRegisterIC("MCZ133", new MCX133(), ICType.ZISO);
             internalRegisterIC("MCZ203", new MCX203(), ICType.ZISO);
             internalRegisterIC("MCZ205", new MCX205(), ICType.ZISO);
             internalRegisterIC("MCZ230", new MCX230(), ICType.ZISO);
@@ -271,6 +273,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX130", new MCX130(), ICType.SISO);
         internalRegisterIC("MCX131", new MCX131(), ICType.SISO);
         internalRegisterIC("MCX132", new MCX132(), ICType.SISO);
+        internalRegisterIC("MCX133", new MCX133(), ICType.SISO);
         internalRegisterIC("MCX200", new MCX200(), ICType.SISO);
         internalRegisterIC("MCX201", new MCX201(), ICType.SISO);
         internalRegisterIC("MCX202", new MCX202(), ICType.SISO);
@@ -307,6 +310,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCU131", new MCU131(), ICType.UISO);
         internalRegisterIC("MCU132", new MCU132(), ICType.UISO);
         internalRegisterIC("MCU200", new MCX200(), ICType.UISO);
+        internalRegisterIC("MCU220", new MCX220(), ICType.UISO);
         internalRegisterIC("MCU300", new MCX300(), ICType.UISO);
         internalRegisterIC("MCU301", new MCX301(), ICType.UISO);
         internalRegisterIC("MCU302", new MCX302(), ICType.UISO);
@@ -588,6 +592,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                     			|| id.equals("MCU211") || id.equals("MCU212") || id.equals("MCU213") || id.equals("MCU214")
                     			|| id.equals("MCU217")
                     			|| id.equals("MCU200")
+                    			|| id.equals("MCU220")
                     			|| id.equals("MCU300") || id.equals("MCU301") || id.equals("MCU302") || id.equals("MCU303") )
                     		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, thisListener);
                         else
@@ -710,52 +715,92 @@ public class RedstoneListener extends CraftBookDelegateListener
     
     public boolean onBlockBreak(Player player, Block block)
     {
-    	if(player == null || block == null || block.getType() != Block.Type.WallSign.getType())
+    	if(player == null || block == null)
     		return false;
     	
-    	World world = player.getWorld();
+    	if(MCX220.icAreas != null && MCX220.icAreas.size() > 0)
+    	{
+    		Iterator<Map.Entry<WorldBlockVector, BlockArea>> it = MCX220.icAreas.entrySet().iterator();
+			while (it.hasNext())
+			{
+				Map.Entry<WorldBlockVector, BlockArea> item = (Map.Entry<WorldBlockVector, BlockArea>) it.next();
+				BlockArea area = item.getValue();
+				if(area.containsPoint(block.getWorld().getType().getId(), block.getX(), block.getY(), block.getZ()))
+				{
+					SignText text = CraftBook.getSignText(block.getWorld(), item.getKey());
+					if(text == null)
+					{
+						it.remove();
+						continue;
+					}
+					String line2 = text.getLine2();
+			    	if(!line2.startsWith("[MC") || line2.length() < 8)
+			    	{
+						it.remove();
+						continue;
+					}
+			    	
+			    	String id = line2.substring(1, 7).toUpperCase();
+					if(id.equals("MCU220"))
+					{
+						boolean stopBreak = MCX220.blockBroke(item.getKey(), text);
+						return stopBreak;
+					}
+					else
+					{
+						it.remove();
+						continue;
+					}
+				}
+			}
+    	}
     	
-    	Sign sign = (Sign)world.getComplexBlock(block);
-    	
-    	String line2 = sign.getText(1);
-    	if(!line2.startsWith("[MC") || line2.length() < 8)
-        	return false;
-    	
-    	String id = line2.substring(1, 7).toUpperCase();
-        RegisteredIC ic = icList.get(id);
-        if (ic == null)
-        	return false;
-        
-        if(id.equals("MCZ236"))
-        {
-        	if(MCX236.isSameCoord(MCX236.players.get(player),
-        			world.getType().getId(),
-        			new Vector(block.getX(), block.getY(), block.getZ())))
-        	{
-	        	MCX236.players.remove(player);
-        	}
-        }
-        else if(id.equals("MCZ238"))
-        {
-        	if(MCX236.isSameCoord(MCX238.players.get(player),
-        			world.getType().getId(),
-        			new Vector(block.getX(), block.getY(), block.getZ())))
-        	{
-        		MCX238.players.remove(player);
-        	}
-        }
-        
-        if(!ic.type.updateOnce)
-        	return false;
-        
-        SignText signText = new SignText(sign.getText(0), line2, sign.getText(2), sign.getText(3));
-        Vector pos = new Vector(block.getX(), block.getY(), block.getZ());
-        
-        String message = ic.ic.clear(world.getType().getId(), pos, signText);
-        if(message != null)
-        {
-        	//player.sendMessage(Colors.Rose + message);
-        }
+    	if(block.getType() == Block.Type.WallSign.getType())
+    	{
+	    	World world = player.getWorld();
+	    	
+	    	Sign sign = (Sign)world.getComplexBlock(block);
+	    	
+	    	String line2 = sign.getText(1);
+	    	if(!line2.startsWith("[MC") || line2.length() < 8)
+	        	return false;
+	    	
+	    	String id = line2.substring(1, 7).toUpperCase();
+	        RegisteredIC ic = icList.get(id);
+	        if (ic == null)
+	        	return false;
+	        
+	        if(id.equals("MCZ236"))
+	        {
+	        	if(MCX236.isSameCoord(MCX236.players.get(player),
+	        			world.getType().getId(),
+	        			new Vector(block.getX(), block.getY(), block.getZ())))
+	        	{
+		        	MCX236.players.remove(player);
+	        	}
+	        }
+	        else if(id.equals("MCZ238"))
+	        {
+	        	if(MCX236.isSameCoord(MCX238.players.get(player),
+	        			world.getType().getId(),
+	        			new Vector(block.getX(), block.getY(), block.getZ())))
+	        	{
+	        		MCX238.players.remove(player);
+	        	}
+	        }
+	        
+	        if(!ic.type.updateOnce)
+	        	return false;
+	        
+	        SignText signText = new SignText(sign.getText(0), line2, sign.getText(2), sign.getText(3));
+	        Vector pos = new Vector(block.getX(), block.getY(), block.getZ());
+	        
+	        String message = ic.ic.clear(world.getType().getId(), pos, signText);
+	        if(message != null)
+	        {
+	        	//player.sendMessage(Colors.Rose + message);
+	        }
+    	}
     	
     	return false;
     }

@@ -791,27 +791,26 @@ public class MechanismListener extends CraftBookDelegateListener {
 				signs = new Sign[0];
     		}
     		
-    		OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
     		World world = player.getWorld();
     		int data = world.getBlockData(blockClicked.getX(), blockClicked.getY(), blockClicked.getZ());
-    		if(eplayer.be != null)
+    		if(UtilEntity.ridingEntity(player.getEntity()) != null)
     		{
     			switch(data)
         		{
     	    		case 0x0: //south
-    	    			Sitting.stand(eplayer, -0.8D, 0, 0);
+    	    			Sitting.stand(player, -0.8D, 0, 0);
     	    			break;
     	    		case 0x1: //north
-    	    			Sitting.stand(eplayer, 0.8D, 0, 0);
+    	    			Sitting.stand(player, 0.8D, 0, 0);
     	    			break;
     	    		case 0x2: //west
-    	    			Sitting.stand(eplayer, 0, 0, -0.8D);
+    	    			Sitting.stand(player, 0, 0, -0.8D);
     	    			break;
     	    		case 0x3: //east
-    	    			Sitting.stand(eplayer, 0, 0, 0.8D);
+    	    			Sitting.stand(player, 0, 0, 0.8D);
     	    			break;
     	    		default:
-    	    			Sitting.stand(eplayer, 0, 0, 0);
+    	    			Sitting.stand(player, 0, 0, 0);
         		}
     		}
     		else
@@ -869,7 +868,7 @@ public class MechanismListener extends CraftBookDelegateListener {
 							types[types.length-1] = null;
 					}
         		}
-        		Sitting.sit(eplayer, types, player.getWorld(), x, y, z, rotation, 0.5D);
+        		Sitting.sit(player, types, player.getWorld(), x, y, z, rotation, 0.5D);
     		}
     	}
     	
@@ -1410,10 +1409,10 @@ public class MechanismListener extends CraftBookDelegateListener {
         }
         else if(Sitting.enabled && split[0].equalsIgnoreCase("/sit") && player.canUseCommand("/sit"))
         {
-        	OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
-			if(eplayer.be != null)
+        	OEntity ridingEntity = UtilEntity.ridingEntity(player.getEntity());
+			if(ridingEntity != null)
 			{
-				Sitting.stand(eplayer, 0, eplayer.be.q(), 0);
+				Sitting.stand(player, 0, UtilEntity.getMountedYOffset(ridingEntity), 0);
 			}
 			else
 			{
@@ -1427,17 +1426,17 @@ public class MechanismListener extends CraftBookDelegateListener {
 					default:
 						types[0] = null;
 				}
-				Sitting.sit(eplayer, types, player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getRotation(), -0.05D);
+				Sitting.sit(player, types, player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getRotation(), -0.05D);
 			}
 			
         	return true;
         }
         else if(Sitting.enabled && split[0].equalsIgnoreCase("/stand") && player.canUseCommand("/stand"))
         {
-        	OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
-        	if(eplayer.be == null)
+        	OEntity ridingEntity = UtilEntity.ridingEntity(player.getEntity());
+        	if(ridingEntity == null)
         		return true;
-        	Sitting.stand(eplayer, 0, eplayer.be.q(), 0);
+        	Sitting.stand(player, 0, UtilEntity.getMountedYOffset(ridingEntity), 0);
 			
         	return true;
         }

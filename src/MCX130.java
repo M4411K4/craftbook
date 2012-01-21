@@ -19,6 +19,7 @@
 
 
 
+import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.ChipState;
 
 /**
@@ -42,27 +43,36 @@ public class MCX130 extends MCX119 {
         return true;
     }
     
-    
-    @Override
-    protected Boolean entityInRange(ChipState chip, BaseEntity entity, byte type)
-    {
-    	if(type == 0)
-    	{
-    		//entity.destroy();
-    		entity.getEntity().S();
-    		return null;
-    	}
-    	else if(type == 1 && (entity.isMob() || entity.isAnimal()) && entity instanceof Mob)
-    	{
-			Mob mob = (Mob) entity;
-			if(chip.getText().getLine3().isEmpty() || mob.getName().equalsIgnoreCase(chip.getText().getLine3()))
-			{
-				//entity.destroy();
-				entity.getEntity().S();
-				return null;
-			}
-    	}
+    /**
+     * Think.
+     *
+     * @param chip
+     */
+    public void think(ChipState chip) {
     	
-    	return false;
+    	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
+    	{
+    		double dist = 5;
+    		if(!chip.getText().getLine4().isEmpty())
+    			dist = Double.parseDouble(chip.getText().getLine4());
+    		dist *= dist;
+    		Vector lever = Util.getWallSignBack(chip.getWorldType(), chip.getPosition(), 2);
+    		World world = CraftBook.getWorld(chip.getWorldType());
+    		
+    		String id = chip.getText().getLine3();
+    		int type;
+    		if(id.equalsIgnoreCase("mob") || id.equalsIgnoreCase("mobs"))
+    			type = 1;
+    		else if(id.equalsIgnoreCase("animal") || id.equalsIgnoreCase("animals"))
+    			type = 2;
+    		else
+    			type = 3;
+    		
+            synchronized(world.getWorld().g)
+            {
+            	NearbyEntityFinder nearbyFinder = new NearbyEntityFinder(world, chip.getBlockPosition(), lever, dist, id, type, true);
+            	(new Thread(nearbyFinder)).start();
+            }
+    	}
     }
 }

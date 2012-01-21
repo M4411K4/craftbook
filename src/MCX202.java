@@ -96,7 +96,7 @@ public class MCX202 extends MCX201 {
                     if(n!=0)
                     {
                     	if(color >= 0)
-                    		dropColorItem(CraftBook.getOWorld(chip.getWorldType()), x, y, z, item, n, color);
+                    		world.dropItem(x, y, z, item, n, color);
                     	else
                     		world.dropItem(x, y, z, item, n);
                     }

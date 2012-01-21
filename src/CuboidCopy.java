@@ -220,10 +220,7 @@ public class CuboidCopy {
         for (Map.Entry<Vector,byte[]> entry : queueAfter) {
             byte[] v = entry.getValue();
             try {
-                bag.setBlockID(worldType, entry.getKey(), v[0]);
-                if (BlockType.usesData(v[0])) {
-                    CraftBook.setBlockData(world, entry.getKey(), v[1]);
-                }
+                bag.setBlockID(worldType, entry.getKey(), v[0], v[1]);
             } catch (OutOfBlocksException e) {
                 // Eat error
             }
@@ -232,10 +229,7 @@ public class CuboidCopy {
         for (Map.Entry<Vector,byte[]> entry : queueLast) {
             byte[] v = entry.getValue();
             try {
-                bag.setBlockID(worldType, entry.getKey(), v[0]);
-                if (BlockType.usesData(v[0])) {
-                    CraftBook.setBlockData(world, entry.getKey(), v[1]);
-                }
+                bag.setBlockID(worldType, entry.getKey(), v[0], v[1]);
             } catch (OutOfBlocksException e) {
                 // Eat error
             }

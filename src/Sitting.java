@@ -17,27 +17,30 @@ public class Sitting
 		ALL
 	};
 	
-	protected static void sit(OEntityPlayerMP eplayer, SitType[] types, World world, double x, double y, double z, float rotation, double offsety)
+	protected static void sit(Player player, SitType[] types, World world, double x, double y, double z, float rotation, double offsety)
 	{
-		eplayer.bj = x;
-		eplayer.bk = y;
-		eplayer.bl = z;
-		eplayer.bp = rotation;
+		player.setX(x);
+		player.setY(y);
+		player.setZ(z);
+		
+		OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
+		eplayer.bs = rotation;
 		
 		OWorldServer oworld = world.getWorld();
-		EntitySitting esitting = new EntitySitting(types, oworld, eplayer.bj, eplayer.bk, eplayer.bl, offsety);
-		oworld.b(esitting);
-		eplayer.b(esitting);
+		EntitySitting esitting = new EntitySitting(types, oworld, player.getX(), player.getY(), player.getZ(), offsety);
+		
+		UtilEntity.spawnEntityInWorld(oworld, esitting);
+		UtilEntity.mountEntity(eplayer, esitting);
 	}
 	
-	protected static void stand(OEntityPlayerMP eplayer, double offsetx, double offsety, double offsetz)
+	protected static void stand(Player player, double offsetx, double offsety, double offsetz)
 	{
-		if(!(eplayer.be instanceof EntitySitting))
+		OEntityPlayerMP eplayer = (OEntityPlayerMP) player.getEntity();
+		if(!(UtilEntity.ridingEntity(eplayer) instanceof EntitySitting))
 			return;
 		
-		OEntity nullEnt = null;
-		eplayer.b(nullEnt);
-		eplayer.a.a(eplayer.bj+offsetx, eplayer.bk+offsety, eplayer.bl+offsetz, eplayer.bp, eplayer.bq);
+		UtilEntity.mountEntity(eplayer, (OEntity)null);
+		eplayer.a.a(player.getX()+offsetx, player.getY()+offsety, player.getZ()+offsetz, player.getRotation(), player.getPitch());
 	}
 	
 	/*

@@ -1,0 +1,40 @@
+When using the OWorld.class file,
+MAKE SURE THE CROW/CANARY VERSION IS THE SAME!
+
+Using OWorld.class on an incorrect crow/canary version may cause
+server bugs, errors, crashes.
+
+
+ABOUT
+==========
+The custom OWorld.class file adds an extra plugin hook that
+allows more control over minecart collisions.
+
+This is only needed if you wish to use some of the special
+minecart collision modes CraftBook extra has. Such as the 
+ability to harm animals that get in the way of a moving 
+minecart.
+
+
+
+INSTALL
+==========
+It is recommended to create a copy of the CanaryMod.jar
+server file before continuing. This will allow you to 
+easily go back to the original version.
+
+1) Stop the crow/canary server properly, if running.
+2) Open CanaryMod.jar with WinRAR or similar program.
+3) Drag the OWorld.class file into the WinRAR window,
+    which should add the modified OWorld.class file to
+    CanaryMod.jar
+4) In the craftbook.properties server file, set:
+    minecart-using-oworld-server-file=false
+     to
+    minecart-using-oworld-server-file=true
+4a) You can also change the "minecart-collision-type="
+    value to the collision mode you would like to have.
+5) Save the craftbook.properties changes
+6) Done.
+    Start up the crow/canary server and your collision
+    mode should start working properly.

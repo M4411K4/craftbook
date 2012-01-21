@@ -1,3 +1,50 @@
+2.0extra14.0:
+- updated to minecraft 1.1
+- added [MCU220] Detect Break IC
+    - quickly triggers the output if a block within the set area was
+        broken.
+    - to prevent the block from breaking add + to the end of [MCU220]
+        line1:
+        line2:  [MCU220]+
+        line3:
+        line4:
+    - Set the width, height, and length on the 3rd line
+        ex:  3:6:5
+        will set the width 3, height 6, and length 5
+    - thanks lacrosse1991 for the suggestion!
+- added [MCX133] [MCZ133] Humans Only IC
+    - removes all entities in range that are not human/player
+        - includes dropped items, minecarts, boats, animals, mobs,
+            arrows, fireballs, etc
+    - to remove everything except human/players, dropped items,
+        minecarts, boats, eyes of ender, fishing hooks, and tamed
+        wolves, place a - after [MCX133] [MCZ133]
+        line1:
+        line2: [MCX133]-
+        line3:
+        line4:
+    - thanks Riot for the suggestion!
+- added new OWorld.class file
+    - a special *optional* file to replace CanaryMod.jar's version
+    - only used for craftbook extra's minecart collision feature
+    - if using OWorld.class file, the version MUST match to the correct
+        CanaryMod.jar
+    - more details found in the "OWorld for crow 4.4.10.txt" file
+- added new minecart collision modes (requires OWorld.class to use)
+    - none, phase, phase_plow, smash, smash_scaled, ram, ram_scaled,
+        no_mercy, no_mercy_scaled
+    - more details in the craftbook.properties
+- fixed issue with [Area] not placing some blocks
+    - thanks Hummtaro for the bug report!
+- fixed (hopefully) sync issue with [MCX118] [MCZ118] [MCX119] [MCZ119]
+    [MCX130] [MCZ130]
+    - thanks Riot for the bug report!
+- fixed issue with ghost and plow collision modes
+    - thanks Riot for the bug report!
+- fixed [MCX027] [MCZ027] to use correct time method from Canary
+    - thanks 14mRh4X0r for the suggestion!
+- removed minecart-enable-collision-type-helper property
+
 2.0extra13.3:
 - added ability for Cauldron and Minecart Craft to recognize colors
     ...or possibly broke both
