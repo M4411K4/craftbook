@@ -1,3 +1,23 @@
+2.0extra14.1:
+- added [MCU221] Detect PLACE IC
+    - works just like [MCU220] (including the + protection) except
+        it detects if a block has been placed in the area instead of
+        broken.
+- added [MCU222] Detect Edit IC
+    - a combination of [MCU220] and [MCU221] where it will trigger if
+        a block was broken and/or placed.
+- fixed player crash when player is killed by a weapon while sitting
+    - thanks Riot for the bug report!
+- fixed issue with minecart collisions causing animal and mob riders
+    to die from the minecart.
+    - thanks healthyuncle for the bug report!
+- fixed (hopefully) issue with IC output causing a
+    ConcurrentModificationException. The fix will at least prevent
+    server crashes from this issue.
+    - thanks healthyuncle for the bug report!
+- fixed issue with [MCX203] & [MCZ203] creating duplicate items
+    - thanks lacrosse1991 for the bug report!
+
 2.0extra14.0:
 - updated to minecraft 1.1
 - added [MCU220] Detect Break IC

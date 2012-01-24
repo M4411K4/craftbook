@@ -216,7 +216,7 @@ public class MCX203 extends BaseIC {
 		        {
 		        	OEntityItem eitem = itemEnt.getEntity();
 		        	
-		        	if(!eitem.bB && eitem.a.a > 0 && (item == -1 || (eitem.a.c == item && (color < 0 || eitem.a.h() == color) )))
+		        	if(!UtilEntity.isDead(eitem) && eitem.a.a > 0 && (item == -1 || (eitem.a.c == item && (color < 0 || eitem.a.h() == color) )))
 					{
 						double diffX = x - itemEnt.getX();
 						double diffY = y - itemEnt.getY();

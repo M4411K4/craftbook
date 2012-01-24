@@ -129,6 +129,7 @@ public class CraftBook extends Plugin {
         registerHook(redstone, "SIGN_CHANGE", PluginListener.Priority.MEDIUM);
         registerHook(redstone, "SIGN_SHOW", PluginListener.Priority.MEDIUM);
         registerHook(redstone, "BLOCK_BROKEN", PluginListener.Priority.MEDIUM);
+        registerHook(redstone, "BLOCK_PLACE", PluginListener.Priority.MEDIUM);
         listener.registerDelegate(redstone);
 
         registerHook(vehicle, "DISCONNECT", PluginListener.Priority.MEDIUM);

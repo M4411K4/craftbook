@@ -2218,7 +2218,7 @@ public class VehicleListener extends CraftBookDelegateListener {
     				Minecart minecart2 = new Minecart((OEntityMinecart)collisioner.getEntity());
     				plowMinecart(minecart1, minecart2);
     			}
-    			else if(collisioner.isLiving())
+    			else if(collisioner.isLiving() && !(UtilEntity.ridingEntity(collisioner.getEntity()) instanceof OEntityMinecart))
     			{
     				double s = minecart1.getMotionX() * minecart1.getMotionX()
 							+ minecart1.getMotionZ() * minecart1.getMotionZ();

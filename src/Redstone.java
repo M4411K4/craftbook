@@ -17,6 +17,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import java.lang.reflect.Field;
+import java.util.Set;
+
 import com.sk89q.craftbook.BlockType;
 import com.sk89q.craftbook.Vector;
 
@@ -26,6 +29,37 @@ import com.sk89q.craftbook.Vector;
  * @author sk89q
  */
 public class Redstone {
+	
+	@SuppressWarnings("rawtypes")
+	protected static Set blocksNeedingUpdate = null;
+	
+	@SuppressWarnings("rawtypes")
+	protected static void updateMCBlocksNeedingUpdateSet()
+    {
+    	try
+    	{
+			Field field = OBlockRedstoneWire.class.getDeclaredField("b");
+			field.setAccessible(true);
+			blocksNeedingUpdate = (Set)field.get(OBlock.ax);
+		}
+    	catch (NoSuchFieldException e)
+    	{
+			e.printStackTrace();
+		}
+    	catch (SecurityException e)
+    	{
+			e.printStackTrace();
+		}
+    	catch (IllegalArgumentException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+	
     /**
      * Tests to see if a block is high, possibly including redstone wires. If
      * there was no redstone at that location, null will be returned.
@@ -343,7 +377,18 @@ public class Redstone {
 
             if (newData != data) {
             	
-            	OBlock.aL.a(world.getWorld(), pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), (OEntityPlayer)null);
+            	if(blocksNeedingUpdate == null)
+            	{
+            		ToggleLever.toggle(world.getWorld(), pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+            	}
+            	else
+            	{
+            		synchronized(blocksNeedingUpdate)
+            		{
+            			ToggleLever setOutput = new ToggleLever(world.getWorld(), pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+            			(new Thread(setOutput)).start();
+            		}
+            	}
             }
         }
     }
@@ -408,4 +453,30 @@ public class Redstone {
         }
     }
 
+    static class ToggleLever implements Runnable
+    {
+    	private final OWorldServer OWORLD;
+    	private final int X;
+    	private final int Y;
+    	private final int Z;
+    	
+    	public ToggleLever(OWorldServer oworld, int x, int y, int z)
+    	{
+    		OWORLD = oworld;
+    		X = x;
+    		Y = y;
+    		Z = z;
+    	}
+    	
+		@Override
+		public void run()
+		{
+			toggle(OWORLD, X, Y, Z);
+		}
+		
+		protected static void toggle(OWorldServer oworld, int x, int y, int z)
+		{
+			OBlock.aL.a(oworld, x, y, z, (OEntityPlayer)null);
+		}
+    }
 }

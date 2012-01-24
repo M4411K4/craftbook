@@ -170,6 +170,8 @@ public class RedstoneListener extends CraftBookDelegateListener
             System.err.println("Chunk finder failed: "+t.getClass());
             t.printStackTrace();
         }
+        
+        Redstone.updateMCBlocksNeedingUpdateSet();
     }
     
     /**
@@ -311,6 +313,8 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCU132", new MCU132(), ICType.UISO);
         internalRegisterIC("MCU200", new MCX200(), ICType.UISO);
         internalRegisterIC("MCU220", new MCX220(), ICType.UISO);
+        internalRegisterIC("MCU221", new MCX221(), ICType.UISO);
+        internalRegisterIC("MCU222", new MCX222(), ICType.UISO);
         internalRegisterIC("MCU300", new MCX300(), ICType.UISO);
         internalRegisterIC("MCU301", new MCX301(), ICType.UISO);
         internalRegisterIC("MCU302", new MCX302(), ICType.UISO);
@@ -592,7 +596,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                     			|| id.equals("MCU211") || id.equals("MCU212") || id.equals("MCU213") || id.equals("MCU214")
                     			|| id.equals("MCU217")
                     			|| id.equals("MCU200")
-                    			|| id.equals("MCU220")
+                    			|| id.equals("MCU220") || id.equals("MCU221") || id.equals("MCU222")
                     			|| id.equals("MCU300") || id.equals("MCU301") || id.equals("MCU302") || id.equals("MCU303") )
                     		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, thisListener);
                         else
@@ -713,6 +717,48 @@ public class RedstoneListener extends CraftBookDelegateListener
         instantICs.add(new WorldBlockVector(worldType, sign.getX(),sign.getY(),sign.getZ()));
     }
     
+    public boolean onBlockPlace(Player player, Block blockPlaced, Block blockClicked, Item itemInHand)
+    {
+    	if(blockPlaced != null && MCX221.icAreas != null && MCX221.icAreas.size() > 0)
+    	{
+    		Iterator<Map.Entry<WorldBlockVector, BlockArea>> it = MCX221.icAreas.entrySet().iterator();
+    		while (it.hasNext())
+			{
+				Map.Entry<WorldBlockVector, BlockArea> item = (Map.Entry<WorldBlockVector, BlockArea>) it.next();
+				BlockArea area = item.getValue();
+				if(area.containsPoint(blockPlaced.getWorld().getType().getId(), blockPlaced.getX(), blockPlaced.getY(), blockPlaced.getZ()))
+				{
+					SignText text = CraftBook.getSignText(blockPlaced.getWorld(), item.getKey());
+					if(text == null)
+					{
+						it.remove();
+						continue;
+					}
+					String line2 = text.getLine2();
+			    	if(!line2.startsWith("[MC") || line2.length() < 8)
+			    	{
+						it.remove();
+						continue;
+					}
+			    	
+			    	String id = line2.substring(1, 7).toUpperCase();
+					if(id.equals("MCU221") || id.equals("MCU222"))
+					{
+						boolean stopBreak = MCX221.blockPlaced(item.getKey(), text);
+						return stopBreak;
+					}
+					else
+					{
+						it.remove();
+						continue;
+					}
+				}
+			}
+    	}
+    	
+    	return false;
+    }
+    
     public boolean onBlockBreak(Player player, Block block)
     {
     	if(player == null || block == null)
@@ -741,7 +787,7 @@ public class RedstoneListener extends CraftBookDelegateListener
 					}
 			    	
 			    	String id = line2.substring(1, 7).toUpperCase();
-					if(id.equals("MCU220"))
+					if(id.equals("MCU220") || id.equals("MCU222"))
 					{
 						boolean stopBreak = MCX220.blockBroke(item.getKey(), text);
 						return stopBreak;

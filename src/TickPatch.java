@@ -11,7 +11,9 @@ http://sam.zoy.org/wtfpl/COPYING for more details.
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ConcurrentModificationException;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 
 import net.minecraft.server.MinecraftServer;
 
@@ -67,7 +69,17 @@ public class TickPatch extends OEntityTracker {
         if(WORLD_INDEX == 0)
         {
 	        Runnable[] tasks = TASK_LIST.toArray(new Runnable[0]);
-	        for(int i=0;i<tasks.length;i++) tasks[i].run();
+	        for(int i=0;i<tasks.length;i++)
+        	{
+	        	try
+	        	{
+	        		tasks[i].run();
+	        	}
+	        	catch(ConcurrentModificationException e)
+	        	{
+	        		CraftBookDelegateListener.logger.log(Level.WARNING, "CraftBook TickPatch ConcurrentModificationException Error: ", e);
+	        	}
+        	}
         }
     }
     
