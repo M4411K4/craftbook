@@ -190,7 +190,7 @@ public class MC1250 extends BaseIC {
      * @param y
      * @param z
      */
-    protected void explodeTNT(OWorld oworld, double x, double y, double z) {
+    protected static void explodeTNT(OWorld oworld, double x, double y, double z) {
         // Make TNT explode
     	OEntityTNTPrimed tnt = new OEntityTNTPrimed(oworld);
         tnt.c(x, y, z);

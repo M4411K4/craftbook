@@ -170,8 +170,6 @@ public class RedstoneListener extends CraftBookDelegateListener
             System.err.println("Chunk finder failed: "+t.getClass());
             t.printStackTrace();
         }
-        
-        Redstone.updateMCBlocksNeedingUpdateSet();
     }
     
     /**

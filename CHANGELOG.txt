@@ -1,3 +1,11 @@
+2.0extra14.2:
+- fixed several concurrent errors from IC outputs and entity
+    searching ICs.
+    - this fix reduces the speed of IC output levers to Minecraft's
+        speed.
+    - special thanks to Riot and lacrosse1991 from
+        minecraftonline.com for helping me test this issue!
+
 2.0extra14.1:
 - added [MCU221] Detect PLACE IC
     - works just like [MCU220] (including the + protection) except

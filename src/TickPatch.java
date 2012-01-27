@@ -81,6 +81,8 @@ public class TickPatch extends OEntityTracker {
 	        	}
         	}
         }
+        
+        Redstone.processOutputQueue();
     }
     
     /**

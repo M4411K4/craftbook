@@ -19,6 +19,8 @@
 
 
 
+import java.util.List;
+
 import com.sk89q.craftbook.*;
 import com.sk89q.craftbook.ic.BaseIC;
 import com.sk89q.craftbook.ic.ChipState;
@@ -79,52 +81,23 @@ public class MCX116 extends BaseIC {
     	
     	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
     	{
-    		World world = CraftBook.getWorld(chip.getWorldType());
-    		chip.getOut(1).set(playerAbove(world, chip.getBlockPosition(), chip.getText().getLine3()) != null);
+    		findPlayerAbove(chip, false);
     	}
     }
     
-    protected Player playerAbove(World world, Vector pos, String id)
+    protected void findPlayerAbove(ChipState chip, boolean tnt)
     {
-    	id = id.toLowerCase();
+    	World world = CraftBook.getWorld(chip.getWorldType());
+		String id = chip.getText().getLine3().toLowerCase();
     	
-    	int x = pos.getBlockX();
-        int z = pos.getBlockZ();
+    	int x = chip.getBlockPosition().getBlockX();
+        int z = chip.getBlockPosition().getBlockZ();
         
-        int y = getSafeY(world, pos);
+        int y = getSafeY(world, chip.getBlockPosition());
     	
-    	for(Player player: etc.getServer().getPlayerList())
-        {
-        	Location pLoc = player.getLocation();
-        	Vector pVec = new Vector(pLoc.x, pLoc.y, pLoc.z);
-        	
-        	if(player.getWorld() == world
-        	   && (pVec.getBlockX() == x || pVec.getBlockX() == x + 1 || pVec.getBlockX() == x - 1)
-        	   &&  pVec.getBlockY() == y
-        	   && (pVec.getBlockZ() == z || pVec.getBlockZ() == z + 1 || pVec.getBlockZ() == z - 1)
-        		)
-        	{
-        		if(!id.isEmpty())
-        		{
-        			if( (id.charAt(0) == 'g' && player.isInGroup(id.substring(2))) ||
-        					(id.charAt(0) == 'p' && player.getName().equalsIgnoreCase(id.substring(2))) )
-        			{
-        				return player;
-        			}
-        			else
-        			{
-        				//continue to check if another player happens to be in the same area instead of stopping
-        				continue;
-        			}
-        		}
-        		else
-        		{
-        			return player;
-        		}
-        	}
-        }
-    	
-    	return null;
+        Vector lever = Util.getWallSignBack(world, chip.getPosition(), 2);
+        FindPlayerAbove findAbove = new FindPlayerAbove(world, x, y, z, lever, id, tnt);
+        etc.getServer().addToServerQueue(findAbove);
     }
     
     private int getSafeY(World world, Vector pos)
@@ -144,5 +117,74 @@ public class MCX116 extends BaseIC {
 		}
     	
     	return maxY;
+    }
+    
+    public class FindPlayerAbove implements Runnable
+    {
+    	private final World WORLD;
+    	private final int X;
+    	private final int Y;
+    	private final int Z;
+    	private final Vector LEVER;
+    	private final String ID;
+    	private final boolean TNT;
+    	
+    	public FindPlayerAbove(World world, int x, int y, int z, Vector lever, String id, boolean tnt)
+    	{
+    		WORLD = world;
+    		X = x;
+    		Y = y;
+    		Z = z;
+    		LEVER = lever;
+    		ID = id;
+    		TNT = tnt;
+    	}
+    	
+		@Override
+		public void run()
+		{
+			List<Player> entities = etc.getServer().getPlayerList();
+			Player abovePlayer = null;
+			for(Player player : entities)
+			{
+				Location pLoc = player.getLocation();
+	        	Vector pVec = new Vector(pLoc.x, pLoc.y, pLoc.z);
+	        	
+	        	if(player.getWorld() == WORLD
+	        	   && (pVec.getBlockX() == X || pVec.getBlockX() == X + 1 || pVec.getBlockX() == X - 1)
+	        	   &&  pVec.getBlockY() == Y
+	        	   && (pVec.getBlockZ() == Z || pVec.getBlockZ() == Z + 1 || pVec.getBlockZ() == Z - 1)
+	        		)
+	        	{
+	        		if(!ID.isEmpty())
+	        		{
+	        			if( (ID.charAt(0) == 'g' && player.isInGroup(ID.substring(2))) ||
+	        					(ID.charAt(0) == 'p' && player.getName().equalsIgnoreCase(ID.substring(2))) )
+	        			{
+	        				abovePlayer = player;
+	        				break;
+	        			}
+	        			else
+	        			{
+	        				//continue to check if another player happens to be in the same area instead of stopping
+	        				continue;
+	        			}
+	        		}
+	        		else
+	        		{
+	        			abovePlayer = player;
+	        			break;
+	        		}
+	        	}
+			}
+			
+			boolean output = abovePlayer != null && !UtilEntity.isDead(abovePlayer.getEntity());
+			if(TNT && output)
+			{
+				MC1250.explodeTNT(WORLD.getWorld(), abovePlayer.getX(), abovePlayer.getY(), abovePlayer.getZ());
+			}
+			
+			Redstone.setOutput(WORLD, LEVER, output);
+		}
     }
 }

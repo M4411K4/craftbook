@@ -17,11 +17,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.lang.reflect.Field;
-import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import com.sk89q.craftbook.BlockType;
 import com.sk89q.craftbook.Vector;
+import com.sk89q.craftbook.WorldBlockVector;
 
 /**
  * Library for Redstone-related logic.
@@ -30,35 +30,19 @@ import com.sk89q.craftbook.Vector;
  */
 public class Redstone {
 	
-	@SuppressWarnings("rawtypes")
-	protected static Set blocksNeedingUpdate = null;
+	private static final LinkedBlockingQueue<WorldBlockVector> outputQueue = new LinkedBlockingQueue<WorldBlockVector>();
 	
-	@SuppressWarnings("rawtypes")
-	protected static void updateMCBlocksNeedingUpdateSet()
-    {
-    	try
-    	{
-			Field field = OBlockRedstoneWire.class.getDeclaredField("b");
-			field.setAccessible(true);
-			blocksNeedingUpdate = (Set)field.get(OBlock.ax);
+	protected static void addToOutputQueue(WorldBlockVector outputBlock)
+	{
+		try
+		{
+			outputQueue.put(outputBlock);
 		}
-    	catch (NoSuchFieldException e)
-    	{
+		catch (InterruptedException e)
+		{
 			e.printStackTrace();
 		}
-    	catch (SecurityException e)
-    	{
-			e.printStackTrace();
-		}
-    	catch (IllegalArgumentException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
+	}
 	
     /**
      * Tests to see if a block is high, possibly including redstone wires. If
@@ -376,19 +360,7 @@ public class Redstone {
             }
 
             if (newData != data) {
-            	
-            	if(blocksNeedingUpdate == null)
-            	{
-            		ToggleLever.toggle(world.getWorld(), pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
-            	}
-            	else
-            	{
-            		synchronized(blocksNeedingUpdate)
-            		{
-            			ToggleLever setOutput = new ToggleLever(world.getWorld(), pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
-            			(new Thread(setOutput)).start();
-            		}
-            	}
+            	addToOutputQueue(new WorldBlockVector(world.getType().getId(), pos.getBlockX(), pos.getBlockY(), pos.getBlockZ()));
             }
         }
     }
@@ -452,31 +424,12 @@ public class Redstone {
                     pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), newData);
         }
     }
-
-    static class ToggleLever implements Runnable
+    
+    protected static void processOutputQueue()
     {
-    	private final OWorldServer OWORLD;
-    	private final int X;
-    	private final int Y;
-    	private final int Z;
-    	
-    	public ToggleLever(OWorldServer oworld, int x, int y, int z)
+    	for(WorldBlockVector output = outputQueue.poll(); output != null; output = outputQueue.poll())
     	{
-    		OWORLD = oworld;
-    		X = x;
-    		Y = y;
-    		Z = z;
+    		OBlock.aL.a(CraftBook.getOWorldServer(output.getWorldType()), output.getBlockX(), output.getBlockY(), output.getBlockZ(), (OEntityPlayer)null);
     	}
-    	
-		@Override
-		public void run()
-		{
-			toggle(OWORLD, X, Y, Z);
-		}
-		
-		protected static void toggle(OWorldServer oworld, int x, int y, int z)
-		{
-			OBlock.aL.a(oworld, x, y, z, (OEntityPlayer)null);
-		}
     }
 }

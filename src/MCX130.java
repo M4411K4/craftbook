@@ -68,11 +68,8 @@ public class MCX130 extends MCX119 {
     		else
     			type = 3;
     		
-            synchronized(world.getWorld().g)
-            {
-            	NearbyEntityFinder nearbyFinder = new NearbyEntityFinder(world, chip.getBlockPosition(), lever, dist, id, type, true);
-            	(new Thread(nearbyFinder)).start();
-            }
+        	NearbyEntityFinder nearbyFinder = new NearbyEntityFinder(world, chip.getBlockPosition(), lever, dist, id, type, true);
+        	etc.getServer().addToServerQueue(nearbyFinder);
     	}
     }
 }

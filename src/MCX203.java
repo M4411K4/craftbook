@@ -171,11 +171,8 @@ public class MCX203 extends BaseIC {
         double z = chip.getPosition().getZ();
         
         World world = CraftBook.getWorld(chip.getWorldType());
-        synchronized(world.getWorld().g)
-        {
-        	ItemChestCollector chestCollector = new ItemChestCollector(world, source, dist, item, color, x, y, z);
-        	(new Thread(chestCollector)).start();
-        }
+    	ItemChestCollector chestCollector = new ItemChestCollector(world, source, dist, item, color, x, y, z);
+    	etc.getServer().addToServerQueue(chestCollector);
     }
     
     public class ItemChestCollector implements Runnable

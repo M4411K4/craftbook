@@ -100,11 +100,8 @@ public class MCX118 extends BaseIC {
     		Vector lever = Util.getWallSignBack(chip.getWorldType(), chip.getPosition(), 2);
     		World world = CraftBook.getWorld(chip.getWorldType());
     		
-            synchronized(world.getWorld().g)
-            {
-            	NearbyEntityFinder nearbyFinder = new NearbyEntityFinder(world, chip.getBlockPosition(), lever, dist, chip.getText().getLine3(), 0, false);
-            	(new Thread(nearbyFinder)).start();
-            }
+        	NearbyEntityFinder nearbyFinder = new NearbyEntityFinder(world, chip.getBlockPosition(), lever, dist, chip.getText().getLine3(), 0, false);
+        	etc.getServer().addToServerQueue(nearbyFinder);
     	}
     }
     
