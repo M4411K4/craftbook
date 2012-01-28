@@ -1,3 +1,18 @@
+2.0extra14.3:
+- added [MCX140] [MCU140] IN AREA IC
+    - detects if set entity type/name is within set area
+- added [MCX142] [MCU142] AREA PORT IC
+    - if set entity type/name is within the set area, then the
+        entity will be teleported to the specified destionation IC
+        [MCU113]
+    - thanks Krenath for the suggestion!
+- added [MCX144] [MCU144] AREA CBWARP IC
+    - works like [MCX142] [MCU142] except it teleports to a CBWarp
+        location.
+    - thanks Krenath for the suggestion!
+- fixed issue with reloading CraftBook causing the output queue
+    to reference the wrong variable resulting in a memory leak.
+
 2.0extra14.2:
 - fixed several concurrent errors from IC outputs and entity
     searching ICs.

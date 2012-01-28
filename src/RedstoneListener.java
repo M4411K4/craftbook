@@ -274,6 +274,9 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX131", new MCX131(), ICType.SISO);
         internalRegisterIC("MCX132", new MCX132(), ICType.SISO);
         internalRegisterIC("MCX133", new MCX133(), ICType.SISO);
+        internalRegisterIC("MCX140", new MCX140(), ICType.SISO);
+        internalRegisterIC("MCX142", new MCX142(), ICType.SISO);
+        internalRegisterIC("MCX144", new MCX144(), ICType.SISO);
         internalRegisterIC("MCX200", new MCX200(), ICType.SISO);
         internalRegisterIC("MCX201", new MCX201(), ICType.SISO);
         internalRegisterIC("MCX202", new MCX202(), ICType.SISO);
@@ -309,6 +312,9 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCU113", new MCX113(), ICType.UISO);
         internalRegisterIC("MCU131", new MCU131(), ICType.UISO);
         internalRegisterIC("MCU132", new MCU132(), ICType.UISO);
+        internalRegisterIC("MCU140", new MCX140(), ICType.UISO);
+        internalRegisterIC("MCU142", new MCX142(), ICType.UISO);
+        internalRegisterIC("MCU144", new MCX144(), ICType.UISO);
         internalRegisterIC("MCU200", new MCX200(), ICType.UISO);
         internalRegisterIC("MCU220", new MCX220(), ICType.UISO);
         internalRegisterIC("MCU221", new MCX221(), ICType.UISO);
@@ -590,6 +596,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                     		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, listener.getBlockBag(worldType, pt));
                     	else if(id.equals("MCU440")
                     			|| id.equals("MCU131") || id.equals("MCU132")
+                    			|| id.equals("MCU140") || id.equals("MCU142") || id.equals("MCU144")
                     			|| id.equals("MCU700") || id.equals("MCU701") || id.equals("MCU702") || id.equals("MCU705")
                     			|| id.equals("MCU211") || id.equals("MCU212") || id.equals("MCU213") || id.equals("MCU214")
                     			|| id.equals("MCU217")

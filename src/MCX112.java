@@ -173,7 +173,7 @@ public class MCX112 extends BaseIC {
         return false;
     }
     
-    private int getSafeY(World world, Vector pos)
+    protected static int getSafeY(World world, Vector pos)
     {
     	int maxY = Math.min(128, pos.getBlockY() + 10);
         int x = pos.getBlockX();

@@ -17,8 +17,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.util.concurrent.LinkedBlockingQueue;
-
 import com.sk89q.craftbook.BlockType;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.WorldBlockVector;
@@ -30,19 +28,7 @@ import com.sk89q.craftbook.WorldBlockVector;
  */
 public class Redstone {
 	
-	private static final LinkedBlockingQueue<WorldBlockVector> outputQueue = new LinkedBlockingQueue<WorldBlockVector>();
-	
-	protected static void addToOutputQueue(WorldBlockVector outputBlock)
-	{
-		try
-		{
-			outputQueue.put(outputBlock);
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
-	}
+	protected static OutputLever outputLever = null;
 	
     /**
      * Tests to see if a block is high, possibly including redstone wires. If
@@ -359,8 +345,8 @@ public class Redstone {
                 newData = data | 0x8;
             }
 
-            if (newData != data) {
-            	addToOutputQueue(new WorldBlockVector(world.getType().getId(), pos.getBlockX(), pos.getBlockY(), pos.getBlockZ()));
+            if (newData != data && outputLever != null) {
+            	outputLever.addToOutputQueue(new WorldBlockVector(world.getType().getId(), pos.getBlockX(), pos.getBlockY(), pos.getBlockZ()));
             }
         }
     }
@@ -423,13 +409,5 @@ public class Redstone {
             world.updateBlockPhysics(
                     pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), newData);
         }
-    }
-    
-    protected static void processOutputQueue()
-    {
-    	for(WorldBlockVector output = outputQueue.poll(); output != null; output = outputQueue.poll())
-    	{
-    		OBlock.aL.a(CraftBook.getOWorldServer(output.getWorldType()), output.getBlockX(), output.getBlockY(), output.getBlockZ(), (OEntityPlayer)null);
-    	}
     }
 }

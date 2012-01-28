@@ -42,6 +42,7 @@ public class TickPatch extends OEntityTracker {
     private static Field[] FIELDS = CLASS.getDeclaredFields();
     
     private final int WORLD_INDEX;
+    private static Runnable tickRunnable;
     
     private TickPatch(MinecraftServer arg0, OEntityTracker g, int index) {
         super(arg0, index);
@@ -82,7 +83,26 @@ public class TickPatch extends OEntityTracker {
         	}
         }
         
-        Redstone.processOutputQueue();
+        if(tickRunnable != null)
+        	tickRunnable.run();
+    }
+    
+    protected static void setTickRunnable(Runnable runnable, int index)
+    {
+    	MinecraftServer s = etc.getServer().getMCServer();
+        try {
+        	Field field = s.m[index].getClass().getDeclaredField("tickRunnable");
+        	field.setAccessible(true);
+        	field.set(s.m[index], runnable);
+        } catch (SecurityException e) {
+            throw new RuntimeException("unexpected error: cannot use reflection");
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException("patch not applied");
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("patch not applied, or incompatable patch applied");
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("patch not applied, or incompatable patch applied");
+        }
     }
     
     /**

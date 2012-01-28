@@ -149,6 +149,9 @@ public class CraftBook extends Plugin {
         
         loader.addCustomListener(cbRequest);
         
+        Redstone.outputLever = new OutputLever();
+        TickPatch.setTickRunnable(Redstone.outputLever, 0);
+        
         //for(int i = 0; i < delays.length; i++)
         	//TickPatch.addTask(TickPatch.wrapRunnable(this, delays[i], i), i);
         TickPatch.addTask(TickPatch.wrapRunnable(this, delays[0], 0), 0);

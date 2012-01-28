@@ -198,7 +198,7 @@ public class MCX220 extends BaseIC {
     	MCX220.icAreas.remove(key);
     }
     
-    protected BlockArea getBlockArea(ChipState chip, int data, int width, int height, int length, int offx, int offy, int offz)
+    protected static BlockArea getBlockArea(ChipState chip, int data, int width, int height, int length, int offx, int offy, int offz)
     {
     	width--;
     	height--;
