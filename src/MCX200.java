@@ -320,7 +320,7 @@ public class MCX200 extends BaseIC {
     	}
 	}
     
-    private boolean isValidColorMob(String mob)
+    protected static boolean isValidColorMob(String mob)
     {
     	if( mob.equals("Sheep")
     		|| mob.equals("Creeper")

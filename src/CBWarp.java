@@ -87,7 +87,8 @@ public class CBWarp
 			return WarpError.INCORRECT_PASS;
 		}
 		
-		player.teleportTo(warpObj.LOCATION);
+		CraftBook.teleportPlayer(player,  warpObj.LOCATION);
+		//player.teleportTo(warpObj.LOCATION);
 		
 		if(warpObj.MESSAGE == null || warpObj.MESSAGE.isEmpty())
 			player.sendMessage(Colors.Rose+"Woosh!");

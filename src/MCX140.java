@@ -126,16 +126,14 @@ public class MCX140 extends BaseIC {
     	if(entityName.isEmpty())
     		return false;
     	
-    	entityName = entityName.toUpperCase();
-    	
-    	return entityName.equals("P") || entityName.equals("PLAYER") || entityName.equals("PLY")
-    			|| entityName.equals("G") || entityName.equals("GROUP") || entityName.equals("GRP")
-    			|| entityName.equals("MOB") || entityName.equals("ANIMAL")
+    	return entityName.equalsIgnoreCase("P") || entityName.equalsIgnoreCase("PLAYER") || entityName.equalsIgnoreCase("PLY")
+    			|| entityName.equalsIgnoreCase("G") || entityName.equalsIgnoreCase("GROUP") || entityName.equalsIgnoreCase("GRP")
+    			|| entityName.equalsIgnoreCase("MOB") || entityName.equalsIgnoreCase("ANIMAL")
     			|| Mob.isValid(entityName)
-    			|| entityName.equals("MINECART")
-    			|| entityName.equals("BOAT")
-    			|| entityName.equals("ITEM")
-    			|| entityName.equals("ARROW") || entityName.equals("EGG") || entityName.equals("SNOWBALL") || entityName.equals("FIREBALL")
+    			|| entityName.equalsIgnoreCase("MINECART")
+    			|| entityName.equalsIgnoreCase("BOAT")
+    			|| entityName.equalsIgnoreCase("ITEM")
+    			|| entityName.equalsIgnoreCase("ARROW") || entityName.equalsIgnoreCase("EGG") || entityName.equalsIgnoreCase("SNOWBALL") || entityName.equalsIgnoreCase("FIREBALL")
     			;
     }
     
@@ -147,7 +145,7 @@ public class MCX140 extends BaseIC {
     	String[] values = args.split(":", 2);
     	String entityName = values[0];
     	
-    	if(entityName.equals("P") || entityName.equals("PLAYER") || entityName.equals("PLY"))
+    	if(entityName.equalsIgnoreCase("P") || entityName.equalsIgnoreCase("PLAYER") || entityName.equalsIgnoreCase("PLY"))
     	{
     		if(values.length > 1)
     		{
@@ -156,7 +154,7 @@ public class MCX140 extends BaseIC {
     		
     		return entity.getEntity() instanceof OEntityPlayerMP;
     	}
-    	else if(entityName.equals("G") || entityName.equals("GROUP") || entityName.equals("GRP"))
+    	else if(entityName.equalsIgnoreCase("G") || entityName.equalsIgnoreCase("GROUP") || entityName.equalsIgnoreCase("GRP"))
     	{
     		if(values.length > 1 && entity.getEntity() instanceof OEntityPlayerMP)
     		{
@@ -166,47 +164,138 @@ public class MCX140 extends BaseIC {
     		
     		return false;
     	}
-    	else if(entityName.equals("MOB"))
+    	else if(entityName.equalsIgnoreCase("MOB"))
     	{
     		return entity.isMob();
     	}
-		else if(entityName.equals("ANIMAL"))
+		else if(entityName.equalsIgnoreCase("ANIMAL"))
 		{
 			return entity.isAnimal();
 		}
 		else if(Mob.isValid(entityName))
 		{
-			if(values.length > 1 && !entity.isPlayer())
+			if((entity.isMob() || entity.isAnimal()) && entity.getName().equals(entityName))
 			{
-				return entity.getName().equalsIgnoreCase(values[1]);
+				if(values.length > 1 && MCX200.isValidColorMob(entityName))
+				{
+					int color = 0;
+					try
+					{
+						color = Integer.parseInt(values[1]);
+					}
+					catch(NumberFormatException e)
+					{
+						return false;
+					}
+					if(color < 0)
+						color = 0;
+					else if(color > 15)
+						color = 15;
+					
+					if(entityName.equals("Sheep") && (entity.getEntity() instanceof OEntitySheep))
+			    	{
+			    		OEntitySheep sheep = (OEntitySheep)entity.getEntity();
+			    		return color == sheep.w();
+			    	}
+			    	else if(entityName.equals("Creeper") && (entity.getEntity() instanceof OEntityCreeper))
+			    	{
+			    		if(color > 1)
+			    			return false;
+			    		
+			    		OEntityCreeper creeper = (OEntityCreeper)entity.getEntity();
+			    		return (color == 0) ^ creeper.u_();
+			    	}
+			    	else if(entityName.equals("Wolf") && (entity.getEntity() instanceof OEntityWolf))
+			    	{
+			    		if(color > 2)
+			    			return false;
+			    		
+			    		OEntityWolf wolf = (OEntityWolf)entity.getEntity();
+			    		return (color == 2 && wolf.B())
+			    				|| (color == 1 && wolf.v_())
+			    				|| (color == 0 && !wolf.B() && !wolf.v_() && !wolf.C());
+			    	}
+			    	else if(entityName.equals("Pig") && (entity.getEntity() instanceof OEntityPig))
+			    	{
+			    		if(color > 1)
+			    			return false;
+			    		
+			    		OEntityPig pig = (OEntityPig)entity.getEntity();
+			    		return (color == 0) ^ pig.z();
+			    	}
+				}
+				
+				return true;
 			}
 			return false;
 		}
-		else if(entityName.equals("MINECART"))
+		else if(entityName.equalsIgnoreCase("MINECART"))
 		{
-			return entity.getEntity() instanceof OEntityMinecart;
+			if(entity.getEntity() instanceof OEntityMinecart)
+			{
+				if(values.length > 1)
+				{
+					try
+					{
+						int type = Integer.parseInt(values[1]);
+						return type == (new Minecart((OEntityMinecart)entity.getEntity()).getType().getType());
+					}
+					catch(NumberFormatException e)
+					{
+						return false;
+					}
+				}
+				
+				return true;
+			}
+			return false;
 		}
-		else if(entityName.equals("BOAT"))
+		else if(entityName.equalsIgnoreCase("BOAT"))
 		{
 			return entity.getEntity() instanceof OEntityBoat;
 		}
-		else if(entityName.equals("ITEM"))
+		else if(entityName.equalsIgnoreCase("ITEM"))
 		{
-			return entity.isItem();
+			if(entity.isItem())
+			{
+				if(values.length > 1)
+				{
+					String[] data = values[1].split("@", 2);
+					try
+					{
+						int type = Integer.parseInt(data[0]);
+						int color = -1;
+						if(data.length > 1)
+						{
+							color = Integer.parseInt(data[1]);
+						}
+						
+						Item item = (new ItemEntity((OEntityItem)entity.getEntity())).getItem();
+						
+						return item.getItemId() == type && (color < 0 || color == item.getDamage());
+					}
+					catch(NumberFormatException e)
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+			return false;
 		}
-		else if(entityName.equals("ARROW"))
+		else if(entityName.equalsIgnoreCase("ARROW"))
 		{
 			return entity.getEntity() instanceof OEntityArrow;
 		}
-		else if(entityName.equals("EGG"))
+		else if(entityName.equalsIgnoreCase("EGG"))
 		{
 			return entity.getEntity() instanceof OEntityEgg;
 		}
-		else if(entityName.equals("SNOWBALL"))
+		else if(entityName.equalsIgnoreCase("SNOWBALL"))
 		{
 			return entity.getEntity() instanceof OEntitySnowball;
 		}
-		else if(entityName.equals("FIREBALL"))
+		else if(entityName.equalsIgnoreCase("FIREBALL"))
 		{
 			return entity.getEntity() instanceof OEntityFireball;
 		}
@@ -322,7 +411,8 @@ public class MCX140 extends BaseIC {
     			BaseEntity entity = new BaseEntity((OEntity)obj);
     			
     			if(MCX140.isValidEntity(entity, ENTITY_NAME)
-    				&& (RIDER_NAME == null || RIDER_NAME.isEmpty() || MCX140.isValidEntity(entity, RIDER_NAME))
+    				&& (RIDER_NAME == null || RIDER_NAME.isEmpty()
+    					|| (UtilEntity.riddenByEntity(entity.getEntity()) != null && MCX140.isValidEntity(new BaseEntity(UtilEntity.riddenByEntity(entity.getEntity())), RIDER_NAME)) )
     				&& AREA.containsPoint(AREA.getWorldType(),
     										OMathHelper.b(entity.getX()),
     										OMathHelper.b(entity.getY()),
@@ -347,11 +437,13 @@ public class MCX140 extends BaseIC {
     					if(entity.isPlayer())
     					{
     						Player player = new Player((OEntityPlayerMP)entity.getEntity());
-    						player.teleportTo(DESTINATION);
+    						//player.teleportTo(DESTINATION);
+    						CraftBook.teleportPlayer(player, DESTINATION);
     					}
     					else
     					{
-    						entity.teleportTo(DESTINATION);
+    						//entity.teleportTo(DESTINATION);
+    						CraftBook.teleportEntity(entity, DESTINATION);
     					}
     				}
     				

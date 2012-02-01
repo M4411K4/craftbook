@@ -251,7 +251,7 @@ public class VehicleListener extends CraftBookDelegateListener {
     			}
     			else
     			{
-    				basecart.teleportTo(point.getX(), point.getY(), point.getZ(), player.getRotation(), 0);
+    				basecart.teleportTo(point.getX(), point.getY() + 0.6200000047683716D, point.getZ(), player.getRotation(), 0);
     				basecart.setMotionX((point.getX() - blockpt.getBlockX()) * minecartBoostLaunch);
     				basecart.setMotionY(0.0);
     				basecart.setMotionZ((point.getZ() - blockpt.getBlockZ()) * minecartBoostLaunch);
@@ -1062,7 +1062,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                 }
             }
 
-            if (minecartDispensers && !minecart.getEntity().bB) {
+            if (minecartDispensers && !UtilEntity.isDead(minecart.getEntity()) ) {
                 Vector pt = new Vector(blockX, blockY, blockZ);
                 Vector depositPt = null;
 
@@ -2072,7 +2072,7 @@ public class VehicleListener extends CraftBookDelegateListener {
     		}
             
             
-            if (minecartDestroyOnExit && vehicle.getPassenger() != null && !vehicle.getEntity().bB) {
+            if (minecartDestroyOnExit && vehicle.getPassenger() != null && !UtilEntity.isDead(vehicle.getEntity()) ) {
                 vehicle.destroy();
                 
                 if (minecartDropOnExit) {

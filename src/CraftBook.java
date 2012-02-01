@@ -480,4 +480,95 @@ public class CraftBook extends Plugin {
     		this.val = val;
     	}
     }
+    
+    //[TODO]: temporary fix for warping out of The End. Remove if Canary adds a work around to Minecraft's "feature"
+    public static void teleportPlayer(Player player, Location location)
+    {
+    	boolean isEnd = player.getWorld().getType() == World.Type.END;
+		
+		player.teleportTo(location);
+		
+		if(isEnd && location.dimension != World.Type.END.getId())
+		{
+			World world = location.getWorld();
+			boolean found = false;
+			for(@SuppressWarnings("rawtypes")
+    		Iterator it = world.getWorld().g.iterator(); it.hasNext();)
+    		{
+				Object obj = it.next();
+    			
+    			if(!(obj instanceof OEntityPlayerMP))
+    			{
+    				continue;
+    			}
+    			
+    			if(((OEntityPlayerMP)obj).hashCode() == player.getEntity().hashCode())
+    			{
+    				found = true;
+    				break;
+    			}
+    		}
+			
+			if(!found)
+			{
+				UtilEntity.spawnEntityInWorld(world.getWorld(), player.getEntity());
+				player.getEntity().c(location.x, player.getY(), location.z, player.getRotation(), player.getPitch());
+				world.getWorld().a(player.getEntity(), false);
+			}
+		}
+    }
+    
+    /* Allows entities (Minecarts, items, Mobs, etc) to teleport to other worlds (Nether, The End, etc)
+     * Also enables riders to teleport with the teleporting entity. Ex: Players riding minecarts.
+     * 
+     * NOTE: because of how Minecraft works, entities will be DELETED if teleported to an unloaded chunk!
+     * 
+     */
+    public static void teleportEntity(BaseEntity entity, Location location)
+    {
+    	if(entity == null || UtilEntity.isDead(entity.getEntity()))
+    		return;
+    	
+    	World oldWorld = entity.getWorld();
+    	World.Type worldType = oldWorld.getType();
+    	
+    	if(worldType.getId() != location.dimension)
+    	{
+    		World newWorld = location.getWorld();
+    		OEntity rider = UtilEntity.riddenByEntity(entity.getEntity());
+    		
+    		if(rider != null)
+    		{
+    			UtilEntity.mountEntity(rider, entity.getEntity());
+    			if(rider instanceof OEntityPlayerMP)
+    			{
+    				CraftBook.teleportPlayer(new Player((OEntityPlayerMP)rider), location);
+    			}
+    			else
+    			{
+    				CraftBook.teleportEntity(new BaseEntity((OEntity)rider), location);
+    			}
+    		}
+    		
+    		oldWorld.getWorld().f(entity.getEntity());
+    		entity.getEntity().bE = false;
+    		
+    		location.y += 0.6200000047683716D;
+    		
+    		oldWorld.getWorld().a(entity.getEntity(), false);
+    		
+    		entity.teleportTo(location);
+    		UtilEntity.spawnEntityInWorld(newWorld.getWorld(), entity.getEntity());
+    		newWorld.getWorld().a(entity.getEntity(), false);
+    		
+    		entity.getEntity().a(newWorld.getWorld());
+    		
+    		if(rider != null)
+    		{
+    			UtilEntity.mountEntity(rider, entity.getEntity());
+    		}
+    	}
+    	
+    	entity.teleportTo(location);
+    }
 }

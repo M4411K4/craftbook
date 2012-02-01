@@ -1,3 +1,40 @@
+2.0extra14.4:
+- added ability to teleport entities (Mobs, Minecarts, items, etc)
+    to other worlds (Nether, The End, etc)
+    - NOTE!: entities that are teleported to map chunks that are
+        not loaded, will be deleted.
+        - This is due to how Minecraft works.
+        - Players that are teleported will not have this issue, so
+            players riding minecarts/boats are safe.
+    - currently only works with
+        [MCX140][MCU140][MCX142][MCU142][MCX144][MCU144]
+    - includes teleporting riders with the entities
+        - Example: players riding minecarts
+- updated [MCX140][MCU140][MCX142][MCU142][MCX144][MCU144] to
+    recognize more specific arguments for color mob types, items,
+    and minecarts.
+- fixed major issue where players would be marked dead by [MCX130]
+    & [MCZ130].
+    - special thanks to lacrosse1991 from minecraftonline.com
+        and healthyuncle from minecraftgame.net
+        for help with gathering data about this issue!
+- fixed (temporarily) issue with players teleporting out of The End
+    - This fix is NOT applied to everything!
+        - The fix applies to
+            /CBWarp
+            [MCX140][MCU140][MCX142][MCU142][MCX144][MCU144]
+    - This issue is caused by how Minecraft wants to work.
+        - Minecraft does not want players to teleport out of The
+            End
+        - When players do manage to teleport out of The End from
+            Canary modifications, players become invisible, and
+            unable to see entities such as Mobs, Players, items,
+            etc.
+- fixed (hopefully) issue with /cbgo hurting players.
+    - thanks 14mRh4X0r for the bug report!
+- fixed checks that were not updated properly for minecart
+    dispensers and destroy-on-exit
+
 2.0extra14.3:
 - added [MCX140] [MCU140] IN AREA IC
     - detects if set entity type/name is within set area

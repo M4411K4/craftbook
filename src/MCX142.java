@@ -60,7 +60,7 @@ public class MCX142 extends MCX140 {
     			return "Line 1 must start with @ or left blank.";
     		}
     		
-    		String[] args = sign.getLine1().substring(1).split("+", 2);
+    		String[] args = sign.getLine1().substring(1).split("\\+", 2);
     		if(!MCX140.isValidEntityName(args[0]))
     		{
     			return "Invalid name on Line 1";

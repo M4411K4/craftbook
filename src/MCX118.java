@@ -210,6 +210,7 @@ public class MCX118 extends BaseIC {
 						if(SETTINGS.isEmpty() || mob.getName().equalsIgnoreCase(SETTINGS))
 							return true;
 					}
+					break;
 				case 4:
 				case 5:
 					return true;
