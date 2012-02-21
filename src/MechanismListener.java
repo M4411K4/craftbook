@@ -2223,21 +2223,27 @@ public class MechanismListener extends CraftBookDelegateListener {
                 	}
                 }
 
+                int item = -1;
                 try {
-                    for (int i = 0; i < multiplier; i++) {
-                        out.add(new CraftBookItem(Integer.valueOf(part), color));
-                    }
+                    item = Integer.valueOf(part);
                 } catch (NumberFormatException e) {
-                    int item = etc.getDataSource().getItem(part);
+                    item = etc.getDataSource().getItem(part);
 
-                    if (item > 0) {
-                        for (int i = 0; i < multiplier; i++) {
-                            out.add(new CraftBookItem(item, color));
-                        }
-                    } else {
+                    if (item <= 0) {
                         logger.log(Level.WARNING, "Cauldron: Unknown item " + part);
                     }
                 }
+                
+                if(item > 0)
+                {
+                	if(BlockType.isDirectionBlock(item))
+                		color = 0;
+                	
+                	for (int i = 0; i < multiplier; i++) {
+                        out.add(new CraftBookItem(item, color));
+                    }
+                }
+                
             } catch (NumberFormatException e) { // Bad multiplier
                 logger.log(Level.WARNING, "Cauldron: Bad multiplier in '" + part + "'");
             }

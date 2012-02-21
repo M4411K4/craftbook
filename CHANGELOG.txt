@@ -92,6 +92,9 @@
 - fixed issue with Cauldrons only recognizing color items that have
     multipliers. Normal items did not have this issue.
     - thanks Glacksy for the bug report!
+- fixed issue with Cauldrons and blocks that use damage values for
+    direction, such as pumpkins, stairs, furnaces, etc. requiring
+    specific values in recipes when it shouldn't.
 
 2.0extra14.4:
 - added ability to teleport entities (Mobs, Minecarts, items, etc)

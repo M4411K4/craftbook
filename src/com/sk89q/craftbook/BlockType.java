@@ -517,6 +517,47 @@ public final class BlockType {
                 || id == TALL_GRASS
                 || id == STONE_BRICKS;
     }
+    
+    /**
+     * Returns true if a block uses data for direction.
+     *
+     * @param id
+     * @return
+     */
+    public static boolean isDirectionBlock(int id) {
+        return id == DISPENSER
+        		|| id == BED
+                || id == POWERED_RAIL
+                || id == DETECTOR_RAIL
+                || id == STICKY_PISTON
+                || id == PISTON
+                || id == TORCH
+                || id == WOODEN_STAIRS
+                || id == CHEST
+                || id == FURNACE
+                || id == BURNING_FURNACE
+                || id == SIGN_POST
+                || id == LADDER
+                || id == MINECART_TRACKS
+                || id == COBBLESTONE_STAIRS
+                || id == WALL_SIGN
+                || id == LEVER
+                || id == IRON_DOOR
+        		|| id == REDSTONE_TORCH_ON
+                || id == REDSTONE_TORCH_OFF
+                || id == STONE_BUTTON
+                || id == PUMPKIN
+                || id == JACKOLANTERN
+                || id == REDSTONE_REPEATER_OFF
+                || id == REDSTONE_REPEATER_ON
+                || id == TRAPDOOR
+        		|| id == FENCE_GATE
+                || id == BRICK_STAIRS
+                || id == STONE_BRICK_STAIRS
+        		|| id == NETHER_BRICK_STAIRS
+                || id == BREWING_STAND
+                ;
+    }
 
     /**
      * Get the block or item that would have been dropped. If nothing is

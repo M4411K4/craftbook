@@ -877,7 +877,11 @@ public class VehicleListener extends CraftBookDelegateListener {
                         		if(item == null || item.getAmount() <= 0)
                         			continue;
                         		
-                        		CraftBookItem cbItem = new CraftBookItem(item.getItemId(), item.getDamage());
+                        		int dmg = item.getDamage();
+                        		if(BlockType.isDirectionBlock(item.getItemId()))
+                        			dmg = 0;
+                        		
+                        		CraftBookItem cbItem = new CraftBookItem(item.getItemId(), dmg);
                         		if(!contents.containsKey(cbItem))
                         		{
                         			contents.put(cbItem, item.getAmount());

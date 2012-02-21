@@ -230,6 +230,9 @@ public class Cauldron {
 
         int type = CraftBook.getBlockID(world, pt);
         int data = CraftBook.getBlockData(world, pt);
+        
+        if(BlockType.isDirectionBlock(type))
+        	data = 0;
 
         // Make water work reliably
         if (type == 9) {
