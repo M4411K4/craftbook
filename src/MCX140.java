@@ -339,6 +339,11 @@ public class MCX140 extends BaseIC {
 	    		}
 	    	}
 	    	
+	    	if(width > RedstoneListener.icInAreaMaxLength)
+	    		width = RedstoneListener.icInAreaMaxLength;
+	    	if(length > RedstoneListener.icInAreaMaxLength)
+	    		length = RedstoneListener.icInAreaMaxLength;
+	    	
 	    	World world = CraftBook.getWorld(chip.getWorldType());
 	    	Vector lever = Util.getWallSignBack(chip.getWorldType(), chip.getPosition(), 2);
 	        int data = CraftBook.getBlockData(world, chip.getPosition());

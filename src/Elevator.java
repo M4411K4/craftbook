@@ -181,7 +181,7 @@ public class Elevator {
             }
 
             // Teleport!
-            player.teleportTo(player.getX(), y2 + 1, player.getZ(),
+            player.teleportTo(plyX+0.5D, y2 + 1, plyZ+0.5D,
                     player.getRotation(), player.getPitch());
 
 

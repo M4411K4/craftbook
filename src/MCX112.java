@@ -145,7 +145,8 @@ public class MCX112 extends BaseIC {
                 	}
                 }
                 
-        		player.teleportTo(dest);
+        		//player.teleportTo(dest);
+        		CraftBook.teleportPlayer(player, dest);
         		
         		if(chip.getMode() == 'P')
         		{

@@ -1,3 +1,98 @@
+2.0extra14.5:
+- added potion effect ICs [MCX146] and [MCU146]
+    - potion effects can be limited with the craftbook properties
+        value for:
+            ic-potions-allowed=
+        - leaving the value blank (default) will allow all potion
+            effects. Players will still require permission to
+            build the ICs.
+    - potion effect names and id #s can be found at the main
+        minecraft wiki:
+      http://www.minecraftwiki.net/wiki/Potion_effects#Parameters
+        - ID #s are in the very slim column on the far left of the
+        table.
+    - [MCX146] will give players within the set IC area the
+        specified potion effect when toggled on. This potion will
+        not be removed when the IC is turned off.
+    - [MCU146] will give players within the set IC area the
+        specified potion effect while they are in the area and
+        while the IC is turned on.
+        - When players leave the area they will lose the potion
+            effect
+        - When the IC is turned off, the players will retain the
+            potion effect until it wears off
+        - Players within the area do not lose the potion effect
+            - The potions will refresh when it is almost gone
+        - Players that enter the area with the same potion effect
+            will regain their original potion effect and the
+            remaining time when they leave.
+        - NOTE: Players that use potions of the same type as the
+            IC's will lose their potions when they leave the area!
+            It is best to use potions outside of the IC area, and
+            then enter in.
+    - [MCX146] example:
+        line1:  2:60
+        line2:  [MCX146]
+        line3:  Speed
+        line4:  5:3:6/0:2:0
+        - this will give players Speed III for 1 minute.
+        - line 1 is *optional* where 2 is the potion amplifier
+            making the potion III. 60 is the optional duration
+            in seconds.
+        - line 3 is the potion type, which can also be an id #
+            instead of the name.
+        - line 4 is the *optional* size and offset
+            5 width, 3 height, 6 length. 0 x-offset, 2 y-offset
+            0 z-offset
+    - [MCU146] is built the same way as [MCX146] but ignores
+        potion durations if set.
+- added Minecart Warp block.
+    - default block is purple wool(# 10)
+    - Requires [CartWarp] sign
+    - uses /cbwarp destinations
+    - can be disabled in the craftbook.properties with:
+        minecart-enable-warpblock=false
+    - Example:
+        line1:  Area1
+        line2:  [CartWarp]
+        line3:  Full
+        line4:  Storage
+        - This will warp Full or Storage minecarts to the
+            "Area1" /cbwarp
+            - line3 and line4 are optional, and use Sort settings
+            - If line3 and line4 are blank, it will warp all
+                minecarts.
+    - works similar to Minecart Lift where the [CartWarp] can
+        also be placed at the warp destination to tell which
+        way the minecart should go.
+        - If the [CartWarp] is not added to the destination, the
+            minecart will attempt to follow any tracks that may
+            be there.
+    - thanks Krenath for the suggestion!
+- added Minecart Destroy block.
+    - default block is black wool (# 15)
+    - this will destroy minecarts without dropping them
+        - this will NOT destroy storage minecarts
+    - this is disabled by default
+    - can be enabled in the craftbook.properties with:
+        minecart-enable-destroyblock=true
+    - no sign is used.
+- added max ic-area length settings in the craftbook.properties
+    - used to limit ICs such as [MCX140][MCX142][MCX144] etc
+- fixed Minecart Craft block crafting more than once on a single
+    pass.
+    - thanks Riot for the bug report!
+- fixed [Lift] recognizing post-signs instead of only wall-signs
+    - thanks 14mRh4X0r for the bug report!
+- fixed [Lift] sending players on block edges to possibly get hurt
+    - thanks 14mRh4X0r for the bug report!
+- fixed Cauldron to recognize more damage/color values to support
+    new items such as spawn eggs.
+    - thanks Glacksy for the bug report!
+- fixed issue with Cauldrons only recognizing color items that have
+    multipliers. Normal items did not have this issue.
+    - thanks Glacksy for the bug report!
+
 2.0extra14.4:
 - added ability to teleport entities (Mobs, Minecarts, items, etc)
     to other worlds (Nether, The End, etc)

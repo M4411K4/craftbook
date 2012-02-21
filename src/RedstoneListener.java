@@ -77,6 +77,7 @@ public class RedstoneListener extends CraftBookDelegateListener
     
     protected static int chestCollectorMaxRange = 64;
     protected static int icMessageMaxRange = 64;
+    protected static int icInAreaMaxLength = 64;
     
     /**
      * Construct the object.
@@ -130,6 +131,42 @@ public class RedstoneListener extends CraftBookDelegateListener
         		icMessageMaxRange = 1;
         	else if(icMessageMaxRange > 64)
         		icMessageMaxRange = 64;
+        }
+        
+        if(properties.containsKey("ic-in-area-max-length"))
+        {
+        	icInAreaMaxLength = properties.getInt("ic-in-area-max-length", 64);
+        	if(icInAreaMaxLength < 1)
+        		icInAreaMaxLength = 1;
+        	else if(icInAreaMaxLength > 64)
+        		icInAreaMaxLength = 64;
+        }
+        
+        if(properties.containsKey("ic-potions-allowed"))
+        {
+        	String values = properties.getString("ic-potions-allowed");
+        	if(values != null && !values.isEmpty())
+        	{
+        		String[] args = values.split(",");
+        		
+        		for(PotionType type : PotionType.values())
+        		{
+        			type.allowed = false;
+        		}
+        		
+        		try
+        		{
+	        		for(int i = 0; i < args.length; i++)
+	        		{
+	        			PotionType type = PotionType.getEffectFromId(Integer.parseInt(args[i]));
+	        			type.allowed = true;
+	        		}
+        		}
+        		catch(NumberFormatException e)
+        		{
+        			logger.warning("craftbook.properties [ic-potions-allowed] contained invalid value. All potion effects might be disabled!");
+        		}
+        	}
         }
 
         icList.clear();
@@ -277,6 +314,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX140", new MCX140(), ICType.SISO);
         internalRegisterIC("MCX142", new MCX142(), ICType.SISO);
         internalRegisterIC("MCX144", new MCX144(), ICType.SISO);
+        internalRegisterIC("MCX146", new MCX146(), ICType.SISO);
         internalRegisterIC("MCX200", new MCX200(), ICType.SISO);
         internalRegisterIC("MCX201", new MCX201(), ICType.SISO);
         internalRegisterIC("MCX202", new MCX202(), ICType.SISO);
@@ -315,6 +353,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCU140", new MCX140(), ICType.UISO);
         internalRegisterIC("MCU142", new MCX142(), ICType.UISO);
         internalRegisterIC("MCU144", new MCX144(), ICType.UISO);
+        internalRegisterIC("MCU146", new MCX146(), ICType.UISO);
         internalRegisterIC("MCU200", new MCX200(), ICType.UISO);
         internalRegisterIC("MCU220", new MCX220(), ICType.UISO);
         internalRegisterIC("MCU221", new MCX221(), ICType.UISO);
@@ -596,7 +635,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                     		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, listener.getBlockBag(worldType, pt));
                     	else if(id.equals("MCU440")
                     			|| id.equals("MCU131") || id.equals("MCU132")
-                    			|| id.equals("MCU140") || id.equals("MCU142") || id.equals("MCU144")
+                    			|| id.equals("MCU140") || id.equals("MCU142") || id.equals("MCU144") || id.equals("MCU146")
                     			|| id.equals("MCU700") || id.equals("MCU701") || id.equals("MCU702") || id.equals("MCU705")
                     			|| id.equals("MCU211") || id.equals("MCU212") || id.equals("MCU213") || id.equals("MCU214")
                     			|| id.equals("MCU217")

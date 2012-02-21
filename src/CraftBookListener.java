@@ -18,6 +18,7 @@
 */
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -87,6 +88,8 @@ public class CraftBookListener extends PluginListener {
     private Set<String> beenToldVersion =
             new HashSet<String>();
     
+    private static final Map<Player, PlayerSettings> playerSettings = new HashMap<Player, PlayerSettings>();
+    
     /**
      * Properties file for CraftBook. This instance is shared among this
      * listener and all delegates.
@@ -136,6 +139,12 @@ public class CraftBookListener extends PluginListener {
         // throw any exceptions
         for (CraftBookDelegateListener listener : delegates) {
             listener.loadConfiguration();
+        }
+        
+        List<Player> players = etc.getServer().getPlayerList();
+        for(Player player : players)
+        {
+        	createPlayerSettings(player);
         }
     }
     
@@ -497,6 +506,13 @@ public class CraftBookListener extends PluginListener {
     @Override
     public void onDisconnect(Player player) {
         beenToldVersion.remove(player.getName());
+        playerSettings.remove(player);
+    }
+    
+	@Override
+    public void onLogin(Player player)
+    {
+    	createPlayerSettings(player);
     }
     
     /**
@@ -562,5 +578,33 @@ public class CraftBookListener extends PluginListener {
      */
     public CopyManager getCopyManager() {
         return copies;
+    }
+    
+    @SuppressWarnings("rawtypes")
+    protected static void createPlayerSettings(Player player)
+    {
+    	PlayerSettings settings = new PlayerSettings();
+    	
+    	try {
+        	Field field = player.getEntity().getClass().getSuperclass().getSuperclass().getDeclaredField("aL");
+        	field.setAccessible(true);
+        	
+        	settings.activePotionsMap = (HashMap)field.get(player.getEntity());
+        } catch (SecurityException e) {
+        	e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+        	e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+        	e.printStackTrace();
+        } catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+    	
+    	playerSettings.put(player, settings);
+    }
+    
+    protected static PlayerSettings getPlayerSettings(Player player)
+    {
+    	return playerSettings.get(player);
     }
 }

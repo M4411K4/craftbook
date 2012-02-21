@@ -69,6 +69,8 @@ public class VehicleListener extends CraftBookDelegateListener {
     private boolean minecartDestroyOnExit = false;
     private boolean minecartDropOnExit = false;
     private boolean minecartEnableLoadBlock = true;
+    private boolean minecartEnableWarpBlock = true;
+    private boolean minecartEnableDestroyBlock = false;
     
     private int[] minecart25xBoostBlock = new int[]{BlockType.GOLD_ORE, 0};
     private int[] minecart100xBoostBlock = new int[]{BlockType.GOLD_BLOCK, 0};
@@ -86,6 +88,8 @@ public class VehicleListener extends CraftBookDelegateListener {
     private int[] minecartLoadBlock = new int[]{BlockType.CLOTH, 9};
     private int[] minecartStationClearBlock = new int[]{BlockType.CLOTH, 12};
     private int[] minecartCraftBlock = new int[]{BlockType.CLOTH, 7};
+    private int[] minecartWarpBlock = new int[]{BlockType.CLOTH, 10};
+    private int[] minecartDestroyBlock = new int[]{BlockType.CLOTH, 15};
     
     private enum MinecartCollisionType
     {
@@ -144,6 +148,10 @@ public class VehicleListener extends CraftBookDelegateListener {
         
         if(properties.containsKey("minecart-enable-loadblock"))
         	minecartEnableLoadBlock = properties.getBoolean("minecart-enable-loadblock", true);
+        if(properties.containsKey("minecart-enable-warpblock"))
+        	minecartEnableWarpBlock = properties.getBoolean("minecart-enable-warpblock", true);
+        if(properties.containsKey("minecart-enable-destroyblock"))
+        	minecartEnableDestroyBlock = properties.getBoolean("minecart-enable-destroyblock", false);
         if(properties.containsKey("minecart-using-oworld-server-file"))
         	usingMinecartOWorldFile = properties.getBoolean("minecart-using-oworld-server-file", false);
         
@@ -163,6 +171,8 @@ public class VehicleListener extends CraftBookDelegateListener {
         minecartLoadBlock = StringUtil.getPropColorInt(properties.getString("minecart-load-block"), BlockType.CLOTH, 9);
         minecartStationClearBlock = StringUtil.getPropColorInt(properties.getString("minecart-station-clear-block"), BlockType.CLOTH, 12);
         minecartCraftBlock = StringUtil.getPropColorInt(properties.getString("minecart-craft-block"), BlockType.CLOTH, 7);
+        minecartWarpBlock = StringUtil.getPropColorInt(properties.getString("minecart-warp-block"), BlockType.CLOTH, 10);
+        minecartDestroyBlock = StringUtil.getPropColorInt(properties.getString("minecart-destroy-block"), BlockType.CLOTH, 15);
         
         if(properties.containsKey("minecart-max-speed"))
         	minecartMaxSpeed = properties.getInt("minecart-max-speed", 100);
@@ -847,7 +857,10 @@ public class VehicleListener extends CraftBookDelegateListener {
                     }
 
                     return;
-                } else if (craftBlockRecipes != null && under == minecartCraftBlock[0] && underColor == minecartCraftBlock[1]) {
+                } else if (craftBlockRecipes != null && under == minecartCraftBlock[0] && underColor == minecartCraftBlock[1]
+                		&& (OMathHelper.b(minecart.getEntity().bj) != OMathHelper.b(minecart.getX())
+                    			|| OMathHelper.b(minecart.getEntity().bl) != OMathHelper.b(minecart.getZ()))
+                		) {
                     Boolean test = Redstone.testAnyInput(world, underPt);
 
                     if (test == null || test) {
@@ -947,7 +960,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                                         	{
                             					if(cartItems[i] == null)
                             					{
-                            						cartItems[i] = new Item(cbItem.id(), 1, i, cbItem.safeColor());
+                            						cartItems[i] = new Item(cbItem.id(), 1, i, cbItem.color());
                             						found = true;
                             						break;
                             					}
@@ -1623,6 +1636,136 @@ public class VehicleListener extends CraftBookDelegateListener {
 	                	}
 	                }
                 }
+                else if(under == minecartWarpBlock[0] && underColor == minecartWarpBlock[1])
+                {
+                	Boolean test = Redstone.testAnyInput(world, underPt);
+                	
+	                if (test == null || test)
+	                {
+	                	Sign sign = getControllerSign(world, blockX, blockY - 1, blockZ, "[CartWarp]");
+	                	
+	                	//works the same as [Sort]
+	                	if (sign != null) {
+                            SortDir dir = SortDir.FORWARD;
+                            
+                            //LEFT = Warp
+                            //RIGHT = Warp
+
+                            if (satisfiesCartSort(sign.getText(2), minecart,
+                                    new Vector(blockX, blockY, blockZ))) {
+                                dir = SortDir.LEFT;
+                            } else if (satisfiesCartSort(sign.getText(3), minecart,
+                                    new Vector(blockX, blockY, blockZ))) {
+                                dir = SortDir.RIGHT;
+                            }
+                            
+                            if(dir != SortDir.LEFT && dir != SortDir.RIGHT)
+                            {
+                            	return;
+                            }
+                            
+                            //warp
+                            Player player = minecart.getPassenger();
+                            
+                            CBWarpObject warp = CBWarp.getWarp(sign.getText(0), false);
+                            if(warp == null)
+                            {
+                            	if(player != null)
+                            		player.sendMessage(Colors.Rose+"CBWarp not found: "+sign.getText(0));
+                            	return;
+                            }
+                            
+                            world = warp.LOCATION.getWorld();
+                            blockX = (int)Math.floor(warp.LOCATION.x);
+                            blockY = (int)Math.floor(warp.LOCATION.y);
+                            blockZ = (int)Math.floor(warp.LOCATION.z);
+                            
+                            if(!BlockType.canPassThrough(CraftBook.getBlockID(world, blockX, blockY, blockZ)))
+                            {
+                            	if(player != null)
+                            		player.sendMessage(Colors.Rose+"The warp is obstructed!");
+                            	return;
+                            }
+                            
+                            Location targetTrack = null;
+                            Vector motion = null;
+                            int wantedDir = -1;
+                            
+                            Sign destSign = getControllerSign(world, blockX, blockY - 1, blockZ, "[CartWarp]");
+                            
+                            if(destSign != null)
+                            {
+                            	wantedDir = CraftBook.getBlockData(world, destSign.getX(), destSign.getY(), destSign.getZ());
+                            	if(wantedDir != 0 && wantedDir != 4 && wantedDir != 8 && wantedDir != 12)
+                            	{
+                            		wantedDir = -1;
+                            	}
+                            }
+                            
+                            //if wantedDir == -1 then find a track that exists
+                            if((wantedDir == -1 || wantedDir == 8)
+                            		&& CraftBook.getBlockID(world, blockX, blockY, blockZ + 1) == BlockType.MINECART_TRACKS
+                            		&& CraftBook.getBlockData(world, blockX, blockY, blockZ + 1) == 0)
+                            {
+                            	//west
+                            	targetTrack = new Location(blockX, blockY, blockZ + 1, 0, 0);
+                            	motion = new Vector(0, 0, minecartBoostLaunch);
+                            }
+                            if((wantedDir == -1 || wantedDir == 4)
+                            		&& CraftBook.getBlockID(world, blockX + 1, blockY, blockZ) == BlockType.MINECART_TRACKS
+                            		&& CraftBook.getBlockData(world, blockX + 1, blockY, blockZ) == 1)
+                            {
+                            	//south
+                            	targetTrack = new Location(blockX + 1, blockY, blockZ, 270, 0);
+                            	motion = new Vector(minecartBoostLaunch, 0, 0);
+                            }
+                            if((wantedDir == -1 || wantedDir == 0)
+                            		&& CraftBook.getBlockID(world, blockX, blockY, blockZ - 1) == BlockType.MINECART_TRACKS
+                            		&& CraftBook.getBlockData(world, blockX, blockY, blockZ - 1) == 0)
+                            {
+                            	//east
+                            	targetTrack = new Location(blockX, blockY, blockZ - 1, 180, 0);
+                            	motion = new Vector(0, 0, -minecartBoostLaunch);
+                            }
+                            if((wantedDir == -1 || wantedDir == 12)
+                            		&& CraftBook.getBlockID(world, blockX - 1, blockY, blockZ) == BlockType.MINECART_TRACKS
+                            		&& CraftBook.getBlockData(world, blockX - 1, blockY, blockZ) == 1)
+                            {
+                            	//north
+                            	targetTrack = new Location(blockX - 1, blockY, blockZ, 90, 0);
+                            	motion = new Vector(-minecartBoostLaunch, 0, 0);
+                            }
+                            
+                            if(targetTrack != null)
+                            {
+                            	targetTrack.dimension = warp.LOCATION.dimension;
+                            	targetTrack.y += 0.6200000047683716D;
+                            	CraftBook.teleportEntity(minecart, targetTrack);
+                            	minecart.setMotion(motion.getX(), 0, motion.getZ());
+                            }
+                            else
+                            {
+                            	warp.LOCATION.y += 0.6200000047683716D;
+                            	CraftBook.teleportEntity(minecart, warp.LOCATION);
+                            }
+                            return;
+                        }
+	                }
+                }
+                else if(minecartEnableDestroyBlock && under == minecartDestroyBlock[0] && underColor == minecartDestroyBlock[1])
+                {
+                	Boolean test = Redstone.testAnyInput(world, underPt);
+                	
+	                if (test == null || test)
+	                {
+	                	if(!UtilEntity.isDead(minecart.getEntity()) && minecart.getType() != Minecart.Type.StorageCart)
+	                	{
+	                		UtilEntity.mountEntity(minecart.getEntity(), null);
+	                		minecart.destroy();
+	                	}
+	                	return;
+	                }
+                }
             }
             
             int block = CraftBook.getBlockID(world, blockX, blockY, blockZ);
@@ -1809,6 +1952,21 @@ public class VehicleListener extends CraftBookDelegateListener {
             } else if (minecartControlBlocks && minecartEnableLoadBlock && under == minecartLoadBlock[0]
                        && underColor == minecartLoadBlock[1]) {
             	player.sendMessage(Colors.Gold + "Minecart load block created.");
+            } else if (minecartControlBlocks && minecartEnableWarpBlock && under == minecartWarpBlock[0]
+                    && underColor == minecartWarpBlock[1]) {
+            	Sign sign = getControllerSign(world, blockPlaced.getX(),
+                        blockPlaced.getY() - 1, blockPlaced.getZ(), "[CartWarp]");
+            	
+                if (sign == null) {
+                    player.sendMessage(Colors.Rose
+                            + "Cart Warp destination created. A [CartWarp] sign is needed to warp Minecarts.");
+                } else {
+                    player.sendMessage(Colors.Gold
+                            + "Minecart Cart Warp block created.");
+                }
+            } else if (minecartControlBlocks && minecartEnableDestroyBlock && under == minecartDestroyBlock[0]
+                    && underColor == minecartDestroyBlock[1]) {
+            	player.sendMessage(Colors.Gold + "Minecart destroy block created.");
             }
         }
         
@@ -2035,6 +2193,57 @@ public class VehicleListener extends CraftBookDelegateListener {
                 }
                 
                 player.sendMessage(Colors.Gold + "Load sign detected.");
+            } else {
+                player.sendMessage(Colors.Rose
+                        + "Minecart control blocks are disabled on this server.");
+            }
+         // Teleport
+        } else if (line2.equalsIgnoreCase("[CartWarp]")) {
+        	
+        	if(!player.canUseCommand("/cbwarp"))
+        	{
+        		player.sendMessage(Colors.Rose + "You do not have permission to make that.");
+                CraftBook.dropSign(world, sign.getX(), sign.getY(), sign.getZ());
+                return true;
+        	}
+        	
+            listener.informUser(player);
+            
+            sign.setText(1, "[CartWarp]");
+            sign.update();
+            
+            if (minecartControlBlocks) {
+                int data = CraftBook.getBlockData(world, 
+                        sign.getX(), sign.getY(), sign.getZ());
+
+                if (type == BlockType.WALL_SIGN) {
+                    player.sendMessage(Colors.Rose + "The sign must be a sign post.");
+                    CraftBook.dropSign(world, sign.getX(), sign.getY(), sign.getZ());
+                    return true;
+                } else if (data != 0x0 && data != 0x4 && data != 0x8 && data != 0xC) {
+                    player.sendMessage(Colors.Rose + "The sign cannot be at an odd angle.");
+                    CraftBook.dropSign(world, sign.getX(), sign.getY(), sign.getZ());
+                    return true;
+                }
+                else if(!line1.isEmpty() && !CBWarp.warpExists(line1, false))
+                {
+                	player.sendMessage(Colors.Rose + "CBWarp not found: "+line1);
+                    CraftBook.dropSign(world, sign.getX(), sign.getY(), sign.getZ());
+                    return true;
+                }
+                
+                if(line1.isEmpty())
+                {
+                	sign.setText(2, "Direction");
+                    sign.update();
+                }
+                else if(sign.getText(2).isEmpty() && sign.getText(3).isEmpty())
+                {
+                	sign.setText(2, "ALL");
+                    sign.update();
+                }
+                
+                player.sendMessage(Colors.Gold + "Warp sign detected.");
             } else {
                 player.sendMessage(Colors.Rose
                         + "Minecart control blocks are disabled on this server.");

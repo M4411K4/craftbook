@@ -113,6 +113,7 @@ public class CraftBook extends Plugin {
 
         registerHook(listener, "COMMAND", PluginListener.Priority.MEDIUM);
         registerHook(listener, "DISCONNECT", PluginListener.Priority.MEDIUM);
+        registerHook(listener, "LOGIN", PluginListener.Priority.MEDIUM);
         registerHook(listener, "REDSTONE_CHANGE", PluginListener.Priority.MEDIUM);
         registerHook(listener, "SIGN_CHANGE", PluginListener.Priority.MEDIUM);
 

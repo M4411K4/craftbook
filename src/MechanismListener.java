@@ -586,6 +586,13 @@ public class MechanismListener extends CraftBookDelegateListener {
             
             listener.informUser(player);
             
+            if(CraftBook.getBlockID(world, pt) != BlockType.WALL_SIGN)
+            {
+            	player.sendMessage(Colors.Rose + "Elevators must be made with wall signs.");
+            	CraftBook.dropSign(world, sign.getX(), sign.getY(), sign.getZ());
+            	return true;
+            }
+            
             if (useElevators) {
                 if (line2.equalsIgnoreCase("[Lift Up]")) {
                     if (Elevator.hasLinkedLift(worldType, pt, true)) {
@@ -1127,7 +1134,7 @@ public class MechanismListener extends CraftBookDelegateListener {
                     return LightSwitch.toggleLights(worldType, pt, bag);
 
                 // Elevator
-                } else if (useElevators
+                } else if (blockType == BlockType.WALL_SIGN && useElevators
                         && (line2.equalsIgnoreCase("[Lift Up]")
                         || line2.equalsIgnoreCase("[Lift Down]"))
                         && checkPermission(player, "/elevator")) {
@@ -2193,7 +2200,6 @@ public class MechanismListener extends CraftBookDelegateListener {
         for (String part : parts) {
             int multiplier = 1;
             int color = 0;
-
             try {
                 // Multiplier
                 if (part.matches("^.*\\*([0-9]+)$")) {
@@ -2201,21 +2207,20 @@ public class MechanismListener extends CraftBookDelegateListener {
                     multiplier = Integer.parseInt(
                             part.substring(at + 1, part.length()));
                     part = part.substring(0, at);
-                    String[] item = part.split("@",2);
-                    if(item.length > 1)
-                    {
-                    	part = item[0];
-                    	try
-                    	{
-                    		color = Integer.parseInt(item[1]);
-                    		if(color > 15)
-                    			color = 15;
-                    	}
-                    	catch(NumberFormatException e)
-                    	{
-                    		color = 0;
-                    	}
-                    }
+                }
+                
+                String[] itemtype = part.split("@",2);
+                if(itemtype.length > 1)
+                {
+                	part = itemtype[0];
+                	try
+                	{
+                		color = Integer.parseInt(itemtype[1]);
+                	}
+                	catch(NumberFormatException e)
+                	{
+                		color = 0;
+                	}
                 }
 
                 try {
