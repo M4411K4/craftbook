@@ -184,12 +184,12 @@ public class MCX131 extends BaseIC {
     
     private static int getSafeY(World world, int x, int y, int z)
     {
-    	int maxY = Math.min(128, y + 10);
+    	int maxY = Math.min(CraftBook.MAP_BLOCK_HEIGHT, y + 10);
     	
     	for (int safeY = y + 1; safeY <= maxY; safeY++)
 		{
             if (BlockType.canPassThrough(CraftBook.getBlockID(world, x, safeY, z)) &&
-            		safeY < 128 && BlockType.canPassThrough(CraftBook.getBlockID(world, x, safeY+1, z))	
+            		safeY < CraftBook.MAP_BLOCK_HEIGHT && BlockType.canPassThrough(CraftBook.getBlockID(world, x, safeY+1, z))	
             	)
             {
             	return safeY;

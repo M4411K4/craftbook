@@ -224,7 +224,7 @@ public class MCX118 extends BaseIC {
 			List<BaseEntity> entities = new ArrayList<BaseEntity>();
 			
 			for(@SuppressWarnings("rawtypes")
-    		Iterator it = oworld.g.iterator(); it.hasNext();)
+    		Iterator it = oworld.b.iterator(); it.hasNext();)
     		{
     			Object obj = it.next();
     			if(!(obj instanceof OEntityPlayerMP))
@@ -241,7 +241,7 @@ public class MCX118 extends BaseIC {
 			List<BaseEntity> entities = new ArrayList<BaseEntity>();
 			
 			for(@SuppressWarnings("rawtypes")
-    		Iterator it = oworld.g.iterator(); it.hasNext();)
+    		Iterator it = oworld.b.iterator(); it.hasNext();)
     		{
     			Object obj = it.next();
     			if(!(obj instanceof OEntityPlayerMP)
@@ -250,7 +250,8 @@ public class MCX118 extends BaseIC {
     				&& !(obj instanceof OEntityBoat)
     				&& !(obj instanceof OEntityEnderEye)
     				&& !(obj instanceof OEntityFishHook)
-    				&& (!(obj instanceof OEntityWolf) || ((OEntityWolf)obj).z().isEmpty() )
+    				&& (!(obj instanceof OEntityWolf) || ((OEntityTamable)obj).A().isEmpty() )
+    				&& (!(obj instanceof OEntityOzelot) || ((OEntityTamable)obj).A().isEmpty() )
     				)
     			{
     				entities.add(new BaseEntity((OEntity)obj));

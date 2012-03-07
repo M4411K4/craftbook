@@ -109,7 +109,7 @@ public class MC1205 extends BaseIC {
             int z = pos.getBlockZ();
 
             World world = CraftBook.getWorld(chip.getWorldType());
-            if (y <= 127 && (isForced || CraftBook.getBlockID(world, x, y, z) == 0)) {
+            if (y <= CraftBook.MAP_BLOCK_HEIGHT - 1 && (isForced || CraftBook.getBlockID(world, x, y, z) == 0)) {
                 CraftBook.setBlockID(world, x, y, z, item);
                 chip.getOut(1).set(true);
             } else {

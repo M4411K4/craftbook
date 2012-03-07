@@ -1006,9 +1006,9 @@ public class VehicleListener extends CraftBookDelegateListener {
                         	
                         	double closeDist = -1.0D;
                         	
-                        	for(int i = 0; i < oworld.i.size(); i++)
+                        	for(int i = 0; i < oworld.d.size(); i++)
                         	{
-                        		OEntityPlayer tmpplayer = (OEntityPlayer) oworld.i.get(i);
+                        		OEntityPlayer tmpplayer = (OEntityPlayer) oworld.d.get(i);
                         		double d2 = tmpplayer.e(minecart.getX(), minecart.getY(), minecart.getZ());
                         		
                         		BaseEntity basePlayer = new BaseEntity(tmpplayer);
@@ -1421,7 +1421,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             else if(dir == SortDir.LEFT)
                             {
                             	//up
-                            	for(int y = blockY + 1; y <= 127; y++)
+                            	for(int y = blockY + 1; y <= CraftBook.MAP_BLOCK_HEIGHT - 1; y++)
                             	{
                             		if (CraftBook.getBlockID(world, blockX, y, blockZ) == minecartLiftBlock[0] &&
                             			CraftBook.getBlockData(world, blockX, y, blockZ) == minecartLiftBlock[1] &&

@@ -33,13 +33,13 @@ public class ChunkFinder {
     @SuppressWarnings("unchecked")
     public static Tuple2<Integer,Integer>[] getLoadedChunks(OWorld world) {
         List<Tuple2<Integer,Integer>> chunkList = new ArrayList<Tuple2<Integer,Integer>>();
-        List<OChunk> list = (List<OChunk>)get(get(world,"A"),"g");
+        List<OChunk> list = (List<OChunk>)get(get(world,"v"),"g");
         for(OChunk chunk:list.toArray(new OChunk[0])) if(chunk!=null) chunkList.add(getChunkCoords(chunk));
         return chunkList.toArray((Tuple2<Integer, Integer>[]) new Tuple2<?,?>[0]);
     }
     
     private static Tuple2<Integer,Integer> getChunkCoords(OChunk chunk) {
-        return new Tuple2<Integer,Integer>(chunk.l,chunk.m);
+        return new Tuple2<Integer,Integer>(chunk.g,chunk.h);
     }
     
     private static Object get(Object o, String field) {

@@ -195,7 +195,7 @@ public class MCX140 extends BaseIC {
 					if(entityName.equals("Sheep") && (entity.getEntity() instanceof OEntitySheep))
 			    	{
 			    		OEntitySheep sheep = (OEntitySheep)entity.getEntity();
-			    		return color == sheep.w();
+			    		return color == sheep.x();
 			    	}
 			    	else if(entityName.equals("Creeper") && (entity.getEntity() instanceof OEntityCreeper))
 			    	{
@@ -203,7 +203,7 @@ public class MCX140 extends BaseIC {
 			    			return false;
 			    		
 			    		OEntityCreeper creeper = (OEntityCreeper)entity.getEntity();
-			    		return (color == 0) ^ creeper.u_();
+			    		return (color == 0) ^ creeper.x();
 			    	}
 			    	else if(entityName.equals("Wolf") && (entity.getEntity() instanceof OEntityWolf))
 			    	{
@@ -211,9 +211,18 @@ public class MCX140 extends BaseIC {
 			    			return false;
 			    		
 			    		OEntityWolf wolf = (OEntityWolf)entity.getEntity();
-			    		return (color == 2 && wolf.B())
+			    		return (color == 2 && wolf.D())
 			    				|| (color == 1 && wolf.v_())
-			    				|| (color == 0 && !wolf.B() && !wolf.v_() && !wolf.C());
+			    				|| (color == 0 && !wolf.D() && !wolf.v_() && !wolf.u_());
+			    	}
+			    	else if(entityName.equals("Ozelot") && (entity.getEntity() instanceof OEntityOzelot))
+			    	{
+			    		if(color > 2)
+			    			return false;
+			    		
+			    		OEntityOzelot ocelot = (OEntityOzelot)entity.getEntity();
+			    		return (color == 1 && ocelot.v_())
+			    				|| (color == 0 && !ocelot.v_() && !ocelot.u_());
 			    	}
 			    	else if(entityName.equals("Pig") && (entity.getEntity() instanceof OEntityPig))
 			    	{
@@ -221,7 +230,7 @@ public class MCX140 extends BaseIC {
 			    			return false;
 			    		
 			    		OEntityPig pig = (OEntityPig)entity.getEntity();
-			    		return (color == 0) ^ pig.z();
+			    		return (color == 0) ^ pig.A();
 			    	}
 				}
 				
@@ -403,7 +412,7 @@ public class MCX140 extends BaseIC {
 			
 			OWorldServer oworld = CraftBook.getOWorldServer(AREA.getWorldType());
 			for(@SuppressWarnings("rawtypes")
-    		Iterator it = oworld.g.iterator(); it.hasNext();)
+    		Iterator it = oworld.b.iterator(); it.hasNext();)
     		{
     			Object obj = it.next();
     			

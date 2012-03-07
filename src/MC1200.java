@@ -79,7 +79,7 @@ public class MC1200 extends BaseIC {
             
             if (Mob.isValid(id)) {
                 Vector pos = chip.getBlockPosition();
-                int maxY = Math.min(128, pos.getBlockY() + 10);
+                int maxY = Math.min(CraftBook.MAP_BLOCK_HEIGHT, pos.getBlockY() + 10);
                 int x = pos.getBlockX();
                 int z = pos.getBlockZ();
 

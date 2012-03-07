@@ -1,3 +1,23 @@
+2.0extra15.0:
+- updated to minecraft 1.2.3
+- added support for the new max height (from 128 to 256)
+    - I have changed all I could find, but a few things may still
+        be limited to 128. Please report if a feature can not be
+        used above 128 blocks up.
+- added [MCX228] Refresh IC
+    - Recommended only for admins/mods
+    - Searches each block in the set area for self-triggered ICs.
+        Self-triggered ICs that are found are refreshed even if
+        they are already working.
+    - Since it searches each block in a set area every time it is
+        triggered on, it is recommended to only use occasionaly 
+        unless your server is powerful enough to handle it.
+    - width, height, length, x-offset, y-offset, and z-offset
+        are placed on the 4th line of the IC sign, similar to
+        [MCU220], [MCX146], and other area based ICs.
+    - the 3rd line of the sign is currently not used.
+    - thanks Glacksy for the suggestion!
+
 2.0extra14.5:
 - added potion effect ICs [MCX146] and [MCU146]
     - potion effects can be limited with the craftbook properties
@@ -972,7 +992,7 @@ The wiki can be found at: http://cbx.m4411k4.com
     output states. Also updated name to MONOFLOP
     -thanks clouder for the suggestions and the better name!
     -To set the amount of time for the output to remain "on", type on the third line:
-	    [count#]:[clock rate#]:[on count#]
+        [count#]:[clock rate#]:[on count#]
         Ex:
         10:5:4
         where [on count] is the number of "ticks" to remain on.

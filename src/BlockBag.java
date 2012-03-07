@@ -175,6 +175,9 @@ public abstract class BlockBag {
                     // Look for lit redstone torch
                     } else if (id == BlockType.REDSTONE_TORCH_OFF) {
                         fetchBlock(BlockType.REDSTONE_TORCH_ON);
+                    // Look for redstone lamp
+                    } else if (id == BlockType.REDSTONE_LAMP_ON) {
+                        fetchBlock(BlockType.REDSTONE_LAMP_OFF);
                     // Look for signs
                     } else if (id == BlockType.WALL_SIGN || id == BlockType.SIGN_POST) {
                         fetchBlock(323);

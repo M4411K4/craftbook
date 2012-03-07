@@ -40,7 +40,7 @@ public class Elevator {
         
         if (up) {
             // Need to traverse up to find the next sign to teleport to
-            for (int y1 = y + 1; y1 <= 127; y1++) {
+            for (int y1 = y + 1; y1 <= CraftBook.MAP_BLOCK_HEIGHT - 1; y1++) {
                 if (CraftBook.getBlockID(world, x, y1, z) == BlockType.WALL_SIGN
                         && getSign(world, new Vector(x, y1, z), up) != null) {
                     return true;
@@ -75,7 +75,7 @@ public class Elevator {
 
         if (up) {
             // Need to traverse up to find the next sign to teleport to
-            for (int y1 = y + 1; y1 <= 127; y1++) {
+            for (int y1 = y + 1; y1 <= CraftBook.MAP_BLOCK_HEIGHT - 1; y1++) {
                 if (CraftBook.getBlockID(world, x, y1, z) == BlockType.WALL_SIGN
                         && checkLift(player, new Vector(x, y1, z), up)) {
                     return;

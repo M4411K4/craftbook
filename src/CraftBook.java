@@ -104,6 +104,8 @@ public class CraftBook extends Plugin {
     
     private PluginInterface cbRequest = new CBHookFunc();
     
+    public static final int MAP_BLOCK_HEIGHT = 256;
+    
     /**
      * Initializes the plugin.
      */
@@ -233,12 +235,12 @@ public class CraftBook extends Plugin {
         for(int i = 0; i < oworlds.length; i++)
         {
     		for(@SuppressWarnings("rawtypes")
-    		Iterator it = oworlds[i].g.iterator(); it.hasNext();)
+    		Iterator it = oworlds[i].b.iterator(); it.hasNext();)
     		{
     			Object obj = it.next();
     			if(obj instanceof EntitySitting)
     			{
-    				((EntitySitting)obj).T();
+    				((EntitySitting)obj).W();
     			}
     		}
         }
@@ -347,7 +349,7 @@ public class CraftBook extends Plugin {
     }
     
     protected static boolean setBlockID(World world, int x, int y, int z, int type) {
-        if (y < 127 && BlockType.isBottomDependentBlock(getBlockID(world, x, y + 1, z))) {
+        if (y < MAP_BLOCK_HEIGHT - 1 && BlockType.isBottomDependentBlock(getBlockID(world, x, y + 1, z))) {
             world.setBlockAt(0, x, y + 1, z);
         }
         return world.setBlockAt(type, x, y, z);
@@ -494,7 +496,7 @@ public class CraftBook extends Plugin {
 			World world = location.getWorld();
 			boolean found = false;
 			for(@SuppressWarnings("rawtypes")
-    		Iterator it = world.getWorld().g.iterator(); it.hasNext();)
+    		Iterator it = world.getWorld().b.iterator(); it.hasNext();)
     		{
 				Object obj = it.next();
     			

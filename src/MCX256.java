@@ -57,8 +57,8 @@ public class MCX256 extends BaseIC {
             try
             {
             	int y = Integer.parseInt(sign.getLine3());
-            	if(y < -126 || y > 127)
-            		return "Third line needs to be a number from -126 to 127";
+            	if(y < -CraftBook.MAP_BLOCK_HEIGHT + 2 || y > CraftBook.MAP_BLOCK_HEIGHT - 1)
+            		return "Third line needs to be a number from "+(-CraftBook.MAP_BLOCK_HEIGHT + 2)+" to "+(CraftBook.MAP_BLOCK_HEIGHT - 1);
             }
             catch(NumberFormatException e)
             {
@@ -99,8 +99,8 @@ public class MCX256 extends BaseIC {
         if(chip.getText().getLine3().length() > 0)
         {
         	y += Integer.parseInt(chip.getText().getLine3());
-        	if(y > 127)
-        		y = 127;
+        	if(y > CraftBook.MAP_BLOCK_HEIGHT - 1)
+        		y = CraftBook.MAP_BLOCK_HEIGHT - 1;
         	else if(y < 1)
         		y = 1; //make sure it lands on at least one block
         }

@@ -101,7 +101,7 @@ public class MC1261 extends BaseIC {
             y -= 1;
         }
         
-        y = Math.min(Math.max(0, y), 127);
+        y = Math.min(Math.max(0, y), CraftBook.MAP_BLOCK_HEIGHT - 1);
         
         int type = CraftBook.getBlockID(chip.getWorldType(), x, y, z);
         

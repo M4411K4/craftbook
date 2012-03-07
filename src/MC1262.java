@@ -136,7 +136,7 @@ public class MC1262 extends BaseIC {
         	}
         }
         
-        y = Math.min(Math.max(0, y), 127);
+        y = Math.min(Math.max(0, y), CraftBook.MAP_BLOCK_HEIGHT - 1);
         
         try{
             String minLightLine = chip.getText().getLine3();
@@ -145,8 +145,8 @@ public class MC1262 extends BaseIC {
             return;
         }
         
-        OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
-        int light = oworld.l(x, y + 1, z);
+        World world = CraftBook.getWorld(chip.getWorldType());
+        float light = world.getLightLevel(x, y + 1, z);
         
         chip.getOut(1).set(light >= minLight);
     }

@@ -203,7 +203,7 @@ public class MCX200 extends BaseIC {
         
         if (Mob.isValid(id)) {
             Vector pos = chip.getBlockPosition();
-            int maxY = Math.min(128, pos.getBlockY() + 10);
+            int maxY = Math.min(CraftBook.MAP_BLOCK_HEIGHT, pos.getBlockY() + 10);
             int x = pos.getBlockX();
             int z = pos.getBlockZ();
 
@@ -286,7 +286,7 @@ public class MCX200 extends BaseIC {
     	if(entity instanceof OEntitySheep)
     	{
     		OEntitySheep sheep = (OEntitySheep)entity;
-    		sheep.b(color);
+    		sheep.d_(color);
     	}
     	else if(entity instanceof OEntityCreeper)
     	{
@@ -297,7 +297,7 @@ public class MCX200 extends BaseIC {
     			return;
     		
     		OEntityCreeper creeper = (OEntityCreeper)entity;
-    		creeper.aF().b(17, (byte)1);
+    		creeper.aO().b(17, (byte)1);
     	}
     	else if(entity instanceof OEntityWolf)
     	{
@@ -308,7 +308,16 @@ public class MCX200 extends BaseIC {
     			return;
     		
     		OEntityWolf wolf = (OEntityWolf)entity;
-    		wolf.aF().b(16, (byte)color);
+    		wolf.aO().b(16, (byte)color);
+    	}
+    	else if(entity instanceof OEntityOzelot)
+    	{
+    		//same as wolf
+    		if(color != 1)
+    			return;
+    		
+    		OEntityOzelot ocelot = (OEntityOzelot)entity;
+    		ocelot.aO().b(16, (byte)color);
     	}
     	else if(entity instanceof OEntityPig)
     	{
@@ -325,6 +334,7 @@ public class MCX200 extends BaseIC {
     	if( mob.equals("Sheep")
     		|| mob.equals("Creeper")
     		|| mob.equals("Wolf")
+    		|| mob.equals("Ozelot")
     		|| mob.equals("Pig")
     		)
     	{

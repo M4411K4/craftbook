@@ -117,7 +117,7 @@ public class MCX205 extends BaseIC {
         if(direction.length > 1)
         	distance = Integer.parseInt(direction[1]);
         else
-        	distance = 127;
+        	distance = CraftBook.MAP_BLOCK_HEIGHT - 1;
         
         if(direction[0].equalsIgnoreCase("up"))
         {
@@ -170,12 +170,12 @@ public class MCX205 extends BaseIC {
     {
     	if(start < 0)
     		start = 0;
-    	else if(start > 127)
-    		start = 127;
+    	else if(start > CraftBook.MAP_BLOCK_HEIGHT - 1)
+    		start = CraftBook.MAP_BLOCK_HEIGHT - 1;
     	if(end < 0)
     		end = 0;
-    	else if(end > 127)
-    		end = 127;
+    	else if(end > CraftBook.MAP_BLOCK_HEIGHT - 1)
+    		end = CraftBook.MAP_BLOCK_HEIGHT - 1;
     	
     	int direction;
     	if(end >= start)

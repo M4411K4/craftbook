@@ -108,8 +108,8 @@ public class MCX112 extends BaseIC {
     		
     		double newY = pos.getY() + 2;
     		
-    		if(newY > 128)
-    			newY = 128;
+    		if(newY > CraftBook.MAP_BLOCK_HEIGHT)
+    			newY = CraftBook.MAP_BLOCK_HEIGHT;
     		
     		pos.setY(newY);
     	}
@@ -176,14 +176,14 @@ public class MCX112 extends BaseIC {
     
     protected static int getSafeY(World world, Vector pos)
     {
-    	int maxY = Math.min(128, pos.getBlockY() + 10);
+    	int maxY = Math.min(CraftBook.MAP_BLOCK_HEIGHT, pos.getBlockY() + 10);
         int x = pos.getBlockX();
         int z = pos.getBlockZ();
     	
     	for (int y = pos.getBlockY() + 1; y <= maxY; y++)
 		{
             if (BlockType.canPassThrough(CraftBook.getBlockID(world, x, y, z)) &&
-            	y < 128 && BlockType.canPassThrough(CraftBook.getBlockID(world, x, y+1, z))	
+            	y < CraftBook.MAP_BLOCK_HEIGHT && BlockType.canPassThrough(CraftBook.getBlockID(world, x, y+1, z))	
             	)
             {
             	return y;

@@ -197,7 +197,7 @@ public class RedstoneListener extends CraftBookDelegateListener
 	                int xs = (chunkCoord.a+1)<<4;
 	                int ys = (chunkCoord.b+1)<<4;
 	                for(int x=chunkCoord.a<<4;x<xs;x++) 
-	                    for(int y=0;y<128;y++) 
+	                    for(int y=0;y<CraftBook.MAP_BLOCK_HEIGHT;y++) 
 	                        for(int z=chunkCoord.b<<4;z<ys;z++) 
 	                            if(world.getBlockIdAt(x, y, z)==BlockType.WALL_SIGN)
 	                                onSignAdded(world, x,y,z);
@@ -325,6 +325,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX208", new MCX208(), ICType.SISO);
         internalRegisterIC("MCX209", new MCX209(), ICType.SISO);
         internalRegisterIC("MCX210", new MCX210(), ICType.SISO);
+        internalRegisterIC("MCX228", new MCX228(), ICType.SISO);
         internalRegisterIC("MCX230", new MCX230(), ICType.SISO);
         internalRegisterIC("MCX231", new MCX231(), ICType.SISO);
         internalRegisterIC("MCX233", new MCX233(), ICType.SISO);
@@ -641,6 +642,7 @@ public class RedstoneListener extends CraftBookDelegateListener
                     			|| id.equals("MCU217")
                     			|| id.equals("MCU200")
                     			|| id.equals("MCU220") || id.equals("MCU221") || id.equals("MCU222")
+                    			|| id.equals("MCX228")
                     			|| id.equals("MCU300") || id.equals("MCU301") || id.equals("MCU302") || id.equals("MCU303") )
                     		ic.think(worldType, pt, changed, signText, sign, craftBook.getDelay(worldIndex), mode, abc, def, thisListener);
                         else

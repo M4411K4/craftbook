@@ -1254,7 +1254,7 @@ public class MechanismListener extends CraftBookDelegateListener {
      * @param pt
      */
     private void toggleHiddenSwitch(String type, World world, int x, int y, int z) {
-    	if(y < 0 || y > 127)
+    	if(y < 0 || y > CraftBook.MAP_BLOCK_HEIGHT - 1)
     		return;
     	
         ComplexBlock cblock = world.getComplexBlock(x, y, z);

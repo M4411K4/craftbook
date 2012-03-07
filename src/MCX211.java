@@ -526,8 +526,8 @@ public class MCX211 extends BaseIC {
     {
     	if(y < 0)
     		return 0;
-    	if(y > 127)
-    		return 127;
+    	if(y > CraftBook.MAP_BLOCK_HEIGHT - 1)
+    		return CraftBook.MAP_BLOCK_HEIGHT - 1;
     	return y;
     }
 }

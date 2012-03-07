@@ -135,7 +135,7 @@ public class MCX201 extends BaseIC {
         World world = CraftBook.getWorld(chip.getWorldType());
         if (item > 0 && !(item >= 21 && item <= 34) && item != 36) {
             Vector pos = chip.getBlockPosition();
-            int maxY = Math.min(128, pos.getBlockY() + 10);
+            int maxY = Math.min(CraftBook.MAP_BLOCK_HEIGHT, pos.getBlockY() + 10);
             int x = pos.getBlockX();
             int z = pos.getBlockZ();
 

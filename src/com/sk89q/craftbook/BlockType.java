@@ -150,6 +150,8 @@ public final class BlockType {
     public static final int END_PORTAL_FRAME = 120;
     public static final int END_STONE = 121;
     public static final int DRAGON_EGG = 122;
+    public static final int REDSTONE_LAMP_OFF = 123;
+    public static final int REDSTONE_LAMP_ON = 124;
 
     /**
      * Stores a list of dropped blocks for blocks.
@@ -271,6 +273,8 @@ public final class BlockType {
         blockDrops.put(120, -1);
         blockDrops.put(121, 121);
         blockDrops.put(122, 122);
+        blockDrops.put(123, 123);
+        blockDrops.put(124, 123);
     }
 
     /**

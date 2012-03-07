@@ -305,12 +305,12 @@ public class MCX209 extends BaseIC {
     {
     	if(startY < 0)
     		startY = 0;
-    	else if(startY > 127)
-    		startY = 127;
+    	else if(startY > CraftBook.MAP_BLOCK_HEIGHT - 1)
+    		startY = CraftBook.MAP_BLOCK_HEIGHT - 1;
     	if(endY < 0)
     		endY = 0;
-    	else if(endY > 127)
-    		endY = 127;
+    	else if(endY > CraftBook.MAP_BLOCK_HEIGHT - 1)
+    		endY = CraftBook.MAP_BLOCK_HEIGHT - 1;
     	
     	for(int x = startX; x < endX; x++)
         {

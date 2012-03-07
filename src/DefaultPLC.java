@@ -79,7 +79,7 @@ public class DefaultPLC extends PlcBase {
         int x0 = x;
         int y0 = v.getBlockY();
         int z0 = z;
-        for (int y = 0; y < 128; y++)
+        for (int y = 0; y < CraftBook.MAP_BLOCK_HEIGHT; y++)
             if (CraftBook.getBlockID(world, x, y, z) == BlockType.WALL_SIGN) {
                 if (((Sign) world.getComplexBlock(x, y, z)).getText(1)
                         .equalsIgnoreCase("[CODE BLOCK]"))
