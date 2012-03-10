@@ -74,7 +74,9 @@ public class MCX140 extends BaseIC {
     	
     	if(!sign.getLine4().isEmpty())
     	{
-    		isValidDimensions(sign.getLine4());
+    		String out = isValidDimensions(sign.getLine4());
+    		if(out != null)
+    			return out;
     	}
     	
         return null;
@@ -334,6 +336,9 @@ public class MCX140 extends BaseIC {
 	    	{
 	    		String[] args = chip.getText().getLine4().split("/", 2);
 	    		String[] dim = args[0].split(":", 3);
+	    		
+	    		if(dim.length != 3)
+	    			return;
 	    		
 	    		width = Integer.parseInt(dim[0]);
 	    		height = Integer.parseInt(dim[1]);

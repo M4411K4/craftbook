@@ -57,7 +57,9 @@ public class MCX228 extends BaseIC {
     	
     	if(!sign.getLine4().isEmpty())
     	{
-    		isValidDimensions(sign.getLine4());
+    		String out = isValidDimensions(sign.getLine4());
+    		if(out != null)
+    			return out;
     	}
     	
         return null;

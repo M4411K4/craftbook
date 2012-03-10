@@ -1,3 +1,8 @@
+2.0extra15.1:
+- fixed validation checks for [MCX140][MCX142][MCX144][MCX146]
+    and [MCX228]
+    - thanks Riot for the bug report!
+
 2.0extra15.0:
 - updated to minecraft 1.2.3
 - added support for the new max height (from 128 to 256)

@@ -85,7 +85,9 @@ public class MCX142 extends MCX140 {
     	
     	if(!sign.getLine4().isEmpty())
     	{
-    		MCX140.isValidDimensions(sign.getLine4());
+    		String out = MCX140.isValidDimensions(sign.getLine4());
+    		if(out != null)
+    			return out;
     	}
     	
         return null;
