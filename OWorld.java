@@ -841,7 +841,7 @@ public class OWorld implements OIBlockAccess {
             var1.b((OEntity) null);
         }
 
-        var1.W();
+        var1.X();
         if (var1 instanceof OEntityPlayer) {
             this.d.remove((OEntityPlayer) var1);
             this.t();
@@ -850,7 +850,7 @@ public class OWorld implements OIBlockAccess {
     }
 
     public void f(OEntity var1) {
-        var1.W();
+        var1.X();
         if (var1 instanceof OEntityPlayer) {
             this.d.remove((OEntityPlayer) var1);
             this.t();
@@ -908,10 +908,10 @@ public class OWorld implements OIBlockAccess {
         	
         	//appears to only be for boats.
         	//oentity.h() returns null for everything except boats
-        	 OAxisAlignedBB var15 = oentity.h(); //originally: OAxisAlignedBB var15 = ((OEntity) var17.get(var16)).h();
+        	OAxisAlignedBB var15 = oentity.h(); //originally: OAxisAlignedBB var15 = ((OEntity) var17.get(var16)).h();
 
             if (var15 != null && var15.a(var2)) {
-            	
+
             	//this collided with a boat
             	if(minecart != null && (Boolean) etc.getLoader().callHook(PluginLoader.Hook.VEHICLE_COLLISION, minecart, oentity.entity)) //Canary
                	   continue; //Canary
@@ -922,7 +922,7 @@ public class OWorld implements OIBlockAccess {
             //appears to only be for boats and minecarts currently. Everything else returns null
             var15 = var1.b_(oentity); //originally: var15 = var1.b_((OEntity) var17.get(var16));
             if (var15 != null && var15.a(var2)) {
-            	
+
             	//this collided with entity
             	if(minecart != null && (Boolean) etc.getLoader().callHook(PluginLoader.Hook.VEHICLE_COLLISION, minecart, oentity.entity)) //Canary
              	   continue; //Canary
@@ -1029,7 +1029,7 @@ public class OWorld implements OIBlockAccess {
 
         for (var1 = 0; var1 < this.e.size(); ++var1) {
             var2 = (OEntity) this.e.get(var1);
-            var2.G_();
+            var2.F_();
             if (var2.bE) {
                 this.e.remove(var1--);
             }
@@ -1173,9 +1173,9 @@ public class OWorld implements OIBlockAccess {
             var1.bv = var1.bt;
             if (var2 && var1.bZ) {
                 if (var1.bh != null) {
-                    var1.Q();
+                    var1.R();
                 } else {
-                    var1.G_();
+                    var1.F_();
                 }
             }
 
@@ -1919,7 +1919,7 @@ public class OWorld implements OIBlockAccess {
                         ++var2;
                         OBlock var18 = OBlock.m[var17];
 
-                        if (var18 != null && var18.m()) {
+                        if (var18 != null && var18.n()) {
                             ++var1;
                             var18.a(this, var14 + var5, var16 + var20.c(), var15 + var6, this.r);
                         }
@@ -1942,7 +1942,7 @@ public class OWorld implements OIBlockAccess {
 
     public boolean c(int var1, int var2, int var3, boolean var4) {
         OBiomeGenBase var5 = this.a(var1, var3);
-        float var6 = var5.h();
+        float var6 = var5.i();
 
         if (var6 > 0.15F) {
             return false;
@@ -1985,7 +1985,7 @@ public class OWorld implements OIBlockAccess {
 
     public boolean u(int var1, int var2, int var3) {
         OBiomeGenBase var4 = this.a(var1, var3);
-        float var5 = var4.h();
+        float var5 = var4.i();
 
         if (var5 > 0.15F) {
             return false;
@@ -2638,7 +2638,7 @@ public class OWorld implements OIBlockAccess {
         while (var1.hasNext()) {
             OEntityPlayer var2 = (OEntityPlayer) var1.next();
 
-            if (!var2.Y()) {
+            if (!var2.Z()) {
                 this.N = false;
                 break;
             }
@@ -2653,7 +2653,7 @@ public class OWorld implements OIBlockAccess {
         while (var1.hasNext()) {
             OEntityPlayer var2 = (OEntityPlayer) var1.next();
 
-            if (var2.Y()) {
+            if (var2.Z()) {
                 var2.a(false, false, true);
             }
         }
@@ -2673,7 +2673,7 @@ public class OWorld implements OIBlockAccess {
                 }
 
                 var2 = (OEntityPlayer) var1.next();
-            } while (var2.Z());
+            } while (var2.aa());
 
             return false;
         } else {
@@ -2707,14 +2707,14 @@ public class OWorld implements OIBlockAccess {
         } else {
             OBiomeGenBase var4 = this.a(var1, var3);
 
-            return var4.b() ? false : var4.c();
+            return var4.c() ? false : var4.d();
         }
     }
 
     public boolean z(int var1, int var2, int var3) {
         OBiomeGenBase var4 = this.a(var1, var3);
 
-        return var4.d();
+        return var4.e();
     }
 
     public void a(String var1, OWorldSavedData var2) {

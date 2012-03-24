@@ -240,7 +240,7 @@ public class CraftBook extends Plugin {
     			Object obj = it.next();
     			if(obj instanceof EntitySitting)
     			{
-    				((EntitySitting)obj).W();
+    				((EntitySitting)obj).X();
     			}
     		}
         }

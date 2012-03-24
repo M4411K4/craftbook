@@ -1,3 +1,6 @@
+2.0extra16.0:
+- updated to minecraft 1.2.4
+
 2.0extra15.1:
 - fixed validation checks for [MCX140][MCX142][MCX144][MCX146]
     and [MCX228]

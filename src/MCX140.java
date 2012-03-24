@@ -213,9 +213,9 @@ public class MCX140 extends BaseIC {
 			    			return false;
 			    		
 			    		OEntityWolf wolf = (OEntityWolf)entity.getEntity();
-			    		return (color == 2 && wolf.D())
+			    		return (color == 2 && wolf.E())
 			    				|| (color == 1 && wolf.v_())
-			    				|| (color == 0 && !wolf.D() && !wolf.v_() && !wolf.u_());
+			    				|| (color == 0 && !wolf.E() && !wolf.v_() && !wolf.u_());
 			    	}
 			    	else if(entityName.equals("Ozelot") && (entity.getEntity() instanceof OEntityOzelot))
 			    	{
