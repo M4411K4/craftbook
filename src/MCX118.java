@@ -20,6 +20,7 @@
 
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -132,26 +133,34 @@ public class MCX118 extends BaseIC {
 			@SuppressWarnings("rawtypes")
 			List entities = null;
 			
-			switch(TYPE)
+			try
 			{
-				case 0:
-					entities = etc.getServer().getPlayerList();
-					break;
-				case 1:
-					entities = this.WORLD.getMobList();
-					break;
-				case 2:
-					entities = this.WORLD.getAnimalList();
-					break;
-				case 3:
-					entities = this.WORLD.getLivingEntityList();
-					break;
-				case 4:
-					entities = entitiesExceptPlayers(this.WORLD.getWorld());
-					break;
-				case 5:
-					entities = entitiesExceptPlayersItems(this.WORLD.getWorld());
-					break;
+				switch(TYPE)
+				{
+					case 0:
+						entities = etc.getServer().getPlayerList();
+						break;
+					case 1:
+						entities = this.WORLD.getMobList();
+						break;
+					case 2:
+						entities = this.WORLD.getAnimalList();
+						break;
+					case 3:
+						entities = this.WORLD.getLivingEntityList();
+						break;
+					case 4:
+						entities = entitiesExceptPlayers(this.WORLD.getWorld());
+						break;
+					case 5:
+						entities = entitiesExceptPlayersItems(this.WORLD.getWorld());
+						break;
+				}
+			}
+			catch(ConcurrentModificationException e)
+			{
+				e.printStackTrace();
+				return;
 			}
 			
 			if(entities == null)

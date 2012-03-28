@@ -1,3 +1,35 @@
+2.0extra16.1:
+- added NamedNearby IC [MCX513]
+    - same as [MCX512] except %p names the player closest to the
+        IC instead of the player receiving the message.
+    - This IC was made by drathus. Thanks for the new IC!
+- added Particle IC [MCX250]
+    - creates certain particle effects at a specified location
+        - current effects are:
+            smoke, block, splash, flames
+    - place the particle type on the 3rd line of the IC sign
+    - optional axis and distance selection on the 4th line
+        - must start with X, Y, or Z followed by the distance
+            from -9 to 9
+    - which particles are allowed can be set in the
+        craftbook.properties value for:
+            ic-particles-allowed=
+    - thanks gregthegeek for indirectly pointing me to the
+        effects information!
+- added Sound Effect IC [MCX251]
+    - creates certain sound effects at a specified location
+        - current effects are:
+            click, click2, bow, door, fizz, music,
+            ghast charge, ghast fireball, zombie wood,
+            zombie metal, zombie break
+    - which sound effects are allowed can be set in the
+        craftbook.properties value for:
+            ic-sfx-allowed=
+    - same setup as [MCX250]
+- fixed crashing from concurrent error for [MCX118] and related
+    ICs
+    - thanks Riot for the bug report!
+
 2.0extra16.0:
 - updated to minecraft 1.2.4
 

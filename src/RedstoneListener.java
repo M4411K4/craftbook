@@ -168,6 +168,60 @@ public class RedstoneListener extends CraftBookDelegateListener
         		}
         	}
         }
+        
+        if(properties.containsKey("ic-particles-allowed"))
+        {
+        	String values = properties.getString("ic-particles-allowed");
+        	if(values != null && !values.isEmpty())
+        	{
+        		String[] args = values.split(",");
+        		
+        		for(ParticleType type : ParticleType.values())
+        		{
+        			type.allowed = false;
+        		}
+        		
+        		try
+        		{
+	        		for(int i = 0; i < args.length; i++)
+	        		{
+	        			ParticleType type = ParticleType.getParticle(args[i]);
+	        			type.allowed = true;
+	        		}
+        		}
+        		catch(NumberFormatException e)
+        		{
+        			logger.warning("craftbook.properties [ic-particles-allowed] contained invalid value. All particle effects might be disabled!");
+        		}
+        	}
+        }
+        
+        if(properties.containsKey("ic-sfx-allowed"))
+        {
+        	String values = properties.getString("ic-sfx-allowed");
+        	if(values != null && !values.isEmpty())
+        	{
+        		String[] args = values.split(",");
+        		
+        		for(SFXType type : SFXType.values())
+        		{
+        			type.allowed = false;
+        		}
+        		
+        		try
+        		{
+	        		for(int i = 0; i < args.length; i++)
+	        		{
+	        			SFXType type = SFXType.getEffect(args[i]);
+	        			type.allowed = true;
+	        		}
+        		}
+        		catch(NumberFormatException e)
+        		{
+        			logger.warning("craftbook.properties [ic-sfx-allowed] contained invalid value. All sound effects might be disabled!");
+        		}
+        	}
+        }
 
         icList.clear();
         
@@ -338,6 +392,8 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX244", new MCX244(), ICType.SISO);
         internalRegisterIC("MCX245", new MCX245(), ICType.SISO);
         internalRegisterIC("MCX246", new MCX246(), ICType.SISO);
+        internalRegisterIC("MCX250", new MCX250(), ICType.SISO);
+        internalRegisterIC("MCX251", new MCX251(), ICType.SISO);
         internalRegisterIC("MCX255", new MCX255(), ICType.SISO);
         internalRegisterIC("MCX256", new MCX256(), ICType.SISO);
         internalRegisterIC("MCX512", new MCX512(), ICType.SISO);
