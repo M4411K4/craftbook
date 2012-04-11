@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.sk89q.craftbook.BlockArea;
 import com.sk89q.craftbook.BlockType;
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.WorldBlockVector;
 
@@ -32,7 +33,7 @@ public class Bounce
 		int z = OMathHelper.b(entity.getZ());
 		
 		World world = entity.getWorld();
-		int worldType = world.getType().getId();
+		CraftBookWorld cbworld = CraftBook.getCBWorld(world);
 		
 		Block block = world.getBlockAt(x, y, z);
 		
@@ -47,7 +48,7 @@ public class Bounce
 			{
 				Map.Entry<WorldBlockVector, BlockArea> item = (Map.Entry<WorldBlockVector, BlockArea>) it.next();
 				BlockArea area = item.getValue();
-				if(area.containsPoint(worldType, x, y, z))
+				if(area.containsPoint(cbworld, x, y, z))
 				{
 					SignText text = CraftBook.getSignText(world, item.getKey());
 					if(text == null)
@@ -93,7 +94,7 @@ public class Bounce
 		{
 			OEntity oentity = entity.getEntity();
 			oentity.bq = applyForce;
-			etc.getMCServer().h.a(new OPacket28EntityVelocity(oentity), worldType);
+			etc.getMCServer().h.a(new OPacket28EntityVelocity(oentity), cbworld.dimension());
 			return true;
 		}
 		return false;
@@ -108,7 +109,7 @@ public class Bounce
 			int z = OMathHelper.b(entity.getZ());
 			
 			World world = entity.getWorld();
-			int worldType = world.getType().getId();
+			CraftBookWorld cbworld = CraftBook.getCBWorld(world);
 			
 			double[] applyForce = null;
 			
@@ -117,7 +118,7 @@ public class Bounce
 			{
 				Map.Entry<WorldBlockVector, BlockArea> item = (Map.Entry<WorldBlockVector, BlockArea>) it.next();
 				BlockArea area = item.getValue();
-				if(area.containsPoint(worldType, x, y, z))
+				if(area.containsPoint(cbworld, x, y, z))
 				{
 					SignText text = CraftBook.getSignText(world, item.getKey());
 					if(text == null)
@@ -169,7 +170,7 @@ public class Bounce
 				oentity.bp = applyForce[0];
 				oentity.bq = applyForce[1];
 				oentity.br = applyForce[2];
-				etc.getMCServer().h.a(new OPacket28EntityVelocity(oentity), worldType);
+				etc.getMCServer().h.a(new OPacket28EntityVelocity(oentity), cbworld.dimension());
 			}
 		}
 	}
@@ -198,7 +199,7 @@ public class Bounce
 		else if(allowedICBlocks == null || allowedICBlocks.contains(block.getType()))
 		{
 			//check ic area list
-			int worldType = entity.getWorld().getType().getId();
+			CraftBookWorld cbworld = CraftBook.getCBWorld(entity.getWorld());
 			Iterator<Map.Entry<WorldBlockVector, BlockArea>> it;
 			
 			if(icAreas != null && icAreas.size() > 0)
@@ -208,7 +209,7 @@ public class Bounce
 				{
 					Map.Entry<WorldBlockVector, BlockArea> item = (Map.Entry<WorldBlockVector, BlockArea>) it.next();
 					BlockArea area = item.getValue();
-					if(area.containsPoint(worldType, x, y, z))
+					if(area.containsPoint(cbworld, x, y, z))
 					{
 						return true;
 					}
@@ -222,7 +223,7 @@ public class Bounce
 				{
 					Map.Entry<WorldBlockVector, BlockArea> item = (Map.Entry<WorldBlockVector, BlockArea>) it.next();
 					BlockArea area = item.getValue();
-					if(area.containsPoint(worldType, x, y, z))
+					if(area.containsPoint(cbworld, x, y, z))
 					{
 						return true;
 					}
@@ -239,14 +240,14 @@ public class Bounce
 			if(!BlockType.canPassThrough(block.getType()))
 				return false;
 			
-			int worldType = entity.getWorld().getType().getId();
+			CraftBookWorld cbworld = CraftBook.getCBWorld(entity.getWorld());
 			Iterator<Map.Entry<WorldBlockVector, BlockArea>> it;
 			it = icRepelAreas.entrySet().iterator();
 			while (it.hasNext())
 			{
 				Map.Entry<WorldBlockVector, BlockArea> item = (Map.Entry<WorldBlockVector, BlockArea>) it.next();
 				BlockArea area = item.getValue();
-				if(area.containsPoint(worldType, x, y, z))
+				if(area.containsPoint(cbworld, x, y, z))
 				{
 					return true;
 				}

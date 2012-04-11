@@ -31,6 +31,7 @@ public class MC1200 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "MOB SPAWNER";
     }
@@ -40,6 +41,7 @@ public class MC1200 extends BaseIC {
      *
      * @return
      */
+    @Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MC1200 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
         String rider = sign.getLine4();
 
@@ -72,6 +75,7 @@ public class MC1200 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         if (chip.getIn(1).is()) {
             String id = chip.getText().getLine3();
@@ -84,13 +88,15 @@ public class MC1200 extends BaseIC {
                 int z = pos.getBlockZ();
 
                 for (int y = pos.getBlockY() + 1; y <= maxY; y++) {
-                    if (BlockType.canPassThrough(CraftBook.getBlockID(chip.getWorldType(), x, y, z))) {
-                        Location loc = new Location(x, y, z);
-                        loc.dimension = chip.getWorldType();
+                    if (BlockType.canPassThrough(CraftBook.getBlockID(chip.getCBWorld(), x, y, z))) {
+                        Mob mob = new Mob(id, CraftBook.getWorld(chip.getCBWorld()));
                         
-                        Mob mob = new Mob(id, loc);
+                        Location loc = new Location(x, y, z);
+                        loc.dimension = chip.getCBWorld().dimension();
+                        mob.teleportTo(loc);
+                        
                         if (rider.length() != 0 && Mob.isValid(rider)) {
-                            mob.spawn(new Mob(rider, loc.getWorld()));
+                            mob.spawn(new Mob(rider, CraftBook.getWorld(chip.getCBWorld()) ));
                         } else {
                             mob.spawn();
                         }

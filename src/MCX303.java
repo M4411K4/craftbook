@@ -28,6 +28,7 @@ public class MCX303 extends MCX302 {
      * @return
      */
 	private final String TITLE = "REPEL WALL";
+	@Override
     public String getTitle() {
         return "^"+TITLE;
     }
@@ -41,14 +42,16 @@ public class MCX303 extends MCX302 {
      *
      * @return
      */
+    @Override
     public boolean requiresPermission() {
         return true;
     }
     
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	if(sign.getLine4().isEmpty())
     	{
-    		switch(CraftBook.getBlockData(worldType, pos))
+    		switch(CraftBook.getBlockData(cbworld, pos))
     		{
 	    		case 0x2:
 	    			sign.setLine4("0:0:5");
@@ -65,7 +68,7 @@ public class MCX303 extends MCX302 {
     		}
     	}
     	
-    	return super.validateEnvironment(worldType, pos, sign);
+    	return super.validateEnvironment(cbworld, pos, sign);
     }
 
     protected BlockArea getBlockArea(ChipState chip, int data, int width, int length, int offx, int offy, int offz)
@@ -112,6 +115,6 @@ public class MCX303 extends MCX302 {
         
         int y = (int)chip.getPosition().getY() + offy;
         
-        return new BlockArea(chip.getWorldType(), startX + offx, y, startZ + offz, endX + offx, y + length, endZ + offz);
+        return new BlockArea(chip.getCBWorld(), startX + offx, y, startZ + offz, endX + offx, y + length, endZ + offz);
     }
 }

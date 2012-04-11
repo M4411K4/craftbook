@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.*;
@@ -32,6 +33,7 @@ public class MCT233 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "WEATHER CONTROL";
     }
@@ -41,11 +43,13 @@ public class MCT233 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
 
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         if (sign.getLine3().length() != 0) {
         	return "Third line needs to be blank";
         }
@@ -62,11 +66,12 @@ public class MCT233 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
     	
     	if (chip.getIn(1).isTriggered() && chip.getIn(1).is())
     	{
-    		World world = CraftBook.getWorld(chip.getWorldType());
+    		World world = CraftBook.getWorld(chip.getCBWorld());
     		
 	    	int duration;
 	    	

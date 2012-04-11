@@ -1,6 +1,7 @@
 
 
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 // $Id$
@@ -37,11 +38,13 @@ public class MCX027 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "BETWEEN TIME";
     }
     
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	String line3 = sign.getLine3();
     	String line4 = sign.getLine4();
     	
@@ -85,10 +88,11 @@ public class MCX027 extends BaseIC {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if(chip.inputAmount() == 0 || chip.getIn(1).is())
         {
-        	long worldTime = CraftBook.getWorld(chip.getWorldType()).getRelativeTime();
+        	long worldTime = CraftBook.getWorld(chip.getCBWorld()).getRelativeTime();
         	if(chip.getText().getLine3().indexOf("*") == -1 && chip.getText().getLine4().indexOf("*") == -1)
         	{
 	        	int time = Integer.parseInt(chip.getText().getLine3());

@@ -32,10 +32,16 @@ public class MC1512 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "MESSAGE NEARBY";
     }
     
+	@Override
+	public boolean requiresPermission() {
+        return true; //Could be used for über-spam (with a large value on the 4th line, its practically like MC1511)
+    }
+	
     /**
      * Validates the IC's environment. The position of the sign is given.
      * Return a string in order to state an error message and deny
@@ -44,8 +50,8 @@ public class MC1512 extends BaseIC {
      * @param sign
      * @return
      */
-    
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
         if (sign.getLine4().equals("")) {
             return "Please put a distance on the third line.";
@@ -62,23 +68,19 @@ public class MC1512 extends BaseIC {
         return null;
     }
     
-    public boolean requiresPermission() {
-        return true; //Could be used for über-spam (with a large value on the 4th line, its practically like MC1511)
-    }
-
-    
     /**
      * Think.
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (chip.getIn(1).is()) { //Only on the rising edge
             String distance = chip.getText().getLine4();
             String theMessage = chip.getText().getLine3();
             Vector pos = chip.getBlockPosition();
             for(Player p: etc.getServer().getPlayerList()) 
-                if (p.getWorld().getType().getId() == chip.getWorldType()
+                if (CraftBook.getCBWorld(p.getWorld()).equals(chip.getCBWorld())
                 	&& playerVector(p).distance(pos)<=(double)Float.parseFloat(distance))
                     p.sendMessage(theMessage);
         }

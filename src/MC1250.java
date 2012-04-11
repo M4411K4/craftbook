@@ -18,6 +18,7 @@
  */
 
 //import java.util.Random;
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.*;
@@ -39,6 +40,7 @@ public class MC1250 extends BaseIC {
      * 
      * @return
      */
+	@Override
     public String getTitle() {
         return "FIREWORKS";
     }
@@ -48,6 +50,7 @@ public class MC1250 extends BaseIC {
      * 
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -60,7 +63,8 @@ public class MC1250 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         if (sign.getLine3().length() != 0) {
             return "The third line must be blank.";
         }
@@ -77,6 +81,7 @@ public class MC1250 extends BaseIC {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (chip.getIn(1).isTriggered() && chip.getIn(1).is()) {
             int x = chip.getBlockPosition().getBlockX();
@@ -87,7 +92,7 @@ public class MC1250 extends BaseIC {
                 return;
             }
             
-            OWorldServer oworld = CraftBook.getOWorldServer(chip.getWorldType());
+            OWorldServer oworld = CraftBook.getOWorldServer(chip.getCBWorld());
             if(oworld == null)
             	return;
             

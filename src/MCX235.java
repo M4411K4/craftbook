@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.BaseIC;
@@ -33,6 +34,7 @@ public class MCX235 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "FALSE WEATHER";
     }
@@ -42,11 +44,13 @@ public class MCX235 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
 
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	if (sign.getLine3().length() != 0 &&
     			( sign.getLine3().charAt(1) != ':'
     				|| sign.getLine3().contains(" ")
@@ -88,7 +92,7 @@ public class MCX235 extends BaseIC {
     	OPacket70Bed packet;
     	if(chip.getIn(1).is())
     		packet = new OPacket70Bed(1, 0);
-    	else if(CraftBook.getWorld(chip.getWorldType()).isRaining())
+    	else if(CraftBook.getWorld(chip.getCBWorld()).isRaining())
     		return;
     	else
     		packet = new OPacket70Bed(2, 0);

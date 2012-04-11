@@ -40,10 +40,10 @@ public class LightSwitch {
      * @param oz
      * @return
      */
-    public static boolean toggleLights(int worldType, Vector origin, BlockBag bag)
+    public static boolean toggleLights(CraftBookWorld cbworld, Vector origin, BlockBag bag)
             throws BlockSourceException {
     	
-    	World world = CraftBook.getWorld(worldType);
+    	World world = CraftBook.getWorld(cbworld);
     	
         int aboveID = CraftBook.getBlockID(world, origin.add(0, 1, 0));
 

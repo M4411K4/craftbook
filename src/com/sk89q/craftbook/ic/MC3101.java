@@ -51,6 +51,7 @@ public class MC3101 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "DOWN COUNTER";
     }
@@ -63,7 +64,8 @@ public class MC3101 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0 || !id.matches("^[0-9]+:(INF|ONCE)$")) {
@@ -84,6 +86,7 @@ public class MC3101 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         try {
             // Get IC configuration data from line 3 of sign

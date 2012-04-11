@@ -29,6 +29,7 @@ public class MCX207 extends MCX209 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "BRIDGE";
     }

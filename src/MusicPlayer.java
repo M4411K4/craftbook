@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.HistoryHashMap;
 import com.sk89q.craftbook.music.IMusicPlayer;
 import com.sk89q.craftbook.music.MusicMidiTrack;
@@ -32,7 +33,7 @@ public class MusicPlayer implements IMusicPlayer
 	private final int x;
 	private final int y;
 	private final int z;
-	private final int worldType;
+	private final CraftBookWorld cbworld;
 	
 	private int currentTick = 0;
 	private int skipProtection = 0;
@@ -44,19 +45,19 @@ public class MusicPlayer implements IMusicPlayer
 	
 	private Map<String,RadioObject> radios;
 	
-	public MusicPlayer(String data, int worldType, int x, int y, int z, PropertiesFile properties, byte type, boolean loop)
+	public MusicPlayer(String data, CraftBookWorld cbworld, int x, int y, int z, PropertiesFile properties, byte type, boolean loop)
 	{
-		this(data, worldType, x, y, z, properties, type, loop, false);
+		this(data, cbworld, x, y, z, properties, type, loop, false);
 	}
 	
-	public MusicPlayer(String data, int worldType, int x, int y, int z, PropertiesFile properties, byte type, boolean loop, boolean isStation)
+	public MusicPlayer(String data, CraftBookWorld cbworld, int x, int y, int z, PropertiesFile properties, byte type, boolean loop, boolean isStation)
 	{
 		this.LOOP = loop;
 		
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		this.worldType = worldType;
+		this.cbworld = cbworld;
 		
 		if(isStation)
 			radios = new HistoryHashMap<String,RadioObject>(100);
@@ -247,13 +248,13 @@ public class MusicPlayer implements IMusicPlayer
 	{
 		for(MusicNote note : notes)
 		{
-			etc.getMCServer().h.a(x, y, z, 64.0D, worldType, new OPacket54PlayNoteBlock(x, y, z, note.type, note.pitch));
+			etc.getMCServer().h.a(x, y, z, 64.0D, cbworld.dimension(), new OPacket54PlayNoteBlock(x, y, z, note.type, note.pitch));
 			
 			if(radios != null)
 			{
 				for(RadioObject radio : radios.values())
 				{
-					etc.getMCServer().h.a(radio.X, radio.Y, radio.Z, 64.0D, worldType,
+					etc.getMCServer().h.a(radio.X, radio.Y, radio.Z, 64.0D, cbworld.dimension(),
 							new OPacket54PlayNoteBlock(radio.X, radio.Y, radio.Z, note.type, note.pitch));
 				}
 			}
@@ -267,8 +268,8 @@ public class MusicPlayer implements IMusicPlayer
 	
 	private void sendMessageTo(String message, int x, int y, int z)
 	{
-		World world = CraftBook.getWorld(worldType);
-		World.Type type = world.getType();
+		World world = CraftBook.getWorld(cbworld);
+		World.Dimension type = world.getType();
 		for(Player player: etc.getServer().getPlayerList())
 		{
 			if(player.getWorld().getType() != type)
@@ -397,7 +398,7 @@ public class MusicPlayer implements IMusicPlayer
 		
 		if(radios != null)
 		{
-			World world = CraftBook.getWorld(worldType);
+			World world = CraftBook.getWorld(cbworld);
 			for(RadioObject radio : radios.values())
 			{
 				ComplexBlock block = world.getComplexBlock(radio.SIGN_X, radio.SIGN_Y, radio.SIGN_Z);

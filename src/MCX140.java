@@ -31,6 +31,7 @@ public class MCX140 extends BaseIC {
      */
 	private final String TITLE = "IN AREA";
 	
+	@Override
     public String getTitle() {
     	return "^"+TITLE;
     }
@@ -40,6 +41,7 @@ public class MCX140 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MCX140 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	
     	if(sign.getLine3().isEmpty())
     	{
@@ -217,12 +220,12 @@ public class MCX140 extends BaseIC {
 			    				|| (color == 1 && wolf.v_())
 			    				|| (color == 0 && !wolf.E() && !wolf.v_() && !wolf.u_());
 			    	}
-			    	else if(entityName.equals("Ozelot") && (entity.getEntity() instanceof OEntityOzelot))
+			    	else if(entityName.equals("Ozelot") && (entity.getEntity() instanceof OEntityOcelot))
 			    	{
 			    		if(color > 2)
 			    			return false;
 			    		
-			    		OEntityOzelot ocelot = (OEntityOzelot)entity.getEntity();
+			    		OEntityOcelot ocelot = (OEntityOcelot)entity.getEntity();
 			    		return (color == 1 && ocelot.v_())
 			    				|| (color == 0 && !ocelot.v_() && !ocelot.u_());
 			    	}
@@ -319,6 +322,7 @@ public class MCX140 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip)
     {
     	if(chip.inputAmount() == 0
@@ -358,8 +362,8 @@ public class MCX140 extends BaseIC {
 	    	if(length > RedstoneListener.icInAreaMaxLength)
 	    		length = RedstoneListener.icInAreaMaxLength;
 	    	
-	    	World world = CraftBook.getWorld(chip.getWorldType());
-	    	Vector lever = Util.getWallSignBack(chip.getWorldType(), chip.getPosition(), 2);
+	    	World world = CraftBook.getWorld(chip.getCBWorld());
+	    	Vector lever = Util.getWallSignBack(chip.getCBWorld(), chip.getPosition(), 2);
 	        int data = CraftBook.getBlockData(world, chip.getPosition());
 	        BlockArea area = MCX220.getBlockArea(chip, data, width, height, length, offx, offy, offz);
 	        
@@ -373,7 +377,7 @@ public class MCX140 extends BaseIC {
     			chip.getText().supressUpdate();
     			
     			RedstoneListener redListener = (RedstoneListener) chip.getExtra();
-    			redListener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    			redListener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     		}
     		else if(!chip.getIn(1).is() && chip.getText().getLine1().charAt(0) != '^')
     		{
@@ -397,10 +401,10 @@ public class MCX140 extends BaseIC {
     	private final Vector LEVER;
     	private final String ENTITY_NAME;
     	private final String RIDER_NAME;
-    	private final Location DESTINATION;
+    	private final WorldLocation DESTINATION;
     	private final String[] MESSAGES;
     	
-    	public DetectEntityInArea(BlockArea area, Vector lever, String entityName, String riderName, Location destination, String[] messages)
+    	public DetectEntityInArea(BlockArea area, Vector lever, String entityName, String riderName, WorldLocation destination, String[] messages)
     	{
     		AREA = area;
     		LEVER = lever;
@@ -415,7 +419,7 @@ public class MCX140 extends BaseIC {
 		{
 			boolean output = false;
 			
-			OWorldServer oworld = CraftBook.getOWorldServer(AREA.getWorldType());
+			OWorldServer oworld = CraftBook.getOWorldServer(AREA.getCBWorld());
 			for(@SuppressWarnings("rawtypes")
     		Iterator it = oworld.b.iterator(); it.hasNext();)
     		{
@@ -432,7 +436,7 @@ public class MCX140 extends BaseIC {
     			if(MCX140.isValidEntity(entity, ENTITY_NAME)
     				&& (RIDER_NAME == null || RIDER_NAME.isEmpty()
     					|| (UtilEntity.riddenByEntity(entity.getEntity()) != null && MCX140.isValidEntity(new BaseEntity(UtilEntity.riddenByEntity(entity.getEntity())), RIDER_NAME)) )
-    				&& AREA.containsPoint(AREA.getWorldType(),
+    				&& AREA.containsPoint(AREA.getCBWorld(),
     										OMathHelper.b(entity.getX()),
     										OMathHelper.b(entity.getY()),
     										OMathHelper.b(entity.getZ()) )
@@ -470,7 +474,7 @@ public class MCX140 extends BaseIC {
     			}
     		}
 			
-			Redstone.setOutput(AREA.getWorldType(), LEVER, output);
+			Redstone.setOutput(AREA.getCBWorld(), LEVER, output);
 		}
     }
 }

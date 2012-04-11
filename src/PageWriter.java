@@ -616,7 +616,7 @@ public class PageWriter
 	
 	public static boolean validateEnvironment(CraftBookPlayer player, Vector pt, SignText signText)
 	{
-		World world = CraftBook.getWorld(player.getWorldType());
+		World world = CraftBook.getWorld(player.getCBWorld());
 		Vector bPt = Util.getWallSignBack(world, pt, 1);
 		if(CraftBook.getBlockID(world, pt) != BlockType.WALL_SIGN || CraftBook.getBlockID(world, bPt) != BlockType.BOOKCASE)
 		{

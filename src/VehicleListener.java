@@ -334,13 +334,13 @@ public class VehicleListener extends CraftBookDelegateListener {
                 return;
             }*/
 
-            int worldType = world.getType().getId();
-            NearbyChestBlockBag blockBag = new NearbyChestBlockBag(worldType, pt);
-            blockBag.addSingleSourcePosition(worldType, pt);
-            blockBag.addSingleSourcePosition(worldType, pt.add(1, 0, 0));
-            blockBag.addSingleSourcePosition(worldType, pt.add(-1, 0, 0));
-            blockBag.addSingleSourcePosition(worldType, pt.add(0, 0, 1));
-            blockBag.addSingleSourcePosition(worldType, pt.add(0, 0, -1));
+            CraftBookWorld cbworld = CraftBook.getCBWorld(world);
+            NearbyChestBlockBag blockBag = new NearbyChestBlockBag(cbworld, pt);
+            blockBag.addSingleSourcePosition(cbworld, pt);
+            blockBag.addSingleSourcePosition(cbworld, pt.add(1, 0, 0));
+            blockBag.addSingleSourcePosition(cbworld, pt.add(-1, 0, 0));
+            blockBag.addSingleSourcePosition(cbworld, pt.add(0, 0, 1));
+            blockBag.addSingleSourcePosition(cbworld, pt.add(0, 0, -1));
 
             try {
                 Minecart minecart;
@@ -376,7 +376,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                         }
                     }
                     
-                    minecart = spawnMinecart(worldType,
+                    minecart = spawnMinecart(cbworld,
                     						depositPt.getX(),
                     						depositPt.getY(),
                     						depositPt.getZ(),
@@ -396,7 +396,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                         }
                     }
                     
-                    minecart = spawnMinecart(worldType,
+                    minecart = spawnMinecart(cbworld,
     						depositPt.getX(),
     						depositPt.getY(),
     						depositPt.getZ(),
@@ -415,14 +415,14 @@ public class VehicleListener extends CraftBookDelegateListener {
                         }
                     }
                     
-                    minecart = spawnMinecart(worldType,
+                    minecart = spawnMinecart(cbworld,
     						depositPt.getX(),
     						depositPt.getY(),
     						depositPt.getZ(),
     						Minecart.Type.PoweredMinecart.getType());
                 } else {
                     blockBag.fetchBlock(ItemType.MINECART);
-                    minecart = spawnMinecart(worldType,
+                    minecart = spawnMinecart(cbworld,
     						depositPt.getX(),
     						depositPt.getY(),
     						depositPt.getZ(),
@@ -581,18 +581,18 @@ public class VehicleListener extends CraftBookDelegateListener {
                     if (test == null || test) {
                         if (minecart.getType() == Minecart.Type.StorageCart) {
                             Vector pt = new Vector(blockX, blockY, blockZ);
-                            int worldType = world.getType().getId();
-                            NearbyChestBlockBag bag = new NearbyChestBlockBag(worldType, pt);
+                            CraftBookWorld cbworld = CraftBook.getCBWorld(world);
+                            NearbyChestBlockBag bag = new NearbyChestBlockBag(cbworld, pt);
 
                             for (int y = -1; y <= 0; y++) {
-                                bag.addSingleSourcePositionExtra(worldType, pt.add(1, y, 0));
-                                bag.addSingleSourcePositionExtra(worldType, pt.add(2, y, 0));
-                                bag.addSingleSourcePositionExtra(worldType, pt.add(-1, y, 0));
-                                bag.addSingleSourcePositionExtra(worldType, pt.add(-2, y, 0));
-                                bag.addSingleSourcePositionExtra(worldType, pt.add(0, y, 1));
-                                bag.addSingleSourcePositionExtra(worldType, pt.add(0, y, 2));
-                                bag.addSingleSourcePositionExtra(worldType, pt.add(0, y, -1));
-                                bag.addSingleSourcePositionExtra(worldType, pt.add(0, y, -2));
+                                bag.addSingleSourcePositionExtra(cbworld, pt.add(1, y, 0));
+                                bag.addSingleSourcePositionExtra(cbworld, pt.add(2, y, 0));
+                                bag.addSingleSourcePositionExtra(cbworld, pt.add(-1, y, 0));
+                                bag.addSingleSourcePositionExtra(cbworld, pt.add(-2, y, 0));
+                                bag.addSingleSourcePositionExtra(cbworld, pt.add(0, y, 1));
+                                bag.addSingleSourcePositionExtra(cbworld, pt.add(0, y, 2));
+                                bag.addSingleSourcePositionExtra(cbworld, pt.add(0, y, -1));
+                                bag.addSingleSourcePositionExtra(cbworld, pt.add(0, y, -2));
                             }
                             
                             if (bag.getChestBlockCount() > 0) {
@@ -881,7 +881,9 @@ public class VehicleListener extends CraftBookDelegateListener {
                         		if(BlockType.isDirectionBlock(item.getItemId()))
                         			dmg = 0;
                         		
-                        		CraftBookItem cbItem = new CraftBookItem(item.getItemId(), dmg);
+                        		CraftBookEnchantment[] cbenchants = UtilItem.enchantmentsToCBEnchantment(item.getEnchantments());
+                        		
+                        		CraftBookItem cbItem = new CraftBookItem(item.getItemId(), dmg, cbenchants);
                         		if(!contents.containsKey(cbItem))
                         		{
                         			contents.put(cbItem, item.getAmount());
@@ -914,6 +916,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                                 		if (cartItem == null || cartItem.getAmount() <= 0
                             				|| itemType.id() != cartItem.getItemId()
                             				|| itemType.color() != cartItem.getDamage()
+                            				|| !UtilItem.enchantsAreEqual(cartItem.getEnchantments(), itemType.enchantments())
                             				)
                                 		{
                                 			continue;
@@ -948,6 +951,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             				if(cartItems[i] != null
                             					&& cartItems[i].getItemId() == cbItem.id()
                             					&& cartItems[i].getDamage() == cbItem.color()
+                            					&& UtilItem.enchantsAreEqual(cartItems[i].getEnchantments(), cbItem.enchantments())
                             					&& cartItems[i].getAmount() > 0
                             					&& cartItems[i].getAmount() < ItemArrayUtil.getStackMax(cartItems[i])
                             					)
@@ -965,6 +969,24 @@ public class VehicleListener extends CraftBookDelegateListener {
                             					if(cartItems[i] == null)
                             					{
                             						cartItems[i] = new Item(cbItem.id(), 1, i, cbItem.color());
+                            						if(cbItem.hasEnchantments())
+                            	                	{
+                            		                	for(int k = 0; k < cbItem.enchantments().length; k++)
+                            		        			{
+                            		        				CraftBookEnchantment cbenchant = cbItem.enchantment(k);
+                            		        				
+                            		        				//since this is from a server created recipe we can assume it is allowed
+                            		        				//if(!cbenchant.enchantment().allowed)
+                            		        					//continue;
+                            		        				
+                            		        				Enchantment enchant = new Enchantment(Enchantment.Type.fromId(cbenchant.enchantment().getId()), cbenchant.level());
+                            		        				
+                            		        				if(!enchant.isValid())
+                            		        					continue;
+                            		        				
+                            		        				cartItems[i].addEnchantment(enchant);
+                            		        			}
+                            	                	}
                             						found = true;
                             						break;
                             					}
@@ -1109,13 +1131,13 @@ public class VehicleListener extends CraftBookDelegateListener {
                     Sign sign = getControllerSign(world, depositPt.add(0, -1, 0), "[Dispenser]");
                     String collectType = sign != null ? sign.getText(2) : "";
                     
-                    int worldType = world.getType().getId();
-                    NearbyChestBlockBag blockBag = new NearbyChestBlockBag(worldType, depositPt);
-                    blockBag.addSingleSourcePosition(worldType, depositPt);
-                    blockBag.addSingleSourcePosition(worldType, depositPt.add(1, 0, 0));
-                    blockBag.addSingleSourcePosition(worldType, depositPt.add(-1, 0, 0));
-                    blockBag.addSingleSourcePosition(worldType, depositPt.add(0, 0, 1));
-                    blockBag.addSingleSourcePosition(worldType, depositPt.add(0, 0, -1));
+                    CraftBookWorld cbworld = CraftBook.getCBWorld(world);
+                    NearbyChestBlockBag blockBag = new NearbyChestBlockBag(cbworld, depositPt);
+                    blockBag.addSingleSourcePosition(cbworld, depositPt);
+                    blockBag.addSingleSourcePosition(cbworld, depositPt.add(1, 0, 0));
+                    blockBag.addSingleSourcePosition(cbworld, depositPt.add(-1, 0, 0));
+                    blockBag.addSingleSourcePosition(cbworld, depositPt.add(0, 0, 1));
+                    blockBag.addSingleSourcePosition(cbworld, depositPt.add(0, 0, -1));
 
                     Minecart.Type type = minecart.getType();
                     if (type == Minecart.Type.Minecart) {
@@ -1679,10 +1701,11 @@ public class VehicleListener extends CraftBookDelegateListener {
                             	return;
                             }
                             
-                            world = warp.LOCATION.getWorld();
-                            blockX = (int)Math.floor(warp.LOCATION.x);
-                            blockY = (int)Math.floor(warp.LOCATION.y);
-                            blockZ = (int)Math.floor(warp.LOCATION.z);
+                            CraftBookWorld cbworld = warp.LOCATION.getCBWorld();
+                            world = CraftBook.getWorld(cbworld);
+                            blockX = (int)Math.floor(warp.LOCATION.getX());
+                            blockY = (int)Math.floor(warp.LOCATION.getY());
+                            blockZ = (int)Math.floor(warp.LOCATION.getZ());
                             
                             if(!BlockType.canPassThrough(CraftBook.getBlockID(world, blockX, blockY, blockZ)))
                             {
@@ -1691,7 +1714,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             	return;
                             }
                             
-                            Location targetTrack = null;
+                            WorldLocation targetTrack = null;
                             Vector motion = null;
                             int wantedDir = -1;
                             
@@ -1712,7 +1735,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             		&& CraftBook.getBlockData(world, blockX, blockY, blockZ + 1) == 0)
                             {
                             	//west
-                            	targetTrack = new Location(blockX, blockY, blockZ + 1, 0, 0);
+                            	targetTrack = new WorldLocation(cbworld, blockX, blockY, blockZ + 1, 0, 0);
                             	motion = new Vector(0, 0, minecartBoostLaunch);
                             }
                             if((wantedDir == -1 || wantedDir == 4)
@@ -1720,7 +1743,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             		&& CraftBook.getBlockData(world, blockX + 1, blockY, blockZ) == 1)
                             {
                             	//south
-                            	targetTrack = new Location(blockX + 1, blockY, blockZ, 270, 0);
+                            	targetTrack = new WorldLocation(cbworld, blockX + 1, blockY, blockZ, 270, 0);
                             	motion = new Vector(minecartBoostLaunch, 0, 0);
                             }
                             if((wantedDir == -1 || wantedDir == 0)
@@ -1728,7 +1751,7 @@ public class VehicleListener extends CraftBookDelegateListener {
                             		&& CraftBook.getBlockData(world, blockX, blockY, blockZ - 1) == 0)
                             {
                             	//east
-                            	targetTrack = new Location(blockX, blockY, blockZ - 1, 180, 0);
+                            	targetTrack = new WorldLocation(cbworld, blockX, blockY, blockZ - 1, 180, 0);
                             	motion = new Vector(0, 0, -minecartBoostLaunch);
                             }
                             if((wantedDir == -1 || wantedDir == 12)
@@ -1736,21 +1759,20 @@ public class VehicleListener extends CraftBookDelegateListener {
                             		&& CraftBook.getBlockData(world, blockX - 1, blockY, blockZ) == 1)
                             {
                             	//north
-                            	targetTrack = new Location(blockX - 1, blockY, blockZ, 90, 0);
+                            	targetTrack = new WorldLocation(cbworld, blockX - 1, blockY, blockZ, 90, 0);
                             	motion = new Vector(-minecartBoostLaunch, 0, 0);
                             }
                             
                             if(targetTrack != null)
                             {
-                            	targetTrack.dimension = warp.LOCATION.dimension;
-                            	targetTrack.y += 0.6200000047683716D;
+                            	targetTrack = targetTrack.add(0.0D,  0.6200000047683716D, 0.0D);
                             	CraftBook.teleportEntity(minecart, targetTrack);
                             	minecart.setMotion(motion.getX(), 0, motion.getZ());
                             }
                             else
                             {
-                            	warp.LOCATION.y += 0.6200000047683716D;
-                            	CraftBook.teleportEntity(minecart, warp.LOCATION);
+                            	targetTrack = warp.LOCATION.add(0.0D,  0.6200000047683716D, 0.0D);
+                            	CraftBook.teleportEntity(minecart, targetTrack);
                             }
                             return;
                         }
@@ -2766,9 +2788,9 @@ public class VehicleListener extends CraftBookDelegateListener {
         return false;
     }
     
-    private Minecart spawnMinecart(int worldType, double x, double y, double z, int type)
+    private Minecart spawnMinecart(CraftBookWorld cbworld, double x, double y, double z, int type)
     {
-    	OWorldServer oworld = CraftBook.getOWorldServer(worldType);
+    	OWorldServer oworld = CraftBook.getOWorldServer(cbworld);
     	OEntityMinecart oentity = new OEntityMinecart(oworld, x, y, z, type);
     	UtilEntity.spawnEntityInWorld(oworld, oentity);
     	

@@ -27,6 +27,7 @@ public class MCX301 extends MCX300 {
      * @return
      */
 	private final String TITLE = "SOFT LAND";
+	@Override
     public String getTitle() {
         return "^"+TITLE;
     }
@@ -41,15 +42,17 @@ public class MCX301 extends MCX300 {
      *
      * @return
      */
+    @Override
     public boolean requiresPermission() {
         return true;
     }
     
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	if(!sign.getLine4().isEmpty())
     		return "4th line must be blank.";
     	
-    	return super.validateEnvironment(worldType, pos, sign);
+    	return super.validateEnvironment(cbworld, pos, sign);
     }
     
     @Override

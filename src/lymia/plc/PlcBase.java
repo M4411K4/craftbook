@@ -19,6 +19,7 @@
 
 package lymia.plc;
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.BaseIC;
@@ -36,7 +37,7 @@ public abstract class PlcBase extends BaseIC {
         
         String code;
         try {
-            code = getCode(chip.getWorldType(), chip.getPosition());
+            code = getCode(chip.getCBWorld(), chip.getPosition());
         } catch (PlcException e) {
             t.setLine2("§c"+t.getLine2());
             t.setLine3("!ERROR!");
@@ -85,22 +86,22 @@ public abstract class PlcBase extends BaseIC {
         t.supressUpdate();
     }
     
-    public String validateEnvironment(int worldType, Vector v, SignText t) {
+    public String validateEnvironment(CraftBookWorld cbworld, Vector v, SignText t) {
         if(!t.getLine3().isEmpty()) return "line 3 is not empty";
         
         String code;
         try {
-            code = getCode(worldType, v);
+            code = getCode(cbworld, v);
         } catch (PlcException e) {
             return "Code block not found.";
         }
         
         t.setLine3("HASH:"+Integer.toHexString(code.hashCode()));
         
-        return validateEnviromentEx(worldType, v,t);
+        return validateEnviromentEx(cbworld, v,t);
     }
     
-    protected abstract String validateEnviromentEx(int worldType, Vector v, SignText t);
-    protected abstract String getCode(int worldType, Vector v) throws PlcException;
+    protected abstract String validateEnviromentEx(CraftBookWorld cbworld, Vector v, SignText t);
+    protected abstract String getCode(CraftBookWorld cbworld, Vector v) throws PlcException;
     protected PlcLang getLanguage() {return language;}
 }

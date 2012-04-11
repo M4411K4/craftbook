@@ -20,6 +20,7 @@
 import java.util.Iterator;
 import java.util.Map;
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.HistoryHashMap;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
@@ -45,6 +46,7 @@ public class MCX236 extends BaseIC {
      *
      * @return
      */
+    @Override
     public String getTitle() {
         return "DIST FAKE RAIN";
     }
@@ -54,11 +56,13 @@ public class MCX236 extends BaseIC {
      *
      * @return
      */
+    @Override
     public boolean requiresPermission() {
         return true;
     }
 
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	if (sign.getLine3().length() == 0) {
     		return "Please put a distance on the third line.";
         }
@@ -95,21 +99,22 @@ public class MCX236 extends BaseIC {
 	        {
 	    		Location pLoc = player.getLocation();
 	    		Vector diff = pos.subtract(pLoc.x, pLoc.y, pLoc.z);
+	    		CraftBookWorld pcbworld = CraftBook.getCBWorld(player.getWorld());
 	    		
 	    		WorldBlockVector exists = players.get(player);
 	    		
-	    		if(!isSameCoord(exists, chip.getWorldType(), cPos) || MCX238.players.get(player) != null)
+	    		if(!isSameCoord(exists, chip.getCBWorld(), cPos) || MCX238.players.get(player) != null)
 	    		{
 	    			//not this IC or player already part of another IC
 	    			continue;
 	    		}
 	    		
-	    		if(pLoc.dimension == chip.getWorldType()
+	    		if(pcbworld.equals(chip.getCBWorld())
 	    		   && diff.getX() * diff.getX() + diff.getY() * diff.getY() + diff.getZ() * diff.getZ() < dist)
 	    		{
 	    			if(exists == null)
 	    			{
-	    				players.put(player, new WorldBlockVector(chip.getWorldType(), cPos));
+	    				players.put(player, new WorldBlockVector(chip.getCBWorld(), cPos));
 	    				player.getEntity().a.b(new OPacket70Bed(1, 0));
 	    				if(chip.getText().getLine4().length() > 0)
 	    					player.sendMessage(chip.getText().getLine4());
@@ -118,7 +123,7 @@ public class MCX236 extends BaseIC {
 	    		else if(exists != null)
 	    		{
 	    			players.remove(player);
-	    			if(!CraftBook.getWorld(chip.getWorldType()).isRaining())
+	    			if(!CraftBook.getWorld(chip.getCBWorld()).isRaining())
 	    				player.getEntity().a.b(new OPacket70Bed(2, 0));
 	    		}
 	        }
@@ -130,21 +135,21 @@ public class MCX236 extends BaseIC {
     	    while (it.hasNext())
     	    {
 				Map.Entry<Player, WorldBlockVector> item = (Map.Entry<Player, WorldBlockVector>)it.next();
-				if(!isSameCoord(item.getValue(), chip.getWorldType(), cPos))
+				if(!isSameCoord(item.getValue(), chip.getCBWorld(), cPos))
 					continue;
-				if(!CraftBook.getWorld(chip.getWorldType()).isRaining())
+				if(!CraftBook.getWorld(chip.getCBWorld()).isRaining())
 					item.getKey().getEntity().a.b(new OPacket70Bed(2, 0));
 				it.remove();
     	    }
     	}
     }
     
-    protected static boolean isSameCoord(WorldBlockVector wpos, int worldType, Vector pos)
+    protected static boolean isSameCoord(WorldBlockVector wpos, CraftBookWorld cbworld, Vector pos)
     {
     	if(wpos == null)
     		return true;
     	
-    	if(wpos.getWorldType() != worldType
+    	if(!wpos.getCBWorld().equals(cbworld)
     		|| wpos.getBlockX() != pos.getBlockX()
     		|| wpos.getBlockY() != pos.getBlockY()
     		|| wpos.getBlockZ() != pos.getBlockZ())

@@ -28,7 +28,9 @@ public class MCX300 extends BaseIC {
      * @return
      */
 	private final String TITLE = "BOUNCE UP";
-    public String getTitle() {
+    
+	@Override
+	public String getTitle() {
         return "^"+TITLE;
     }
     protected String thisTitle()
@@ -41,6 +43,7 @@ public class MCX300 extends BaseIC {
      *
      * @return
      */
+    @Override
     public boolean requiresPermission() {
         return true;
     }
@@ -53,7 +56,8 @@ public class MCX300 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	if(!sign.getLine3().isEmpty())
     	{
     		String[] args = sign.getLine3().split("/", 2);
@@ -122,11 +126,12 @@ public class MCX300 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip)
     {
     	if(chip.inputAmount() == 0)
     	{
-    		WorldBlockVector wblockVec = new WorldBlockVector(chip.getWorldType(), chip.getPosition());
+    		WorldBlockVector wblockVec = new WorldBlockVector(chip.getCBWorld(), chip.getPosition());
     		if(hasArea(wblockVec))
     		{
     			return;
@@ -155,7 +160,7 @@ public class MCX300 extends BaseIC {
 	    		}
 	    	}
 	    	
-	    	World world = CraftBook.getWorld(chip.getWorldType());
+	    	World world = CraftBook.getWorld(chip.getCBWorld());
 	        int data = CraftBook.getBlockData(world, chip.getPosition());
 	        BlockArea area = getBlockArea(chip, data, width, length, offx, offy, offz);
 	        addArea(wblockVec, area);
@@ -168,11 +173,11 @@ public class MCX300 extends BaseIC {
     			chip.getText().supressUpdate();
     			
     			RedstoneListener redListener = (RedstoneListener) chip.getExtra();
-    			redListener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    			redListener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     		}
     		else if(!chip.getIn(1).is() && chip.getText().getLine1().charAt(0) != '^')
     		{
-    			WorldBlockVector wblockVec = new WorldBlockVector(chip.getWorldType(), chip.getPosition());
+    			WorldBlockVector wblockVec = new WorldBlockVector(chip.getCBWorld(), chip.getPosition());
     			removeArea(wblockVec);
     			chip.getText().setLine1("^"+thisTitle());
     			chip.getText().supressUpdate();
@@ -239,6 +244,6 @@ public class MCX300 extends BaseIC {
         
         int y = (int)chip.getPosition().getY() + offy;
         
-        return new BlockArea(chip.getWorldType(), startX + offx, y, startZ + offz, endX + offx, y, endZ + offz);
+        return new BlockArea(chip.getCBWorld(), startX + offx, y, startZ + offz, endX + offx, y, endZ + offz);
     }
 }

@@ -34,6 +34,7 @@ public class MCX212 extends MCX211 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "^+"+TITLE+"0:0";
     }
@@ -43,6 +44,7 @@ public class MCX212 extends MCX211 {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -56,7 +58,7 @@ public class MCX212 extends MCX211 {
      * @return
      */
     @Override
-    public String validateEnvironment(int worldType, Vector pos, SignText sign)
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign)
     {
     	String line4 = sign.getLine4();
     	if(!line4.isEmpty())

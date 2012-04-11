@@ -47,7 +47,7 @@ public interface IC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign);
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign);
     /**
      * Get a new state to use.
      *
@@ -62,5 +62,5 @@ public interface IC {
      * @param sign
      * @return
      */
-    public String clear(int worldType, Vector pos, SignText sign);
+    public String clear(CraftBookWorld cbworld, Vector pos, SignText sign);
 }

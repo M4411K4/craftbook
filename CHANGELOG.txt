@@ -1,3 +1,93 @@
+2.0extra17.0:
+- updated to minecraft 1.2.5
+- added multi-world support
+    - due to WorldEdit not being updated, Toggle Area features
+        may not work in other worlds than the main world
+    - Perlstone may have issues in other worlds than the main
+        world and main worlds that have a different name than
+        the default "world".
+    - CBWarp will store world names now in the same CBWarp
+        server files.
+        Older formats will still work.
+- added ability to craft and craft with Enchanted items for
+    Cauldrons and Cart Craft
+    - enchantment format details are found in the recipe .txt
+        files for both
+- added Convert EXP feature
+    - disabled by default
+    - allows players to right-click [Convert EXP] signs to 
+        convert a specified amount of their exp levels for
+        a specified amount of bottle o' enchanting (exp bottles)
+    - 3rd line of sign is the amount of exp levels to convert
+        - anything can be typed right after the number
+            - such as "11 levels" instead of just "11"
+    - 4th line of the sign is the amount of exp bottles to give
+        if the player has enough exp levels
+        - same as the 3rd line where anything can be typed after
+        - this value can also be 0 to allow other types of
+            conversions through plugin hooks
+    - to create [Convert EXP] signs, players require permission
+        to: /makeconvertexp
+        - this is only recommended for Admins or Mods as it can
+            be exploited
+    - if the "check-permissions" setting is set to "true"
+        (default is false) then players will require permission
+        to: /convertexpsign
+        to use [Convert EXP] signs.
+    - this feature uses CraftBook plugin hooks so that other
+        plugins can do additional things.
+        Such as requiring a payment in addition to the exp
+            levels.
+- added Enchantment crafting recipes
+    - allows players to craft enchantments in the workbench or
+        the player's crafting slots
+    - crafted enchantments are *added* to the specified item in
+        the recipe.
+        - Ex: Smite II can be added to a sword, even if the
+            sword already has enchantments. The previous
+            enchantments will not be removed.
+    - unlike normal crafting recipes, these recipes can require
+        a larger stack size than 1.
+        Ex: a stack of 40 exp bottles, instead of a stack of 1
+        - BUG-NOTE
+            - this feature is a little buggy because of how
+                minecraft works
+                - It will recognize when a stack has been
+                decreased, but not if a stack has been increased
+                - To fix, the player will need to put a new item
+                    into the crafting slots, or remove an item.
+                    This lets minecraft know that the crafting
+                    slots have been updated.
+    - max amount of enchantments that can be added per item is
+        specified in the "enchantment-craft-max=" setting
+    - enchantment recipes are contained within the file:
+        cb-enchant-recipes.txt
+    - Enchantment recipes can be reloaded with the command:
+        /reloadcbenchantrecipes
+        - This should not be used often due to the following bug
+        - BUG-NOTE
+            - players who happen to be crafting while the recipes
+                are reloaded will likely get enchantments at
+                a lower cost.
+                - It will not remove more than 1 item per stack
+    - the basic idea for this feature was to convert exp to exp
+        bottles, and then use those bottles to craft enchantments
+- added Dispenser 3.0 [MCX204]
+    - can dispense enchanted items in addition to normal items
+    - the format follows the Cauldron and Cart Craft recipe
+        format instead of [MCX201]
+        - @ for color/damage, & for enchantments, # for
+            enchantment levels
+    - no limit on enchantments except for the sign's 15 character
+        limit
+        - Ex: items can be given 6 or more enchantments
+    - specific enchantments can be allowed instead of all (default)
+        through the setting:
+        ic-enchantments-allowed=
+- removed OWorld files as they are no longer needed.
+    - Canary/Crow now uses the needed hooks
+- fixed [MCX203] & [MCZ203] from removing enchantments on pick up
+
 2.0extra16.1:
 - added NamedNearby IC [MCX513]
     - same as [MCX512] except %p names the player closest to the

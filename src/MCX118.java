@@ -24,6 +24,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.BaseIC;
@@ -42,10 +43,12 @@ public class MCX118 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "PLAYER NEAR?";
     }
     
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -58,7 +61,8 @@ public class MCX118 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3().toLowerCase();
 
         if (id.length() != 0)
@@ -90,6 +94,7 @@ public class MCX118 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
     	
     	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
@@ -98,8 +103,8 @@ public class MCX118 extends BaseIC {
     		if(!chip.getText().getLine4().isEmpty())
     			dist = Double.parseDouble(chip.getText().getLine4());
     		dist *= dist;
-    		Vector lever = Util.getWallSignBack(chip.getWorldType(), chip.getPosition(), 2);
-    		World world = CraftBook.getWorld(chip.getWorldType());
+    		Vector lever = Util.getWallSignBack(chip.getCBWorld(), chip.getPosition(), 2);
+    		World world = CraftBook.getWorld(chip.getCBWorld());
     		
         	NearbyEntityFinder nearbyFinder = new NearbyEntityFinder(world, chip.getBlockPosition(), lever, dist, chip.getText().getLine3(), 0, false);
         	etc.getServer().addToServerQueue(nearbyFinder);
@@ -196,7 +201,7 @@ public class MCX118 extends BaseIC {
 				}
 			}
 			
-			Redstone.setOutput(WORLD, LEVER, found);
+			Redstone.setOutput(CraftBook.getCBWorld(WORLD), LEVER, found);
 		}
 		
 		private boolean entityInRange(BaseEntity entity)
@@ -260,7 +265,7 @@ public class MCX118 extends BaseIC {
     				&& !(obj instanceof OEntityEnderEye)
     				&& !(obj instanceof OEntityFishHook)
     				&& (!(obj instanceof OEntityWolf) || ((OEntityTamable)obj).A().isEmpty() )
-    				&& (!(obj instanceof OEntityOzelot) || ((OEntityTamable)obj).A().isEmpty() )
+    				&& (!(obj instanceof OEntityOcelot) || ((OEntityTamable)obj).A().isEmpty() )
     				)
     			{
     				entities.add(new BaseEntity((OEntity)obj));

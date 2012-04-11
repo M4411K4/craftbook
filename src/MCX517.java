@@ -33,6 +33,7 @@ public class MCX517 extends MCX516 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return TITLE+distance;
     }
@@ -42,6 +43,7 @@ public class MCX517 extends MCX516 {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -51,6 +53,7 @@ public class MCX517 extends MCX516 {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (!chip.getIn(1).is()) {
         	chip.getOut(1).set(false);
@@ -59,7 +62,7 @@ public class MCX517 extends MCX516 {
         
         processMessage(chip.getText().getLine3()+""+chip.getText().getLine4(),
         				chip.getBlockPosition(),
-        				chip.getWorldType(),
+        				chip.getCBWorld(),
         				Integer.parseInt(chip.getText().getLine1().substring(TITLE.length())),
         				chip.getMode() == '+',
         				true);

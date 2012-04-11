@@ -27,6 +27,7 @@ public class MCX302 extends MCX300 {
      * @return
      */
 	private final String TITLE = "REPEL FLOOR";
+	@Override
     public String getTitle() {
         return "^"+TITLE;
     }
@@ -40,6 +41,7 @@ public class MCX302 extends MCX300 {
      *
      * @return
      */
+    @Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MCX302 extends MCX300 {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	if(!sign.getLine3().isEmpty())
     	{
     		String[] args = sign.getLine3().split("/", 2);

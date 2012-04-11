@@ -30,6 +30,7 @@ public class MCX144 extends MCX140 {
      */
 	protected String settings = "";
 	
+	@Override
     public String getTitle() {
     	return "^"+settings;
     }
@@ -39,6 +40,7 @@ public class MCX144 extends MCX140 {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -51,7 +53,8 @@ public class MCX144 extends MCX140 {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	
     	if(!sign.getLine1().isEmpty())
     	{

@@ -31,6 +31,7 @@ public class MC1241 extends MC1240 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "ARROW BARRAGE";
     }
@@ -43,12 +44,13 @@ public class MC1241 extends MC1240 {
      * @param spread
      * @param vertVel
      */
+	@Override
     protected void shoot(ChipState chip, float speed, float spread, float vertVel) {
         for (int i = 0; i < 5; i++) {
             Vector backDir = chip.getBlockPosition().subtract(
                     chip.getPosition());
             Vector firePos = chip.getBlockPosition().add(backDir);
-            OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
+            OWorldServer oworld = CraftBook.getOWorldServer(chip.getCBWorld());
             OEntityArrow arrow = new OEntityArrow(oworld);
             arrow.c(firePos.getBlockX() + 0.5, firePos.getBlockY() + 0.5,
                     firePos.getBlockZ() + 0.5, 0, 0);

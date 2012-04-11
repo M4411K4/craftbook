@@ -38,6 +38,7 @@ public class MCX702 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "^"+TITLE;
     }
@@ -47,6 +48,7 @@ public class MCX702 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -59,7 +61,8 @@ public class MCX702 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -80,6 +83,7 @@ public class MCX702 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip)
     {
     	if(chip.inputAmount() == 0)
@@ -98,7 +102,7 @@ public class MCX702 extends BaseIC {
     			chip.getText().supressUpdate();
     			
     			RedstoneListener listener = (RedstoneListener) chip.getExtra();
-    			listener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    			listener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     		}
     		else
     		{
@@ -153,7 +157,7 @@ public class MCX702 extends BaseIC {
     	if(chip.inputAmount() == 0)
     	{
     		//can add input swap options, but I don't think it's worth it at this point
-    		getMessage = Redstone.isHighBinary(chip.getWorldType(), Util.getWallSignSide(chip.getWorldType(), chip.getPosition(), 1), true);
+    		getMessage = Redstone.isHighBinary(chip.getCBWorld(), Util.getWallSignSide(chip.getCBWorld(), chip.getPosition(), 1), true);
     	}
     	else
     	{
@@ -205,7 +209,7 @@ public class MCX702 extends BaseIC {
     
     private Vector findNoteBlock(ChipState chip)
     {
-    	World world = CraftBook.getWorld(chip.getWorldType());
+    	World world = CraftBook.getWorld(chip.getCBWorld());
     	
     	Vector noteblock = Util.getWallSignBack(world, chip.getPosition(), 2);
     	

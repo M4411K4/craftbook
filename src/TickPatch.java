@@ -15,8 +15,6 @@ import java.util.ConcurrentModificationException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
-import net.minecraft.server.MinecraftServer;
-
 /**
  * <p>Allows plugins to define code to run every tick.</p>
  * 
@@ -44,7 +42,7 @@ public class TickPatch extends OEntityTracker {
     private final int WORLD_INDEX;
     private static Runnable tickRunnable;
     
-    private TickPatch(MinecraftServer arg0, OEntityTracker g, int index) {
+    private TickPatch(OMinecraftServer arg0, OEntityTracker g, int index) {
         super(arg0, index);
         WORLD_INDEX = index;
         if(g.getClass()!=CLASS) throw new RuntimeException("unexpected type for im instance");
@@ -89,7 +87,7 @@ public class TickPatch extends OEntityTracker {
     
     protected static void setTickRunnable(Runnable runnable, int index)
     {
-    	MinecraftServer s = etc.getServer().getMCServer();
+    	OMinecraftServer s = etc.getServer().getMCServer();
         try {
         	Field field = s.m[index].getClass().getDeclaredField("tickRunnable");
         	field.setAccessible(true);
@@ -110,7 +108,7 @@ public class TickPatch extends OEntityTracker {
      * Call before using addTask or getTaskList().
      */
     public static void applyPatch() {
-        MinecraftServer s = etc.getServer().getMCServer();
+        OMinecraftServer s = etc.getServer().getMCServer();
         //for(int i = 0; i < s.k.length; i++)
         int i = 0;
         {
@@ -127,7 +125,7 @@ public class TickPatch extends OEntityTracker {
      * Adds a new task.
      */
     public static void addTask(Runnable r, int worldIndex) {
-    	MinecraftServer s = etc.getServer().getMCServer();
+    	OMinecraftServer s = etc.getServer().getMCServer();
     	
     	if(worldIndex < 0 || worldIndex >= s.m.length)
     		return;
@@ -143,7 +141,7 @@ public class TickPatch extends OEntityTracker {
     	//[TODO]: add multi-world tasks? Might use more resources than needed, so for now keep to one.
     	index = 0;
     	
-        MinecraftServer s = etc.getServer().getMCServer();
+        OMinecraftServer s = etc.getServer().getMCServer();
         try {
             return (CopyOnWriteArrayList<Runnable>) s.m[index].getClass().getField("TASK_LIST").get(null);
         } catch (SecurityException e) {

@@ -36,10 +36,12 @@ public class MCX112 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "TRANSPORTER";
     }
     
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MCX112 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -67,19 +70,18 @@ public class MCX112 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         String id = chip.getText().getLine3();
 
         if (!id.isEmpty() && chip.getIn(1).is()) {
-            Location dest = MCX113.airwaves.get(id);
+            WorldLocation dest = MCX113.airwaves.get(id);
             
             if (dest == null) {
                 chip.getOut(1).set(false);
             } else
             {
-            	int dimension = dest.dimension;
-            	dest = new Location(dest.x+0.5, dest.y, dest.z+0.5, dest.rotX, dest.rotY);
-            	dest.dimension = dimension;
+            	dest = dest.add(0.5D, 0.0D, 0.5D);
             	
             	String[] msg;
         		if(chip.getText().getLine4().length() == 0)
@@ -94,13 +96,13 @@ public class MCX112 extends BaseIC {
         }
     }
     
-    protected boolean transport(ChipState chip, Location dest, boolean useSafeY, String[] messages)
+    protected boolean transport(ChipState chip, WorldLocation dest, boolean useSafeY, String[] messages)
     {
     	if(dest == null)
     		return false;
     	
     	Vector pos;
-    	World world = CraftBook.getWorld(chip.getWorldType());
+    	World world = CraftBook.getWorld(chip.getCBWorld());
     	
     	if(chip.getMode() == 'p' || chip.getMode() == 'P')
     	{
@@ -133,7 +135,9 @@ public class MCX112 extends BaseIC {
         		)
         	{
         		if(useSafeY)
-        			dest.y = getSafeY(CraftBook.getWorld(dest.dimension), new Vector(dest.x, dest.y, dest.z)) + 1.0;
+        		{
+        			dest = dest.setY(getSafeY(CraftBook.getWorld(dest.getCBWorld()), dest.getCoordinate()) + 1.0D);
+        		}
                 
                 if(messages != null)
                 {

@@ -31,12 +31,12 @@ public class Elevator {
      * @param pt
      * @param up
      */
-    public static boolean hasLinkedLift(int worldType, Vector pt, boolean up) {
+    public static boolean hasLinkedLift(CraftBookWorld cbworld, Vector pt, boolean up) {
         int x = pt.getBlockX();
         int y = pt.getBlockY();
         int z = pt.getBlockZ();
 
-        World world = CraftBook.getWorld(worldType);
+        World world = CraftBook.getWorld(cbworld);
         
         if (up) {
             // Need to traverse up to find the next sign to teleport to

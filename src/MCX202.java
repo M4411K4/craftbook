@@ -31,6 +31,7 @@ public class MCX202 extends MCX201 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "CHEST DISPENSER";
     }
@@ -57,13 +58,14 @@ public class MCX202 extends MCX201 {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         if (!chip.getIn(1).is()) {
             return;
         }
         
-        NearbyChestBlockBag source = new NearbyChestBlockBag(chip.getWorldType(), chip.getPosition());
-        source.addSourcePosition(chip.getWorldType(), chip.getPosition());
+        NearbyChestBlockBag source = new NearbyChestBlockBag(chip.getCBWorld(), chip.getPosition());
+        source.addSourcePosition(chip.getCBWorld(), chip.getPosition());
         
         String id = chip.getText().getLine3();
         
@@ -77,7 +79,7 @@ public class MCX202 extends MCX201 {
 
         int item = getItem(id);
 
-        World world = CraftBook.getWorld(chip.getWorldType());
+        World world = CraftBook.getWorld(chip.getCBWorld());
         if (item > 0 && !(item >= 21 && item <= 34) && item != 36) {
             Vector pos = chip.getBlockPosition();
             int maxY = Math.min(CraftBook.MAP_BLOCK_HEIGHT, pos.getBlockY() + 10);

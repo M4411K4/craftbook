@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.BaseIC;
@@ -33,6 +34,7 @@ public class MCX246 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "FIREBALL";
     }
@@ -42,6 +44,7 @@ public class MCX246 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -54,7 +57,8 @@ public class MCX246 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String dest = sign.getLine3();
         String settings = sign.getLine4();
 
@@ -114,6 +118,7 @@ public class MCX246 extends BaseIC {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (chip.getIn(1).is()) {
             String dest = chip.getText().getLine3();
@@ -159,14 +164,14 @@ public class MCX246 extends BaseIC {
     }
     protected void shootFireball(ChipState chip, float power, double speed, float rotation, float pitch, int offsetx, int offsety, int offsetz)
     {
-    	Vector start = Util.getWallSignBack(chip.getWorldType(), chip.getPosition(), 2);
+    	Vector start = Util.getWallSignBack(chip.getCBWorld(), chip.getPosition(), 2);
     	double x = start.getBlockX() + offsetx + 0.5D;
     	double y = start.getBlockY() + offsety;
     	double z = start.getBlockZ() + offsetz + 0.5D;
-    	rotation += Util.getWallSignRotation(chip.getWorldType(), chip.getPosition()); 
+    	rotation += Util.getWallSignRotation(chip.getCBWorld(), chip.getPosition()); 
     	pitch *= 90;
     	
-        OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
+        OWorldServer oworld = CraftBook.getOWorldServer(chip.getCBWorld());
         OEntityFireball fireball = new CBFireball(oworld, x, y, z, rotation, pitch, power, speed);
 		oworld.b(fireball);
     }

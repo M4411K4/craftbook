@@ -39,7 +39,7 @@ public class ChipState {
     private long time;
     private char mode;
     private Object extra;
-    private int worldType;
+    private CraftBookWorld cbworld;
 
     /**
      * Construct the state.
@@ -50,12 +50,12 @@ public class ChipState {
      * @param out
      * @param text
      */
-    public ChipState(int worldType, Vector pos, BlockVector blockPos, Signal[] in, Signal[] out, SignText text, long time)
+    public ChipState(CraftBookWorld cbworld, Vector pos, BlockVector blockPos, Signal[] in, Signal[] out, SignText text, long time)
     {
-    	this(worldType, pos, blockPos, in, out, text, ' ', time, null);
+    	this(cbworld, pos, blockPos, in, out, text, ' ', time, null);
     }
     
-    public ChipState(int worldType, Vector pos, BlockVector blockPos, Signal[] in, Signal[] out, SignText text, char mode, long time, Object extra) {
+    public ChipState(CraftBookWorld cbworld, Vector pos, BlockVector blockPos, Signal[] in, Signal[] out, SignText text, char mode, long time, Object extra) {
         this.pos = pos;
         this.blockPos = blockPos;
         this.in = in;
@@ -63,7 +63,7 @@ public class ChipState {
         this.text = text;
         this.mode = mode;
         this.extra = extra;
-        this.worldType = worldType;
+        this.cbworld = cbworld;
 
         mem = new boolean[out.length];
         int i = 0;
@@ -204,8 +204,8 @@ public class ChipState {
     	return extra;
     }
     
-    public int getWorldType()
+    public CraftBookWorld getCBWorld()
     {
-    	return worldType;
+    	return cbworld;
     }
 }

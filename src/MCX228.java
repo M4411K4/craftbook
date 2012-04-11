@@ -27,6 +27,7 @@ public class MCX228 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
     	return "IC REFRESH";
     }
@@ -36,6 +37,7 @@ public class MCX228 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -48,7 +50,8 @@ public class MCX228 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	
     	if(!sign.getLine3().isEmpty())
     	{
@@ -114,6 +117,7 @@ public class MCX228 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip)
     {
     	if(chip.getIn(1).isTriggered() && chip.getIn(1).is())
@@ -148,11 +152,10 @@ public class MCX228 extends BaseIC {
 	    	if(length > 64)
 	    		length = 64;
 	    	
-	    	World world = CraftBook.getWorld(chip.getWorldType());
+	    	World world = CraftBook.getWorld(chip.getCBWorld());
 	        int data = CraftBook.getBlockData(world, chip.getPosition());
 	        BlockArea area = MCX220.getBlockArea(chip, data, width, height, length, offx, offy, offz);
 	        RedstoneListener redListener = (RedstoneListener) chip.getExtra();
-	        
 	        boolean foundone = false;
 	        for(int y = area.getY(); y < area.getY2(); y++)
 	        {

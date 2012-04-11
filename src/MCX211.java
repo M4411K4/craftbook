@@ -35,6 +35,7 @@ public class MCX211 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "^+"+TITLE+"0:0";
     }
@@ -44,6 +45,7 @@ public class MCX211 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -56,7 +58,8 @@ public class MCX211 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign)
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign)
     {
     	return validate(sign.getLine3(), sign.getLine4());
     }
@@ -225,6 +228,7 @@ public class MCX211 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip)
     {
     	if(chip.inputAmount() == 0)
@@ -287,10 +291,10 @@ public class MCX211 extends BaseIC {
     			return;
     		}
     		
-    		BlockBag bag = redListener.getBlockBag(chip.getWorldType(), chip.getPosition());
-    		bag.addSourcePosition(chip.getWorldType(), chip.getPosition());
+    		BlockBag bag = redListener.getBlockBag(chip.getCBWorld(), chip.getPosition());
+    		bag.addSourcePosition(chip.getCBWorld(), chip.getPosition());
     		
-    		World world = CraftBook.getWorld(chip.getWorldType());
+    		World world = CraftBook.getWorld(chip.getCBWorld());
             int data = CraftBook.getBlockData(world, chip.getPosition());
             
             int[] coord = getStartEnd(chip, data, size, loc);
@@ -411,7 +415,7 @@ public class MCX211 extends BaseIC {
 		chip.getText().supressUpdate();
 		
 		redListener = (RedstoneListener) chip.getExtra();
-		redListener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+		redListener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     }
     
     protected String[] getLine4Values(ChipState chip)

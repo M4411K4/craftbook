@@ -21,8 +21,10 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+
 import com.sk89q.craftbook.*;
 import com.sk89q.craftbook.state.StateManager;
 
@@ -50,7 +52,7 @@ public class CraftBook extends Plugin {
      * Tick delayer instance used to delay some events until the next tick.
      * It is used mostly for redstone-related events.
      */
-    private final TickDelayer[] delays = new TickDelayer[]{new TickDelayer(), new TickDelayer(), new TickDelayer()};
+    private final TickDelayer[] delays = new TickDelayer[]{new TickDelayer()};
 
     /**
      * Used to fake the data value at a point. For the redstone hook, because
@@ -58,7 +60,7 @@ public class CraftBook extends Plugin {
      * value is faked by CraftBook. As all calls to get a block's data are
      * routed through CraftBook already, this makes this hack feasible.
      */
-    private static Map<Integer, FakeData> fakeData = new HashMap<Integer, FakeData>();
+    private static Map<OWorldServer, FakeData> fakeData = new HashMap<OWorldServer, FakeData>();
     
     /**
      * CraftBook version, fetched from the .jar's manifest. Used to print the
@@ -231,19 +233,27 @@ public class CraftBook extends Plugin {
         }
         */
     	
-    	OWorldServer[] oworlds = etc.getMCServer().e;
-        for(int i = 0; i < oworlds.length; i++)
+    	Iterator<Entry<String, OWorldServer[]>> worldIter = etc.getMCServer().worlds.entrySet().iterator();
+        while(worldIter.hasNext())
         {
-    		for(@SuppressWarnings("rawtypes")
-    		Iterator it = oworlds[i].b.iterator(); it.hasNext();)
-    		{
-    			Object obj = it.next();
-    			if(obj instanceof EntitySitting)
-    			{
-    				((EntitySitting)obj).X();
-    			}
-    		}
+        	Map.Entry<String, OWorldServer[]> entry = (Map.Entry<String, OWorldServer[]>)worldIter.next();
+        	OWorldServer[] oworlds = (OWorldServer[])entry.getValue();
+        	
+        	for(int i = 0; i < oworlds.length; i++)
+        	{
+	    		for(@SuppressWarnings("rawtypes")
+	    		Iterator it = oworlds[i].b.iterator(); it.hasNext();)
+	    		{
+	    			Object obj = it.next();
+	    			if(obj instanceof EntitySitting)
+	    			{
+	    				((EntitySitting)obj).X();
+	    			}
+	    		}
+        	}
         }
+        
+        EnchantCraft.removeFeature();
 
         SignPatch.removePatch();
         stateManager.save(pathToState);
@@ -280,26 +290,22 @@ public class CraftBook extends Plugin {
         return version;
     }
     
-    public TickDelayer getDelay(int worldIndex) {
-    	if(worldIndex < 0 || worldIndex >= delays.length)
-    		return null;
-    	
-    	//[TODO]: change if ever needed multi-world delay lists
-    	worldIndex = 0;
-    	
-        return delays[worldIndex];
+    public TickDelayer getDelay(CraftBookWorld cbworld) {
+    	//[NOTE]: change to Map if multi-world delay is needed
+    	//return delays.get(cbworld);
+        return delays[0];
     }
     
     public StateManager getStateManager() {
         return stateManager;
     }
 
-    protected static int getBlockID(int worldType, int x, int y, int z) {
-        return getBlockID(getWorld(worldType), x, y, z);
+    protected static int getBlockID(CraftBookWorld cbworld, int x, int y, int z) {
+        return getBlockID(getWorld(cbworld), x, y, z);
     }
 
-    protected static int getBlockID(int worldType, Vector pt) {
-        return getBlockID(getWorld(worldType), pt);
+    protected static int getBlockID(CraftBookWorld cbworld, Vector pt) {
+        return getBlockID(getWorld(cbworld), pt);
     }
     
     protected static int getBlockID(World world, int x, int y, int z) {
@@ -310,25 +316,25 @@ public class CraftBook extends Plugin {
         return world.getBlockIdAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
     }
 
-    protected static int getBlockData(int worldType, int x, int y, int z) {
-    	return getBlockData(getWorld(worldType), worldType, new BlockVector(x, y, z));
+    protected static int getBlockData(CraftBookWorld cbworld, int x, int y, int z) {
+    	return getBlockData(getWorld(cbworld), new BlockVector(x, y, z));
     }
 
-    protected static int getBlockData(int worldType, Vector pt) {
-    	return getBlockData(getWorld(worldType), worldType, pt.toBlockVector());
+    protected static int getBlockData(CraftBookWorld cbworld, Vector pt) {
+    	return getBlockData(getWorld(cbworld), pt.toBlockVector());
     }
     
     protected static int getBlockData(World world, int x, int y, int z) {
-    	return getBlockData(world, world.getType().getId(), new BlockVector(x, y, z));
+    	return getBlockData(world, new BlockVector(x, y, z));
     }
 
     protected static int getBlockData(World world, Vector pt) {
-    	return getBlockData(world, world.getType().getId(), pt.toBlockVector());
+    	return getBlockData(world, pt.toBlockVector());
     }
     
-    protected static int getBlockData(World world, int worldType, BlockVector bVec)
+    protected static int getBlockData(World world, BlockVector bVec)
     {
-    	FakeData fdata = fakeData.get(worldType);
+    	FakeData fdata = fakeData.get(world.getWorld());
         if (fdata != null && fdata.pos.equals(bVec))
         {
             return fdata.val;
@@ -336,12 +342,12 @@ public class CraftBook extends Plugin {
         return world.getBlockData(bVec.getBlockX(), bVec.getBlockY(), bVec.getBlockZ());
     }
 
-    protected static boolean setBlockID(int worldType, int x, int y, int z, int type) {
-    	return setBlockID(getWorld(worldType), x, y, z, type);
+    protected static boolean setBlockID(CraftBookWorld cbworld, int x, int y, int z, int type) {
+    	return setBlockID(getWorld(cbworld), x, y, z, type);
     }
 
-    protected static boolean setBlockID(int worldType, Vector pt, int type) {
-        return setBlockID(worldType, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), type);
+    protected static boolean setBlockID(CraftBookWorld cbworld, Vector pt, int type) {
+        return setBlockID(cbworld, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), type);
     }
     
     protected static boolean setBlockID(World world, Vector pt, int type) {
@@ -355,12 +361,12 @@ public class CraftBook extends Plugin {
         return world.setBlockAt(type, x, y, z);
     }
 
-    protected static boolean setBlockData(int worldType, int x, int y, int z, int data) {
-        return setBlockData(getWorld(worldType), x, y, z, data);
+    protected static boolean setBlockData(CraftBookWorld cbworld, int x, int y, int z, int data) {
+        return setBlockData(getWorld(cbworld), x, y, z, data);
     }
 
-    protected static boolean setBlockData(int worldType, Vector pt, int data) {
-        return setBlockData(worldType, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), data);
+    protected static boolean setBlockData(CraftBookWorld cbworld, Vector pt, int data) {
+        return setBlockData(cbworld, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), data);
     }
     
     protected static boolean setBlockData(World world, Vector pt, int data) {
@@ -371,13 +377,13 @@ public class CraftBook extends Plugin {
         return world.setBlockData(x, y, z, data);
     }
     
-    protected static boolean setBlockIdAndData(int worldType, int x, int y, int z, int id, int data)
+    protected static boolean setBlockIdAndData(CraftBookWorld cbworld, int x, int y, int z, int id, int data)
     {
-    	return setBlockIdAndData(getWorld(worldType), x, y, z, id, data);
+    	return setBlockIdAndData(getWorld(cbworld), x, y, z, id, data);
     }
 
-    protected static boolean setBlockIdAndData(int worldType, Vector pt, int id, int data) {
-        return setBlockIdAndData(worldType, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), id, data);
+    protected static boolean setBlockIdAndData(CraftBookWorld cbworld, Vector pt, int id, int data) {
+        return setBlockIdAndData(cbworld, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ(), id, data);
     }
     
     protected static boolean setBlockIdAndData(World world, Vector pt, int id, int data) {
@@ -395,37 +401,53 @@ public class CraftBook extends Plugin {
         return result;
     }
     
-    protected static OWorld getOWorld(int worldType) {
-        return etc.getMCServer().a(worldType);
-    }
-    
-    protected static OWorldServer getOWorldServer(int worldType) {
-    	OWorld world = getOWorld(worldType);
-    	if(world instanceof OWorldServer)
-    		return (OWorldServer)world;
-    	return null;
-    }
-    
-    /*
-     * @return Returns Minecraft's index for the OWorldServer array.
-     * This is based on the Minecraft method:
-     * MinecraftServer.a(int)
-     * Note: may change with future updates due to obfuscation.
-     */
-    protected static int getWorldIndex(int worldType)
+    protected static OWorldServer getOWorldServer(CraftBookWorld cbworld)
     {
-    	if(worldType == -1)
-    		return 1;
-    	
-    	return 0;
+    	return getOWorldServer(cbworld.name(), cbworld.dimension());
     }
     
-    protected static World getWorld(int worldType) {
-        return etc.getServer().getWorld(worldType);
+    protected static OWorldServer getOWorldServer(String name, int dimension)
+    {
+    	return etc.getMCServer().getWorld(name, dimension);
     }
     
-    protected static SignText getSignText(int worldType, Vector pt) {
-        return getSignText(getWorld(worldType), pt);
+    protected static World getWorld(CraftBookWorld cbworld)
+    {
+    	return getWorld(cbworld.name(), cbworld.dimension());
+    }
+    
+    protected static World getWorld(String name, int dimension)
+    {
+    	OWorldServer oworld = getOWorldServer(name, dimension);
+    	if(oworld == null)
+    		return null;
+    	return oworld.world;
+    }
+    
+    protected static String getMainWorldName()
+    {
+    	return etc.getMCServer().m();
+    }
+    
+    protected static OWorldServer getMainOWorldServer(int dimension) {
+    	return etc.getMCServer().a(dimension);
+    }
+    
+    protected static World getMainWorld(CraftBookWorld cbworld) {
+        return etc.getServer().getWorld(cbworld.dimension());
+    }
+    
+    protected static World getMainWorld(int dimension) {
+        return etc.getServer().getWorld(dimension);
+    }
+    
+    protected static CraftBookWorld getCBWorld(World world)
+    {
+    	return new CraftBookWorld(world.getName(), world.getType().getId());
+    }
+    
+    protected static SignText getSignText(CraftBookWorld cbworld, Vector pt) {
+        return getSignText(getWorld(cbworld), pt);
     }
     
     protected static SignText getSignText(World world, Vector pt) {
@@ -437,12 +459,12 @@ public class CraftBook extends Plugin {
         return null;
     }
 
-    public static void dropSign(int worldType, Vector pt) {
-        dropSign(worldType, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
+    public static void dropSign(CraftBookWorld cbworld, Vector pt) {
+        dropSign(cbworld, pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
     }
     
-    public static void dropSign(int worldType, int x, int y, int z) {
-        dropSign(getWorld(worldType), x, y, z);
+    public static void dropSign(CraftBookWorld cbworld, int x, int y, int z) {
+        dropSign(getWorld(cbworld), x, y, z);
     }
     
     public static void dropSign(World world, Vector pt) {
@@ -454,16 +476,23 @@ public class CraftBook extends Plugin {
     	world.dropItem(x, y, z, 323);
     }
 
-    protected static void fakeBlockData(int worldType, int x, int y, int z, int data) {
-    	fakeData.put(worldType, new FakeData(new BlockVector(x, y, z), data));
+    protected static void fakeBlockData(CraftBookWorld cbworld, int x, int y, int z, int data) {
+    	fakeBlockData(cbworld, new BlockVector(x, y, z), data);
     }
 
-    protected static void fakeBlockData(int worldType, Vector pt, int data) {
-    	fakeData.put(worldType, new FakeData(pt.toBlockVector(), data));
+    protected static void fakeBlockData(CraftBookWorld cbworld, Vector pt, int data) {
+    	OWorldServer oworld = getOWorldServer(cbworld);
+    	if(oworld == null)
+    		return;
+    	fakeData.put(oworld, new FakeData(pt.toBlockVector(), data));
     }
 
-    protected static void clearFakeBlockData(int worldType) {
-        fakeData.remove(worldType);
+    protected static void clearFakeBlockData(CraftBookWorld cbworld) {
+    	OWorldServer oworld = getOWorldServer(cbworld);
+    	if(oworld == null)
+    		return;
+    	
+    	fakeData.remove(oworld);
     }
     
     public static class FakeData
@@ -484,16 +513,27 @@ public class CraftBook extends Plugin {
     	}
     }
     
-    //[TODO]: temporary fix for warping out of The End. Remove if Canary adds a work around to Minecraft's "feature"
-    public static void teleportPlayer(Player player, Location location)
+    //[NOTE]: temporary fix for warping out of The End. Remove if Canary adds a work around to Minecraft's "feature"
+    public static void teleportPlayer(Player player, WorldLocation wLocation)
     {
-    	boolean isEnd = player.getWorld().getType() == World.Type.END;
+    	if(!player.getWorld().getName().equals(wLocation.getCBWorld().name()))
+    	{
+    		//[TODO]: change when Canary adds support for players to teleport to different worlds, instead of
+        	//	 just dimensions
+    		player.sendMessage("Can not teleport to different worlds currently.");
+    		return;
+    	}
+    	
+    	boolean isEnd = player.getWorld().getType() == World.Dimension.END;
 		
-		player.teleportTo(location);
+    	//[TODO]: change when Canary adds support for players to teleport to different worlds
+		player.teleportTo(Util.worldLocationToLocation(wLocation));
 		
-		if(isEnd && location.dimension != World.Type.END.getId())
+		CraftBookWorld cbworld = wLocation.getCBWorld();
+		
+		if(isEnd && cbworld.dimension() != World.Dimension.END.getId())
 		{
-			World world = location.getWorld();
+			World world = CraftBook.getWorld(cbworld);
 			boolean found = false;
 			for(@SuppressWarnings("rawtypes")
     		Iterator it = world.getWorld().b.iterator(); it.hasNext();)
@@ -515,7 +555,7 @@ public class CraftBook extends Plugin {
 			if(!found)
 			{
 				UtilEntity.spawnEntityInWorld(world.getWorld(), player.getEntity());
-				player.getEntity().c(location.x, player.getY(), location.z, player.getRotation(), player.getPitch());
+				player.getEntity().c(wLocation.getX(), player.getY(), wLocation.getZ(), player.getRotation(), player.getPitch());
 				world.getWorld().a(player.getEntity(), false);
 			}
 		}
@@ -527,17 +567,25 @@ public class CraftBook extends Plugin {
      * NOTE: because of how Minecraft works, entities will be DELETED if teleported to an unloaded chunk!
      * 
      */
-    public static void teleportEntity(BaseEntity entity, Location location)
+    public static void teleportEntity(BaseEntity entity, WorldLocation wLocation)
     {
     	if(entity == null || UtilEntity.isDead(entity.getEntity()))
     		return;
     	
-    	World oldWorld = entity.getWorld();
-    	World.Type worldType = oldWorld.getType();
-    	
-    	if(worldType.getId() != location.dimension)
+    	if(!entity.getWorld().getName().equals(wLocation.getCBWorld().name()))
     	{
-    		World newWorld = location.getWorld();
+    		//[TODO]: change when Canary adds support for players to teleport to different worlds, instead of
+        	//	 just dimensions
+    		return;
+    	}
+    	
+    	World oldWorld = entity.getWorld();
+    	World.Dimension worldType = oldWorld.getType();
+    	CraftBookWorld cbworld = wLocation.getCBWorld();
+    	
+    	if(worldType.getId() != cbworld.dimension())
+    	{
+    		World newWorld = CraftBook.getWorld(cbworld);
     		OEntity rider = UtilEntity.riddenByEntity(entity.getEntity());
     		
     		if(rider != null)
@@ -545,22 +593,24 @@ public class CraftBook extends Plugin {
     			UtilEntity.mountEntity(rider, entity.getEntity());
     			if(rider instanceof OEntityPlayerMP)
     			{
-    				CraftBook.teleportPlayer(new Player((OEntityPlayerMP)rider), location);
+    				CraftBook.teleportPlayer(new Player((OEntityPlayerMP)rider), wLocation);
     			}
     			else
     			{
-    				CraftBook.teleportEntity(new BaseEntity((OEntity)rider), location);
+    				CraftBook.teleportEntity(new BaseEntity((OEntity)rider), wLocation);
     			}
     		}
     		
     		oldWorld.getWorld().f(entity.getEntity());
     		entity.getEntity().bE = false;
     		
-    		location.y += 0.6200000047683716D;
+    		wLocation = wLocation.add(0.0D, 0.6200000047683716D, 0.0D);
     		
     		oldWorld.getWorld().a(entity.getEntity(), false);
     		
-    		entity.teleportTo(location);
+    		//[TODO]: change when Canary adds support for players to teleport to different worlds
+    		entity.teleportTo(Util.worldLocationToLocation(wLocation));
+    		
     		UtilEntity.spawnEntityInWorld(newWorld.getWorld(), entity.getEntity());
     		newWorld.getWorld().a(entity.getEntity(), false);
     		
@@ -572,6 +622,7 @@ public class CraftBook extends Plugin {
     		}
     	}
     	
-    	entity.teleportTo(location);
+    	//[TODO]: change when Canary adds support for players to teleport to different worlds
+    	entity.teleportTo(Util.worldLocationToLocation(wLocation));
     }
 }

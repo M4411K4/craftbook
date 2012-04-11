@@ -20,6 +20,7 @@
 import java.util.List;
 
 import com.sk89q.craftbook.BlockSourceException;
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.OutOfBlocksException;
 import com.sk89q.craftbook.OutOfSpaceException;
 import com.sk89q.craftbook.Vector;
@@ -83,9 +84,9 @@ public class CompoundBlockBag extends BlockBag {
      * @param pos
      * @return
      */
-    public void addSingleSourcePosition(int worldType, Vector pos) {
+    public void addSingleSourcePosition(CraftBookWorld cbworld, Vector pos) {
         for (BlockBag b : sources)
-            b.addSingleSourcePosition(worldType, pos);
+            b.addSingleSourcePosition(cbworld, pos);
     }
 
     /**
@@ -94,9 +95,9 @@ public class CompoundBlockBag extends BlockBag {
      * @param pos
      * @return
      */
-    public void addSourcePosition(int worldType, Vector pos) {
+    public void addSourcePosition(CraftBookWorld cbworld, Vector pos) {
         for (BlockBag b : sources)
-            b.addSourcePosition(worldType, pos);
+            b.addSourcePosition(cbworld, pos);
     }
 
     /**

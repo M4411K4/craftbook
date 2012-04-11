@@ -27,7 +27,8 @@ public class MCX222 extends MCX220 {
      * @return
      */
 	private final String TITLE = "DETECT EDIT";
-    public String getTitle() {
+	@Override
+	public String getTitle() {
         return "^"+TITLE;
     }
     @Override
@@ -41,6 +42,7 @@ public class MCX222 extends MCX220 {
      *
      * @return
      */
+    @Override
     public boolean requiresPermission() {
         return true;
     }

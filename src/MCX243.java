@@ -31,6 +31,7 @@ public class MCX243 extends MC1241 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "SNOW BARRAGE";
     }
@@ -48,7 +49,7 @@ public class MCX243 extends MC1241 {
             Vector backDir = chip.getBlockPosition().subtract(
                     chip.getPosition());
             Vector firePos = chip.getBlockPosition().add(backDir);
-            OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
+            OWorldServer oworld = CraftBook.getOWorldServer(chip.getCBWorld());
             OEntitySnowball arrow = new OEntitySnowball(oworld);
             arrow.c(firePos.getBlockX() + 0.5, firePos.getBlockY() + 0.5,
                     firePos.getBlockZ() + 0.5, 0, 0);

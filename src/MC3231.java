@@ -30,6 +30,7 @@ public class MC3231 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "TIME CONTROL";
     }
@@ -39,6 +40,7 @@ public class MC3231 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -48,6 +50,7 @@ public class MC3231 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         Long specific;
 
@@ -57,7 +60,7 @@ public class MC3231 extends BaseIC {
             else
                 specific = 13000l;
 
-            World world = CraftBook.getWorld(chip.getWorldType());
+            World world = CraftBook.getWorld(chip.getCBWorld());
             world.setRelativeTime(specific);
         }
     }

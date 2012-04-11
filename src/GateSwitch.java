@@ -18,6 +18,7 @@
 */
 
 import com.sk89q.craftbook.*;
+
 import java.util.Set;
 import java.util.HashSet;
 
@@ -39,13 +40,13 @@ public class GateSwitch {
      * @param smallSearchSize
      * @return
      */
-    public static boolean toggleGates(int blockType, int worldType, Vector pt, BlockBag bag,
+    public static boolean toggleGates(int blockType, CraftBookWorld cbworld, Vector pt, BlockBag bag,
             boolean smallSearchSize) throws BlockSourceException {
         int x = pt.getBlockX();
         int y = pt.getBlockY();
         int z = pt.getBlockZ();
         
-        World world = CraftBook.getWorld(worldType);
+        World world = CraftBook.getWorld(cbworld);
 
         boolean foundGate = false;
 
@@ -91,13 +92,13 @@ public class GateSwitch {
      * @param searchSize
      * @return
      */
-    public static boolean setGateState(int blockType, int worldType, Vector pt, BlockBag bag, boolean close,
+    public static boolean setGateState(int blockType, CraftBookWorld cbworld, Vector pt, BlockBag bag, boolean close,
             boolean smallSearchSize) throws BlockSourceException {
         int x = pt.getBlockX();
         int y = pt.getBlockY();
         int z = pt.getBlockZ();
         
-        World world = CraftBook.getWorld(worldType);
+        World world = CraftBook.getWorld(cbworld);
 
         boolean foundGate = false;
 

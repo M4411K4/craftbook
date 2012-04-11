@@ -75,8 +75,8 @@ public class Door extends SignOrientedMechanism {
      * 
      * @param pt
      */
-    public Door(int worldType, Vector pt) {
-        super(worldType, pt);
+    public Door(CraftBookWorld cbworld, Vector pt) {
+        super(cbworld, pt);
     }
     
     /**
@@ -86,7 +86,7 @@ public class Door extends SignOrientedMechanism {
      * @throws InvalidDirection
      */
     private Direction getDirection() throws InvalidDirectionException {
-        int data = CraftBook.getBlockData(worldType, pt);
+        int data = CraftBook.getBlockData(cbworld, pt);
 
         if (data == 0x0 || data == 0x8) { // East-west
             return Direction.NORTH_SOUTH;
@@ -181,7 +181,7 @@ public class Door extends SignOrientedMechanism {
             sideDir = new Vector(0, 0, 1);
         }
         
-        World world = CraftBook.getWorld(worldType);
+        World world = CraftBook.getWorld(cbworld);
         
         int type = CraftBook.getBlockID(world, pt.add(vertDir));
         int data = 0;
@@ -250,13 +250,13 @@ public class Door extends SignOrientedMechanism {
         }
 
         if (toOpen) {
-            clearColumn(worldType, pt.add(vertDir.multiply(2)), vertDir, type, dist, bag);
-            clearColumn(worldType, pt.add(vertDir.multiply(2).add(sideDir)), vertDir, type, dist, bag);
-            clearColumn(worldType, pt.add(vertDir.multiply(2).subtract(sideDir)), vertDir, type, dist, bag);
+            clearColumn(cbworld, pt.add(vertDir.multiply(2)), vertDir, type, dist, bag);
+            clearColumn(cbworld, pt.add(vertDir.multiply(2).add(sideDir)), vertDir, type, dist, bag);
+            clearColumn(cbworld, pt.add(vertDir.multiply(2).subtract(sideDir)), vertDir, type, dist, bag);
         } else {
-            setColumn(worldType, pt.add(vertDir.multiply(2)), vertDir, type, data, dist, bag);
-            setColumn(worldType, pt.add(vertDir.multiply(2).add(sideDir)), vertDir, type, data, dist, bag);
-            setColumn(worldType, pt.add(vertDir.multiply(2).subtract(sideDir)), vertDir, type, data, dist, bag);
+            setColumn(cbworld, pt.add(vertDir.multiply(2)), vertDir, type, data, dist, bag);
+            setColumn(cbworld, pt.add(vertDir.multiply(2).add(sideDir)), vertDir, type, data, dist, bag);
+            setColumn(cbworld, pt.add(vertDir.multiply(2).subtract(sideDir)), vertDir, type, data, dist, bag);
         }
 
         bag.flushChanges();
@@ -271,13 +271,13 @@ public class Door extends SignOrientedMechanism {
      * @param change
      * @param dist
      */
-    private static void clearColumn(int worldType, Vector origin, Vector change, int type, int dist, BlockBag bag)
+    private static void clearColumn(CraftBookWorld cbworld, Vector origin, Vector change, int type, int dist, BlockBag bag)
             throws BlockSourceException {
         for (int i = 0; i < dist; i++) {
             Vector p = origin.add(change.multiply(i));
-            int t = CraftBook.getBlockID(worldType, p);
+            int t = CraftBook.getBlockID(cbworld, p);
             if (t == type) {
-                bag.setBlockID(worldType, p, 0);
+                bag.setBlockID(cbworld, p, 0);
             } else if (t != 0) {
                 break;
             }
@@ -291,13 +291,13 @@ public class Door extends SignOrientedMechanism {
      * @param change
      * @param dist
      */
-    private static void setColumn(int worldType, Vector origin, Vector change, int type, int data, int dist, BlockBag bag)
+    private static void setColumn(CraftBookWorld cbworld, Vector origin, Vector change, int type, int data, int dist, BlockBag bag)
             throws BlockSourceException {
         for (int i = 0; i < dist; i++) {
             Vector p = origin.add(change.multiply(i));
-            int t = CraftBook.getBlockID(worldType, p);
+            int t = CraftBook.getBlockID(cbworld, p);
             if (canPassThrough(t)) {
-                bag.setBlockID(worldType, p, type, data);
+                bag.setBlockID(cbworld, p, type, data);
             } else if (t != type) {
                 break;
             }
@@ -308,9 +308,9 @@ public class Door extends SignOrientedMechanism {
     public static boolean isOpen(Sign sign)
     {
     	World world = sign.getWorld();
-    	int worldType = world.getType().getId();
+    	CraftBookWorld cbworld = CraftBook.getCBWorld(world);
     	
-    	int direction = CraftBook.getBlockData(worldType, sign.getX(), sign.getY(), sign.getZ());
+    	int direction = CraftBook.getBlockData(cbworld, sign.getX(), sign.getY(), sign.getZ());
     	
 		boolean upwards = sign.getText(1).equalsIgnoreCase("[Door Up]");
 		

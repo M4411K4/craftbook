@@ -31,6 +31,7 @@ public class MC1205 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "SET BLOCK ABOVE";
     }
@@ -40,6 +41,7 @@ public class MC1205 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MC1205 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
         String force = sign.getLine4();
 
@@ -90,6 +93,7 @@ public class MC1205 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         if (!chip.getIn(1).is()) {
             return;
@@ -108,7 +112,7 @@ public class MC1205 extends BaseIC {
             int x = pos.getBlockX();
             int z = pos.getBlockZ();
 
-            World world = CraftBook.getWorld(chip.getWorldType());
+            World world = CraftBook.getWorld(chip.getCBWorld());
             if (y <= CraftBook.MAP_BLOCK_HEIGHT - 1 && (isForced || CraftBook.getBlockID(world, x, y, z) == 0)) {
                 CraftBook.setBlockID(world, x, y, z, item);
                 chip.getOut(1).set(true);

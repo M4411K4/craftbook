@@ -45,14 +45,15 @@ public class MCX221 extends MCX220 {
      *
      * @return
      */
+    @Override
     public boolean requiresPermission() {
         return true;
     }
     
     protected static boolean blockPlaced(WorldBlockVector chipBlock, SignText text)
     {
-    	Vector lever = Util.getWallSignBack(chipBlock.getWorldType(), chipBlock, 2);
-    	Redstone.setOutput(chipBlock.getWorldType(), lever, true);
+    	Vector lever = Util.getWallSignBack(chipBlock.getCBWorld(), chipBlock, 2);
+    	Redstone.setOutput(chipBlock.getCBWorld(), lever, true);
     	
     	char mode = ' ';
 		if(text.getLine2().length() > 8)

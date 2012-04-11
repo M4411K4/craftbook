@@ -30,6 +30,7 @@ public class MC1025 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "REL TIME MOD 2";
     }
@@ -39,6 +40,7 @@ public class MC1025 extends BaseIC {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (chip.getIn(1).is())
                 chip.getOut(1).set(isServerTimeOdd(chip));

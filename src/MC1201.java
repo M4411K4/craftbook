@@ -31,6 +31,7 @@ public class MC1201 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "DISPENSER";
     }
@@ -40,6 +41,7 @@ public class MC1201 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MC1201 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -91,6 +94,7 @@ public class MC1201 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         if (!chip.getIn(1).is()) {
             return;
@@ -113,7 +117,7 @@ public class MC1201 extends BaseIC {
             int x = pos.getBlockX();
             int z = pos.getBlockZ();
 
-            World world = CraftBook.getWorld(chip.getWorldType());
+            World world = CraftBook.getWorld(chip.getCBWorld());
             for (int y = pos.getBlockY() + 1; y <= maxY; y++) {
                 if (BlockType.canPassThrough(CraftBook.getBlockID(world, x, y, z))) {
                     world.dropItem(x, y, z, item, quantity);

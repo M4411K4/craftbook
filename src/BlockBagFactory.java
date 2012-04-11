@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.Vector;
 
 /**
@@ -29,5 +30,5 @@ public interface BlockBagFactory {
      * Creates a BlockSource instance for the passed vector, or null if no
      * block bag is valid for that position.
      */
-    BlockBag createBlockSource(int worldType, Vector pos);
+    BlockBag createBlockSource(CraftBookWorld cbworld, Vector pos);
 }

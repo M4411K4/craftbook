@@ -33,6 +33,7 @@ public class MCX203 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "CHEST COLLECTOR";
     }
@@ -42,6 +43,7 @@ public class MCX203 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -54,7 +56,8 @@ public class MCX203 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() > 0) {
@@ -131,13 +134,14 @@ public class MCX203 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         if (chip.inputAmount() != 0 && !chip.getIn(1).is()) {
             return;
         }
         
-        NearbyChestBlockBag source = new NearbyChestBlockBag(chip.getWorldType(), chip.getPosition());
-        source.addSourcePosition(chip.getWorldType(), chip.getPosition());
+        NearbyChestBlockBag source = new NearbyChestBlockBag(chip.getCBWorld(), chip.getPosition());
+        source.addSourcePosition(chip.getCBWorld(), chip.getPosition());
         
         String id = chip.getText().getLine3();
         
@@ -170,7 +174,7 @@ public class MCX203 extends BaseIC {
         double y = chip.getPosition().getY();
         double z = chip.getPosition().getZ();
         
-        World world = CraftBook.getWorld(chip.getWorldType());
+        World world = CraftBook.getWorld(chip.getCBWorld());
     	ItemChestCollector chestCollector = new ItemChestCollector(world, source, dist, item, color, x, y, z);
     	etc.getServer().addToServerQueue(chestCollector);
     }
@@ -224,12 +228,14 @@ public class MCX203 extends BaseIC {
 						{
 							//found = true;
 							
+							Enchantment[] enchants = itemEnt.getItem().getEnchantments();
+							
 							//kill
 							itemEnt.destroy();
 							
 							//store
 							try {
-		                        source.storeBlock(eitem.a.c, (byte)eitem.a.h(), eitem.a.a);
+		                        source.storeBlock(eitem.a.c, (byte)eitem.a.h(), eitem.a.a, enchants);
 		                    } catch (BlockSourceException e) {
 		                        break;
 		                    }

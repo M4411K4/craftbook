@@ -34,10 +34,12 @@ public class MCX117 extends MCX116 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "PLAYER MINE";
     }
     
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -47,6 +49,7 @@ public class MCX117 extends MCX116 {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
     	
     	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )

@@ -30,6 +30,7 @@ public class CBPluginInterface
 		public static final int DOOR = 2;
 		public static final int LIFT = 3;
 		public static final int AREA = 4;
+		public static final int CONVERT_EXP = 5;
 		
 		//public static final int GATE_IS_OPEN = 0;
 		//public static final int BRIDGE_IS_OPEN = 1;
@@ -71,6 +72,8 @@ public class CBPluginInterface
 					return allowLift(sign, player);
 				case AREA:
 					return allowAreaToggle(sign, player);
+				case CONVERT_EXP:
+					return allowConvertExp(sign, player);
 			}
 			return true;
 		}
@@ -129,6 +132,11 @@ public class CBPluginInterface
 		}
 		
 		private boolean allowAreaToggle(Sign sign, Player player)
+		{
+			return true;
+		}
+		
+		private boolean allowConvertExp(Sign sign, Player player)
 		{
 			return true;
 		}

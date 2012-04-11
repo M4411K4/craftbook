@@ -30,6 +30,7 @@ public class MCX210 extends MCX209 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "DOOR+";
     }
@@ -61,6 +62,7 @@ public class MCX210 extends MCX209 {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip)
     {
         if (!chip.getIn(1).isTriggered())
@@ -76,9 +78,9 @@ public class MCX210 extends MCX209 {
 			type[2] = 0;
         
         BlockBag bag = (BlockBag) chip.getExtra();
-        bag.addSourcePosition(chip.getWorldType(), chip.getPosition());
+        bag.addSourcePosition(chip.getCBWorld(), chip.getPosition());
         
-        World world = CraftBook.getWorld(chip.getWorldType());
+        World world = CraftBook.getWorld(chip.getCBWorld());
         
         int data = CraftBook.getBlockData(world, chip.getPosition());
         

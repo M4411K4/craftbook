@@ -30,6 +30,7 @@ public class MC3040 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "MULTIPLEXER";
     }
@@ -39,6 +40,7 @@ public class MC3040 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         boolean swapper = chip.getIn(3).is();
         chip.getOut(1).set(swapper?chip.getIn(1).is():chip.getIn(2).is());

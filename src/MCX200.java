@@ -34,6 +34,7 @@ public class MCX200 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return settings;
     }
@@ -43,6 +44,7 @@ public class MCX200 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -55,7 +57,8 @@ public class MCX200 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	String settings[] = sign.getLine1().split(":",2);
         String id = sign.getLine3();
         String rider = sign.getLine4();
@@ -119,6 +122,7 @@ public class MCX200 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip)
     {
     	if(chip.inputAmount() == 0)
@@ -160,7 +164,7 @@ public class MCX200 extends BaseIC {
     					chip.getText().supressUpdate();
     					
     					RedstoneListener listener = (RedstoneListener) chip.getExtra();
-    					listener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    					listener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     				}
     				else if(!chip.getIn(1).is() && chip.getText().getLine1().charAt(0) == '%')
     				{
@@ -209,26 +213,29 @@ public class MCX200 extends BaseIC {
 
             for (int y = pos.getBlockY() + 1; y <= maxY; y++)
             {
-            	int blockId = CraftBook.getBlockID(chip.getWorldType(), x, y, z);
+            	int blockId = CraftBook.getBlockID(chip.getCBWorld(), x, y, z);
                 if (BlockType.canPassThrough(blockId) || BlockType.isWater(blockId))
                 {
+                	World world = CraftBook.getWorld(chip.getCBWorld());
                     Location loc = new Location(x, y, z);
-                    loc.dimension = chip.getWorldType();
+                    loc.dimension = chip.getCBWorld().dimension();
                     
                     for(int i = 0; i < amount; i++)
                     {
-                        Mob mob = new Mob(id, loc);
+                        Mob mob = new Mob(id, world);
+                        mob.teleportTo(loc);
+                        
                         if (rider.length() != 0 && Mob.isValid(rider)) {
-                        	Mob mobRider = new Mob(rider, loc.getWorld());
+                        	Mob mobRider = new Mob(rider, world);
                             //mob.spawn(mobRider);
-                            spawn(mob, chip.getWorldType(), mobRider); //[TODO]: remove when Canary fixes Mob spawn's world
+                            spawn(mob, chip.getCBWorld(), mobRider); //[TODO]: remove when Canary fixes Mob spawn's world
                             
                             if(colorRider >= 0)
                             	setMobColor(mobRider.getEntity(), colorRider);
                             
                         } else {
                             //mob.spawn();
-                            spawn(mob, chip.getWorldType(), null); //[TODO]: remove when Canary fixes Mob spawn's world
+                            spawn(mob, chip.getCBWorld(), null); //[TODO]: remove when Canary fixes Mob spawn's world
                         }
                         
                         if(color >= 0)
@@ -242,9 +249,9 @@ public class MCX200 extends BaseIC {
     }
     
     //[TODO]: remove when Canary fixes Mob spawn's world
-    private void spawn(BaseEntity entity, int worldType, BaseEntity rider)
+    private void spawn(BaseEntity entity, CraftBookWorld cbworld, BaseEntity rider)
     {
-    	OWorld oworld = CraftBook.getOWorld(worldType);
+    	OWorldServer oworld = CraftBook.getOWorldServer(cbworld);
     	OEntity oentity = entity.getEntity();
     	
     	oentity.c(entity.getX() + 0.5D, entity.getY(), entity.getZ() + 0.5D, entity.getRotation(), 0.0F);
@@ -310,13 +317,13 @@ public class MCX200 extends BaseIC {
     		OEntityWolf wolf = (OEntityWolf)entity;
     		wolf.aP().b(16, (byte)color);
     	}
-    	else if(entity instanceof OEntityOzelot)
+    	else if(entity instanceof OEntityOcelot)
     	{
     		//same as wolf
     		if(color != 1)
     			return;
     		
-    		OEntityOzelot ocelot = (OEntityOzelot)entity;
+    		OEntityOcelot ocelot = (OEntityOcelot)entity;
     		ocelot.aP().b(16, (byte)color);
     	}
     	else if(entity instanceof OEntityPig)

@@ -39,6 +39,7 @@ public class MCX516 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return TITLE+distance;
     }
@@ -48,6 +49,7 @@ public class MCX516 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -60,7 +62,8 @@ public class MCX516 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	if(sign.getLine1().isEmpty() || sign.getLine1().length() > 2)
     	{
     		return "A distance is required on the 1st line (1 to 64)";
@@ -92,6 +95,7 @@ public class MCX516 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (!chip.getIn(1).is()) {
         	chip.getOut(1).set(false);
@@ -100,7 +104,7 @@ public class MCX516 extends BaseIC {
         
         processMessage(chip.getText().getLine3()+""+chip.getText().getLine4(),
         				chip.getBlockPosition(),
-        				chip.getWorldType(),
+        				chip.getCBWorld(),
         				Integer.parseInt(chip.getText().getLine1().substring(TITLE.length())),
         				chip.getMode() == '+',
         				false);
@@ -108,7 +112,7 @@ public class MCX516 extends BaseIC {
         chip.getOut(1).set(true);
     }
     
-    protected static void processMessage(String message, Vector position, int worldType, int distance, boolean messagePlayers, boolean allNearPlayers)
+    protected static void processMessage(String message, Vector position, CraftBookWorld cbworld, int distance, boolean messagePlayers, boolean allNearPlayers)
     {
     	if(distance > RedstoneListener.icMessageMaxRange)
     		distance = RedstoneListener.icMessageMaxRange;
@@ -120,7 +124,7 @@ public class MCX516 extends BaseIC {
     	{
     		Vector loc = new Vector(player.getX(), player.getY(), player.getZ());
     		int playerDist = (int)Math.floor(loc.distance(position));
-    		if(player.getWorld().getType().getId() == worldType && playerDist <= distance)
+    		if(CraftBook.getCBWorld(player.getWorld()).equals(cbworld) && playerDist <= distance)
     		{
     			if(nearest == null || playerDist < min)
     			{

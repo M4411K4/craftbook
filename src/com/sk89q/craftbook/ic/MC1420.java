@@ -19,6 +19,7 @@
 
 package com.sk89q.craftbook.ic;
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.BaseIC;
@@ -35,6 +36,7 @@ public class MC1420 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "CLOCK";
     }
@@ -47,7 +49,8 @@ public class MC1420 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         if (sign.getLine3().length() == 0) {
             return "Specify a clock number on the third line.";
         }
@@ -78,6 +81,7 @@ public class MC1420 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         int clockTime = Integer.parseInt(chip.getText().getLine3());
         int count = chip.getText().getLine4().length();

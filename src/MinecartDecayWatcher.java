@@ -17,8 +17,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Map.Entry;
+
 import com.sk89q.craftbook.HistoryHashMap;
 
 /**
@@ -78,27 +82,33 @@ public class MinecartDecayWatcher {
     private void performCheck() {
         long now = System.currentTimeMillis();
         
-        //[TODO]: change this when canary gets a "getWorldList()" method.
-        for(OWorldServer oworld : etc.getMCServer().e)
+        Iterator<Entry<String, OWorldServer[]>> worldIter = etc.getMCServer().worlds.entrySet().iterator();
+        while(worldIter.hasNext())
         {
-        	World world = new World(oworld);
+        	Map.Entry<String, OWorldServer[]> entry = (Map.Entry<String, OWorldServer[]>)worldIter.next();
+        	OWorldServer[] oworlds = (OWorldServer[])entry.getValue();
         	
-	        for (Minecart minecart : world.getMinecartList()) {
-                if (minecart.getPassenger() != null) {
-                    // We don't need to update the hash map because a player
-                    // existing the minecart will update the hash map,
-                    // and until the minecart is empty it won't be considered
-                    // be deletion
-                } else {
-                    Long then = minecarts.get(minecart.getId());
-                    
-                    if (then == null) {
-                        minecarts.put(minecart.getId(), System.currentTimeMillis());
-                    } else if (now - then > delay) {
-                        minecart.destroy();
-                        forgetMinecart(minecart);
-                    }
-                }
+	        for(OWorldServer oworld : oworlds)
+	        {
+	        	World world = new World(oworld);
+	        	
+		        for (Minecart minecart : world.getMinecartList()) {
+	                if (minecart.getPassenger() != null) {
+	                    // We don't need to update the hash map because a player
+	                    // existing the minecart will update the hash map,
+	                    // and until the minecart is empty it won't be considered
+	                    // be deletion
+	                } else {
+	                    Long then = minecarts.get(minecart.getId());
+	                    
+	                    if (then == null) {
+	                        minecarts.put(minecart.getId(), System.currentTimeMillis());
+	                    } else if (now - then > delay) {
+	                        minecart.destroy();
+	                        forgetMinecart(minecart);
+	                    }
+	                }
+		        }
 	        }
         }
     }

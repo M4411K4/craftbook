@@ -30,6 +30,7 @@ public class MC3030 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "RS NOR LATCH";
     }
@@ -39,6 +40,7 @@ public class MC3030 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         boolean set = chip.getIn(1).is();
         boolean reset = chip.getIn(2).is();

@@ -22,6 +22,7 @@
 
 import java.util.Map;
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.HistoryHashMap;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
@@ -42,6 +43,7 @@ public class MCX705 extends MCX700 {
      *
      * @return
      */
+    @Override
     public String getTitle() {
         return "^"+TITLE;
     }
@@ -51,6 +53,7 @@ public class MCX705 extends MCX700 {
      *
      * @return
      */
+    @Override
     public boolean requiresPermission() {
         return true;
     }
@@ -63,7 +66,8 @@ public class MCX705 extends MCX700 {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	String tune = sign.getLine3() + sign.getLine4();
         if (tune.length() == 0)
         {
@@ -107,6 +111,7 @@ public class MCX705 extends MCX700 {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip)
     {
     	if(music == null)
@@ -139,7 +144,7 @@ public class MCX705 extends MCX700 {
     		Vector noteblockPos = findNoteBlock(chip);
     		
     		MusicPlayer player = new MusicPlayer(chip.getText().getLine3() + chip.getText().getLine4(),
-												chip.getWorldType(),
+												chip.getCBWorld(),
 												noteblockPos.getBlockX(),
 												noteblockPos.getBlockY(),
 												noteblockPos.getBlockZ(),
@@ -151,7 +156,7 @@ public class MCX705 extends MCX700 {
     		
     		player.loadSong();
     		
-    		listener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    		listener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     	}
     }
     

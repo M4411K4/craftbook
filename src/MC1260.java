@@ -19,6 +19,7 @@
 
 import com.sk89q.craftbook.ic.BaseIC;
 import com.sk89q.craftbook.ic.ChipState;
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 
@@ -47,6 +48,7 @@ public class MC1260 extends BaseIC {
      *
      * @return
      */
+    @Override
     public String getTitle() {
         return "WATER SENSOR";
     }
@@ -59,7 +61,8 @@ public class MC1260 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String yOffsetLine = sign.getLine3();
 
         try {
@@ -78,6 +81,7 @@ public class MC1260 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip){
         if (triggerOnRising && !chip.getIn(1).is()) {
             return;
@@ -103,7 +107,7 @@ public class MC1260 extends BaseIC {
         
         y = Math.min(Math.max(0, y), CraftBook.MAP_BLOCK_HEIGHT - 1);
         
-        int type = CraftBook.getBlockID(chip.getWorldType(), x, y, z);
+        int type = CraftBook.getBlockID(chip.getCBWorld(), x, y, z);
         
         chip.getOut(1).set(type == 8 || type == 9);
     }

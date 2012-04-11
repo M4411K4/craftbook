@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 import com.sk89q.craftbook.*;
@@ -36,7 +37,7 @@ public class NearbyChestBlockBag extends BlockBag {
      * 
      * @param origin
      */
-    public NearbyChestBlockBag(int worldType, Vector origin) {
+    public NearbyChestBlockBag(CraftBookWorld cbworld, Vector origin) {
         DistanceComparator<ComparableInventory> comparator =
                 new DistanceComparator<ComparableInventory>(origin);
         chests = new TreeSet<ComparableInventory>(comparator);
@@ -103,6 +104,9 @@ public class NearbyChestBlockBag extends BlockBag {
     	storeBlock(id, data, 1);
     }
     public void storeBlock(int id, byte data, int amount) throws BlockSourceException {
+    	storeBlock(id, data, amount, null);
+    }
+    public void storeBlock(int id, byte data, int amount, Enchantment[] enchants) throws BlockSourceException {
         try {
             for (ComparableInventory c : chests) {
                 Inventory chest = c.getInventory();
@@ -116,7 +120,8 @@ public class NearbyChestBlockBag extends BlockBag {
                     	int itemMax = ItemArrayUtil.getStackMax(itemArray[i]);
                         if (itemArray[i].getItemId() == id &&
                         	(data == -1 || itemArray[i].getDamage() == data) &&
-                            itemArray[i].getAmount() < itemMax) {
+                            itemArray[i].getAmount() < itemMax &&
+                            Arrays.equals(itemArray[i].getEnchantments(), enchants)) {
                         	
                         	int newAmount;
                         	if(itemArray[i].getAmount() + amount > itemMax)
@@ -147,7 +152,13 @@ public class NearbyChestBlockBag extends BlockBag {
                     itemArray[emptySlot] = new Item(id, amount);
                     if(data >= 0)
                     	itemArray[emptySlot].setDamage(data);
-                    
+                    if(enchants != null)
+                    {
+                    	for(Enchantment enchant : enchants)
+                    	{
+                    		itemArray[emptySlot].addEnchantment(enchant);
+                    	}
+                    }
                     ItemArrayUtil.setContents((ItemArray<?>)chest, itemArray);
                     
                     return;
@@ -223,7 +234,7 @@ public class NearbyChestBlockBag extends BlockBag {
      * @param pos
      * @return
      */
-    public void addSourcePosition(int worldType, Vector pos) {
+    public void addSourcePosition(CraftBookWorld cbworld, Vector pos) {
         //int ox = pos.getBlockX();
         //int oy = pos.getBlockY();
         //int oz = pos.getBlockZ();
@@ -232,7 +243,7 @@ public class NearbyChestBlockBag extends BlockBag {
             for (int y = -3; y <= 3; y++) {
                 for (int z = -3; z <= 3; z++) {
                     Vector cur = pos.add(x, y, z);
-                    addSingleSourcePosition(worldType, cur);
+                    addSingleSourcePosition(cbworld, cur);
                 }
             }
         }
@@ -244,11 +255,11 @@ public class NearbyChestBlockBag extends BlockBag {
      * @param pos
      * @return
      */
-    public void addSingleSourcePosition(int worldType, Vector pos) {
+    public void addSingleSourcePosition(CraftBookWorld cbworld, Vector pos) {
         int x = pos.getBlockX();
         int y = pos.getBlockY();
         int z = pos.getBlockZ();
-        World world = CraftBook.getWorld(worldType);
+        World world = CraftBook.getWorld(cbworld);
         
         if (CraftBook.getBlockID(world, pos) == BlockType.CHEST) {
             ComplexBlock complexBlock =
@@ -256,10 +267,10 @@ public class NearbyChestBlockBag extends BlockBag {
 
             if (complexBlock instanceof Chest) {
                 Chest chest = (Chest)complexBlock;
-                chests.add(new ComparableInventory(worldType, pos.toBlockVector(), chest));
+                chests.add(new ComparableInventory(cbworld, pos.toBlockVector(), chest));
             } else if (complexBlock instanceof DoubleChest) {
                 DoubleChest chest = (DoubleChest)complexBlock;
-                chests.add(new ComparableInventory(worldType, 
+                chests.add(new ComparableInventory(cbworld, 
                         new Vector(chest.getX(), chest.getY(), chest.getZ()), chest));
                 // Double chests have two chest blocks, so creating a new Vector
                 // should theoretically prevent duplication (but it doesn't
@@ -268,11 +279,11 @@ public class NearbyChestBlockBag extends BlockBag {
         }
     }
     
-    public void addSingleSourcePositionExtra(int worldType, Vector pos) {
+    public void addSingleSourcePositionExtra(CraftBookWorld cbworld, Vector pos) {
         int x = pos.getBlockX();
         int y = pos.getBlockY();
         int z = pos.getBlockZ();
-        World world = CraftBook.getWorld(worldType);
+        World world = CraftBook.getWorld(cbworld);
         
         if (CraftBook.getBlockID(world, pos) == BlockType.CHEST) {
             ComplexBlock complexBlock =
@@ -280,10 +291,10 @@ public class NearbyChestBlockBag extends BlockBag {
 
             if (complexBlock instanceof Chest) {
                 Chest chest = (Chest)complexBlock;
-                chests.add(new ComparableInventory(worldType, pos.toBlockVector(), chest));
+                chests.add(new ComparableInventory(cbworld, pos.toBlockVector(), chest));
             } else if (complexBlock instanceof DoubleChest) {
                 DoubleChest chest = (DoubleChest)complexBlock;
-                chests.add(new ComparableInventory(worldType, 
+                chests.add(new ComparableInventory(cbworld, 
                         new Vector(chest.getX(), chest.getY(), chest.getZ()), chest));
                 // Double chests have two chest blocks, so creating a new Vector
                 // should theoretically prevent duplication (but it doesn't
@@ -297,7 +308,7 @@ public class NearbyChestBlockBag extends BlockBag {
         	if(complexBlock instanceof Dispenser)
         	{
         		Dispenser dispenser = (Dispenser) complexBlock;
-        		chests.add(new ComparableInventory(worldType, pos.toBlockVector(), dispenser));
+        		chests.add(new ComparableInventory(cbworld, pos.toBlockVector(), dispenser));
         	}
         }
     }
@@ -354,8 +365,8 @@ public class NearbyChestBlockBag extends BlockBag {
      * @author sk89q
      */
     public static class Factory implements BlockBagFactory {
-        public BlockBag createBlockSource(int worldType, Vector v) {
-            return new NearbyChestBlockBag(worldType, v);
+        public BlockBag createBlockSource(CraftBookWorld cbworld, Vector v) {
+            return new NearbyChestBlockBag(cbworld, v);
         }
     }
 }

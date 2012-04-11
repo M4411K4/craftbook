@@ -18,6 +18,7 @@
 */
 
 import com.sk89q.craftbook.*;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -188,8 +189,27 @@ public class Cauldron {
                 }
 
                 // Give results
-                for (CraftBookItem item : recipe.getResults()) {
-                    player.giveItem(new Item(item.id(), 1, -1, item.color()));
+                for (CraftBookItem cbitem : recipe.getResults()) {
+                	Item item = new Item(cbitem.id(), 1, -1, cbitem.color());
+                	if(cbitem.hasEnchantments())
+                	{
+	                	for(int i = 0; i < cbitem.enchantments().length; i++)
+	        			{
+	        				CraftBookEnchantment cbenchant = cbitem.enchantment(i);
+	        				
+	        				//since this is from a server created recipe we can assume it is allowed
+	        				//if(!cbenchant.enchantment().allowed)
+	        					//continue;
+	        				
+	        				Enchantment enchant = new Enchantment(Enchantment.Type.fromId(cbenchant.enchantment().getId()), cbenchant.level());
+	        				
+	        				if(!enchant.isValid())
+	        					continue;
+	        				
+	        				item.addEnchantment(enchant);
+	        			}
+                	}
+                    player.giveItem(item);
                 }
             // Didn't find a recipe
             } else {

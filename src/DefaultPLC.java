@@ -21,6 +21,7 @@ import lymia.plc.PlcBase;
 import lymia.plc.PlcException;
 import lymia.plc.PlcLang;
 import com.sk89q.craftbook.BlockType;
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 
@@ -56,9 +57,9 @@ public class DefaultPLC extends PlcBase {
      * @param sign
      * @return
      */
-    protected String validateEnviromentEx(int worldType, Vector v, SignText t) {
+    protected String validateEnviromentEx(CraftBookWorld cbworld, Vector v, SignText t) {
         try {
-            return getLanguage().validateEnvironment(worldType, v, t, getCode(worldType, v));
+            return getLanguage().validateEnvironment(cbworld, v, t, getCode(cbworld, v));
         } catch (PlcException e) {
             return e.toString();
         }
@@ -69,9 +70,9 @@ public class DefaultPLC extends PlcBase {
      * 
      * @param v
      */
-    protected String getCode(int worldType, Vector v) throws PlcException {
+    protected String getCode(CraftBookWorld cbworld, Vector v) throws PlcException {
         //Server s = etc.getServer();
-    	World world = CraftBook.getWorld(worldType);
+    	World world = CraftBook.getWorld(cbworld);
     	
         StringBuilder b = new StringBuilder();
         int x = v.getBlockX();

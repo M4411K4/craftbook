@@ -31,6 +31,7 @@ public class MCX255 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "LIGHTNING";
     }
@@ -40,6 +41,7 @@ public class MCX255 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MCX255 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         if (sign.getLine3().length() != 0) {
             try
             {
@@ -100,7 +103,7 @@ public class MCX255 extends BaseIC {
         	y++;
         }
         
-        OWorld world = CraftBook.getOWorld(chip.getWorldType());
+        OWorldServer world = CraftBook.getOWorldServer(chip.getCBWorld());
         world.a(new OEntityLightningBolt(world, pos.getX(), y, pos.getZ()));
 
         chip.getOut(1).set(true);

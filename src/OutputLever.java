@@ -24,7 +24,7 @@ public class OutputLever implements Runnable
     {
     	for(WorldBlockVector output = outputQueue.poll(); output != null; output = outputQueue.poll())
     	{
-    		OBlock.aJ.a(CraftBook.getOWorldServer(output.getWorldType()), output.getBlockX(), output.getBlockY(), output.getBlockZ(), (OEntityPlayer)null);
+    		OBlock.aJ.a(CraftBook.getOWorldServer(output.getCBWorld()), output.getBlockX(), output.getBlockY(), output.getBlockZ(), (OEntityPlayer)null);
     	}
     }
 }

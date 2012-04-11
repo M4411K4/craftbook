@@ -38,10 +38,12 @@ public class MCX116 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "PLAYER ABOVE?";
     }
     
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -54,7 +56,8 @@ public class MCX116 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3().toLowerCase();
 
         if (id.length() != 0)
@@ -77,6 +80,7 @@ public class MCX116 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
     	
     	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
@@ -87,7 +91,7 @@ public class MCX116 extends BaseIC {
     
     protected void findPlayerAbove(ChipState chip, boolean tnt)
     {
-    	World world = CraftBook.getWorld(chip.getWorldType());
+    	World world = CraftBook.getWorld(chip.getCBWorld());
 		String id = chip.getText().getLine3().toLowerCase();
     	
     	int x = chip.getBlockPosition().getBlockX();
@@ -184,7 +188,7 @@ public class MCX116 extends BaseIC {
 				MC1250.explodeTNT(WORLD.getWorld(), abovePlayer.getX(), abovePlayer.getY(), abovePlayer.getZ());
 			}
 			
-			Redstone.setOutput(WORLD, LEVER, output);
+			Redstone.setOutput(CraftBook.getCBWorld(WORLD), LEVER, output);
 		}
     }
 }

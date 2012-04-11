@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.BaseIC;
@@ -33,6 +34,7 @@ public class MCX237 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "HIDE WEATHER";
     }
@@ -42,11 +44,13 @@ public class MCX237 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
 
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	if (sign.getLine3().length() != 0 &&
     			( sign.getLine3().charAt(1) != ':'
     				|| sign.getLine3().contains(" ")
@@ -66,6 +70,7 @@ public class MCX237 extends BaseIC {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
     	
     	int type = 0;
@@ -88,7 +93,7 @@ public class MCX237 extends BaseIC {
     	OPacket70Bed packet;
     	if(chip.getIn(1).is())
     		packet = new OPacket70Bed(2, 0);
-    	else if(!CraftBook.getWorld(chip.getWorldType()).isRaining())
+    	else if(!CraftBook.getWorld(chip.getCBWorld()).isRaining())
     		return;
     	else
     		packet = new OPacket70Bed(1, 0);

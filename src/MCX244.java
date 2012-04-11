@@ -31,6 +31,7 @@ public class MCX244 extends MC1240 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "EGG SHOOTER";
     }
@@ -48,7 +49,7 @@ public class MCX244 extends MC1240 {
         Vector backDir = chip.getBlockPosition().subtract(
                 chip.getPosition());
         Vector firePos = chip.getBlockPosition().add(backDir);
-        OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
+        OWorldServer oworld = CraftBook.getOWorldServer(chip.getCBWorld());
         OEntityEgg arrow = new OEntityEgg(oworld);
         arrow.c(firePos.getBlockX() + 0.5, firePos.getBlockY() + 0.5,
                 firePos.getBlockZ() + 0.5, 0, 0);

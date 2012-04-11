@@ -30,6 +30,7 @@ public class MC3034 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "D EDGE FLIPFLOP";
     }
@@ -39,6 +40,7 @@ public class MC3034 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (chip.getIn(1).isTriggered() && chip.getIn(1).is()) {
             chip.getOut(1).set(chip.getIn(2).is());

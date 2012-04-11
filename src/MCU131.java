@@ -28,6 +28,7 @@ public class MCU131 extends BaseIC {
      * @return
      */
 	private final String TITLE = "HIT PLAYER ABV";
+	@Override
     public String getTitle() {
         return "^"+TITLE;
     }
@@ -37,6 +38,7 @@ public class MCU131 extends BaseIC {
      *
      * @return
      */
+    @Override
     public boolean requiresPermission() {
         return true;
     }
@@ -49,7 +51,8 @@ public class MCU131 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	String id = sign.getLine3().toLowerCase();
 
         if (id.length() != 0)
@@ -101,6 +104,7 @@ public class MCU131 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip)
     {
     	if(chip.inputAmount() == 0)
@@ -121,7 +125,7 @@ public class MCU131 extends BaseIC {
     		chip.getText().setLine4(param[0]+":"+param[1]+":0");
     		chip.getText().supressUpdate();
     		
-    		boolean damaged = MCX131.damagePlayers(CraftBook.getWorld(chip.getWorldType()),
+    		boolean damaged = MCX131.damagePlayers(CraftBook.getWorld(chip.getCBWorld()),
 													chip.getBlockPosition().getBlockX(),
 													chip.getBlockPosition().getBlockY(),
 													chip.getBlockPosition().getBlockZ(),
@@ -142,7 +146,7 @@ public class MCU131 extends BaseIC {
         		chip.getText().setLine1("%"+TITLE);
         		chip.getText().supressUpdate();
         		
-        		listener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+        		listener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     		}
     		else if(!chip.getIn(1).is() && chip.getText().getLine1().charAt(0) != '^')
     		{

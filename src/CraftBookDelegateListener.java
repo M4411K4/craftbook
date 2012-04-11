@@ -19,6 +19,7 @@
 
 import java.util.logging.Logger;
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.InsufficientArgumentsException;
 import com.sk89q.craftbook.Vector;
 
@@ -75,8 +76,8 @@ public abstract class CraftBookDelegateListener extends PluginListener {
      * @param origin
      * @return
      */
-    public BlockBag getBlockBag(int worldType, Vector origin) {
-        return listener.getBlockBag(worldType, origin);
+    public BlockBag getBlockBag(CraftBookWorld cbworld, Vector origin) {
+        return listener.getBlockBag(cbworld, origin);
     }
     
     /**

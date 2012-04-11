@@ -20,6 +20,7 @@
 import java.text.DecimalFormat;
 
 import com.sk89q.craftbook.BlockType;
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.ChipState;
@@ -35,12 +36,14 @@ public class MCT246 extends MCX246 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "CANNON";
     }
 
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
-    	String out = super.validateEnvironment(worldType, pos, sign);
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
+    	String out = super.validateEnvironment(cbworld, pos, sign);
     	
     	if(sign.getLine4().isEmpty())
     	{
@@ -61,6 +64,7 @@ public class MCT246 extends MCX246 {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (chip.getIn(1).is() && chip.getIn(1).isTriggered()) {
             String dest = chip.getText().getLine3();
@@ -116,7 +120,7 @@ public class MCT246 extends MCX246 {
         	chip.getText().allowUpdate();
         	
         	//[HACK]:forces update since Sign.update() doesn't always work anymore due to Notch optimizing block updates
-        	OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
+        	OWorldServer oworld = CraftBook.getOWorldServer(chip.getCBWorld());
         	oworld.h(chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
         }
         else if(chip.getIn(3).is() && chip.getIn(3).isTriggered())
@@ -144,14 +148,14 @@ public class MCT246 extends MCX246 {
         	chip.getText().allowUpdate();
         	
         	//[HACK]:forces update since Sign.update() doesn't always work anymore due to Notch optimizing block updates
-        	OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
+        	OWorldServer oworld = CraftBook.getOWorldServer(chip.getCBWorld());
         	oworld.h(chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
         }
     }
     
     private boolean getTopLeverState(ChipState chip)
     {
-    	World world = CraftBook.getWorld(chip.getWorldType());
+    	World world = CraftBook.getWorld(chip.getCBWorld());
     	int x = chip.getBlockPosition().getBlockX();
     	int y = chip.getBlockPosition().getBlockY() + 1;
     	int z = chip.getBlockPosition().getBlockZ();

@@ -74,11 +74,14 @@ public class CopyManager {
      * @throws MissingCuboidCopyException
      * @throws CuboidCopyException
      */
-    public CuboidCopy load(String namespace, String id)
+    public CuboidCopy load(CraftBookWorld cbworld, String namespace, String id)
             throws IOException, CuboidCopyException {
         
+    	if(cbworld == null)
+    		return null;
+    	
         id = id.toLowerCase();
-        String cacheKey = namespace + "/" + id;
+        String cacheKey = cbworld.name() + "/" + namespace + "/" + id;
         
         if (missing.containsKey(cacheKey)) {
             long lastCheck = missing.get(cacheKey);
@@ -91,11 +94,13 @@ public class CopyManager {
 
         if (copy == null) {
             try {
-                copy = CuboidCopy.load("world" + File.separator
+                copy = CuboidCopy.load(cbworld.name() + File.separator
                         + "craftbook" + File.separator
                         + "areas" + File.separator
                         + namespace + File.separator
-                        + id + ".cbcopy");
+                        + id + ".cbcopy"
+                        , cbworld.name()
+                        );
                 missing.remove(cacheKey);
                 cache.put(cacheKey, copy);
                 return copy;
@@ -121,7 +126,10 @@ public class CopyManager {
     public void save(String namespace, String id, CuboidCopy copy)
             throws IOException {
         
-        File folder = new File("world" + File.separator
+    	if(copy == null || copy.getCBWorld() == null)
+    		return;
+    	
+        File folder = new File(copy.getCBWorld().name() + File.separator
                 + "craftbook" + File.separator
                 + "areas" + File.separator
                 + namespace);
@@ -132,7 +140,7 @@ public class CopyManager {
 
         id = id.toLowerCase();
 
-        String cacheKey = namespace + "/" + id;
+        String cacheKey = copy.getCBWorld().name() + "/" + namespace + "/" + id;
         
         copy.save(new File(folder, id + ".cbcopy"));
         missing.remove(cacheKey);
@@ -146,10 +154,14 @@ public class CopyManager {
      * @param ignore
      * @return -1 if the copy can be made, some other number for the count
      */
-    public int meetsQuota(String namespace, String ignore, int quota) {
+    public int meetsQuota(CraftBookWorld cbworld, String namespace, String ignore, int quota) {
+    	
+    	if(cbworld == null)
+    		return 0;
+    	
         String ignoreFilename = ignore + ".cbcopy";
         
-        String[] files = new File("world" + File.separator
+        String[] files = new File(cbworld.name() + File.separator
                 + "craftbook" + File.separator
                 + "areas" + File.separator
                 + namespace).list();

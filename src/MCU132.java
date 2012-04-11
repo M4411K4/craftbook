@@ -30,6 +30,7 @@ public class MCU132 extends BaseIC {
      * @return
      */
 	private final String TITLE = "HIT MOB ABOVE";
+	@Override
     public String getTitle() {
         return "^"+TITLE;
     }
@@ -39,6 +40,7 @@ public class MCU132 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -51,7 +53,8 @@ public class MCU132 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	String id = sign.getLine3();
 
         if (id.length() != 0)
@@ -105,6 +108,7 @@ public class MCU132 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip)
     {
     	if(chip.inputAmount() == 0)
@@ -126,7 +130,7 @@ public class MCU132 extends BaseIC {
     		chip.getText().supressUpdate();
     		
     		String id = chip.getText().getLine3();
-        	World world = CraftBook.getWorld(chip.getWorldType());
+        	World world = CraftBook.getWorld(chip.getCBWorld());
         	@SuppressWarnings("rawtypes")
     		List list;
         	if(id.equalsIgnoreCase("mob") || id.equalsIgnoreCase("mobs"))
@@ -158,7 +162,7 @@ public class MCU132 extends BaseIC {
         		chip.getText().setLine1("%"+TITLE);
         		chip.getText().supressUpdate();
         		
-        		listener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+        		listener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     		}
     		else if(!chip.getIn(1).is() && chip.getText().getLine1().charAt(0) != '^')
     		{

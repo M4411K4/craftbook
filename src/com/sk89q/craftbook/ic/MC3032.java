@@ -33,6 +33,7 @@ public class MC3032 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "JKEDGE FLIPFLOP";
     }
@@ -42,6 +43,7 @@ public class MC3032 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         boolean j = chip.getIn(2).is(); //Set
         boolean k = chip.getIn(3).is(); //Reset

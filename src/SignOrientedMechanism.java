@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 
@@ -30,7 +31,7 @@ public abstract class SignOrientedMechanism {
      * Sign position.
      */
     protected Vector pt;
-    protected int worldType;
+    protected CraftBookWorld cbworld;
     /**
      * Sign text.
      */
@@ -41,10 +42,10 @@ public abstract class SignOrientedMechanism {
      * 
      * @param pt
      */
-    public SignOrientedMechanism(int worldType, Vector pt) {
-        signText = CraftBook.getSignText(worldType, pt);
+    public SignOrientedMechanism(CraftBookWorld cbworld, Vector pt) {
+        signText = CraftBook.getSignText(cbworld, pt);
         this.pt = pt;
-        this.worldType = worldType;
+        this.cbworld = cbworld;
     }
     
     /**
@@ -52,7 +53,7 @@ public abstract class SignOrientedMechanism {
      * 
      * @param pt
      */
-    public SignOrientedMechanism(int worldType, Vector pt, SignText signText) {
+    public SignOrientedMechanism(CraftBookWorld cbworld, Vector pt, SignText signText) {
         this.signText = signText;
     }
     

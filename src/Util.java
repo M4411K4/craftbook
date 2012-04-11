@@ -22,8 +22,10 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import com.sk89q.craftbook.BlockType;
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.InsufficientArgumentsException;
 import com.sk89q.craftbook.Vector;
+import com.sk89q.craftbook.WorldLocation;
 
 /**
  * Library for Minecraft-related functions.
@@ -41,8 +43,8 @@ public class Util {
      * @param multiplier
      * @return
      */
-	public static Vector getWallSignBack(int worldType, Vector pt, int multiplier) {
-		return getWallSignBack(CraftBook.getWorld(worldType), pt, multiplier);
+	public static Vector getWallSignBack(CraftBookWorld cbworld, Vector pt, int multiplier) {
+		return getWallSignBack(CraftBook.getWorld(cbworld), pt, multiplier);
 	}
     public static Vector getWallSignBack(World world, Vector pt, int multiplier) {
         int x = pt.getBlockX();
@@ -59,8 +61,8 @@ public class Util {
             return new Vector(x - multiplier, y, z);
         }
     }
-    public static Vector getWallSignBack(int worldType, Vector pt, double multiplier) {
-		return getWallSignBack(CraftBook.getWorld(worldType), pt, multiplier);
+    public static Vector getWallSignBack(CraftBookWorld cbworld, Vector pt, double multiplier) {
+		return getWallSignBack(CraftBook.getWorld(cbworld), pt, multiplier);
 	}
     public static Vector getWallSignBack(World world, Vector pt, double multiplier) {
         int x = pt.getBlockX();
@@ -87,8 +89,8 @@ public class Util {
      * @param multiplier
      * @return
      */
-    public static Vector getSignPostOrthogonalBack(int worldType, Vector pt, int multiplier) {
-    	return getSignPostOrthogonalBack(CraftBook.getWorld(worldType), pt, multiplier);
+    public static Vector getSignPostOrthogonalBack(CraftBookWorld cbworld, Vector pt, int multiplier) {
+    	return getSignPostOrthogonalBack(CraftBook.getWorld(cbworld), pt, multiplier);
     }
     public static Vector getSignPostOrthogonalBack(World world, Vector pt, int multiplier) {
         int x = pt.getBlockX();
@@ -117,8 +119,8 @@ public class Util {
      * @param multiplier
      * @return
      */
-    public static Vector getWallSignSide(int worldType, Vector pt, int multiplier) {
-    	return getWallSignSide(CraftBook.getWorld(worldType), pt, multiplier);
+    public static Vector getWallSignSide(CraftBookWorld cbworld, Vector pt, int multiplier) {
+    	return getWallSignSide(CraftBook.getWorld(cbworld), pt, multiplier);
     }
     public static Vector getWallSignSide(World world, Vector pt, int multiplier) {
         int x = pt.getBlockX();
@@ -145,8 +147,8 @@ public class Util {
      * @param text
      * @return
      */
-    public static boolean doesSignSay(int worldType, Vector pt, int lineNo, String text) {
-    	return doesSignSay(CraftBook.getWorld(worldType), pt, lineNo, text);
+    public static boolean doesSignSay(CraftBookWorld cbworld, Vector pt, int lineNo, String text) {
+    	return doesSignSay(CraftBook.getWorld(cbworld), pt, lineNo, text);
     }
     public static boolean doesSignSay(World world, Vector pt, int lineNo, String text) {
         ComplexBlock cBlock = world.getComplexBlock(
@@ -169,9 +171,9 @@ public class Util {
      * @param z
      * @return
      */
-    public static Sign getWallSignNextTo(int worldType, int x, int y, int z)
+    public static Sign getWallSignNextTo(CraftBookWorld cbworld, int x, int y, int z)
     {
-    	return getWallSignNextTo(CraftBook.getWorld(worldType), x, y, z);
+    	return getWallSignNextTo(CraftBook.getWorld(cbworld), x, y, z);
     }
     public static Sign getWallSignNextTo(World world, int x, int y, int z)
     {
@@ -200,9 +202,9 @@ public class Util {
      * @param pt
      * @return
      */
-    public static int getWallSignRotation(int worldType, Vector pt)
+    public static int getWallSignRotation(CraftBookWorld cbworld, Vector pt)
     {
-    	return getWallSignRotation(CraftBook.getWorld(worldType), pt);
+    	return getWallSignRotation(CraftBook.getWorld(cbworld), pt);
     }
     
     public static int getWallSignRotation(World world, Vector pt)
@@ -379,9 +381,9 @@ public class Util {
     	
     	return point;
     }
-    public static int getFrontBlockId(int worldType, float rotation, int x, int y, int z)
+    public static int getFrontBlockId(CraftBookWorld cbworld, float rotation, int x, int y, int z)
     {
-    	return getFrontBlockId(CraftBook.getWorld(worldType), rotation, x, y, z);
+    	return getFrontBlockId(CraftBook.getWorld(cbworld), rotation, x, y, z);
     }
     public static int getFrontBlockId(World world, float rotation, int x, int y, int z)
     {
@@ -399,22 +401,61 @@ public class Util {
 				+","+location.rotY
 				;
 	}
+    
+    public static String worldLocationToString(WorldLocation wLocation)
+	{
+    	return wLocation.getCBWorld().name()
+    			+","+locationToString(worldLocationToLocation(wLocation))
+    			;
+	}
 	
 	public static Location stringToLocation(String data)
 	{
 		String[] locData = data.split(",",6);
-		if(locData.length != 6)
+		return stringsToLocation(locData);
+	}
+	
+	public static WorldLocation stringToWorldLocation(String data)
+	{
+		String[] locData = data.split(",",7);
+		if(locData.length < 6 || locData[0].isEmpty())
+			return null;
+		
+		String name = locData[0];
+		
+		//old format support
+		if(locData.length < 7)
+		{
+			if(locData.length != 6)
+				return null;
+			
+			name = CraftBook.getMainWorldName();
+		}
+		else
+		{
+			System.arraycopy(locData, 1, locData, 0, 6);
+		}
+		
+		Location location = stringsToLocation(locData);
+		
+		return locationToWorldLocation(new CraftBookWorld(name, location.dimension), location);
+	}
+	
+	public static Location stringsToLocation(String[] data)
+	{
+		if(data.length < 6)
 			return null;
 		
 		Location location = null;
+		
 		try
 		{
-			int dimension = Integer.parseInt(locData[0]);
-			double x = Double.parseDouble(locData[1]);
-			double y = Double.parseDouble(locData[2]);
-			double z = Double.parseDouble(locData[3]);
-			float rotation = Float.parseFloat(locData[4]);
-			float pitch = Float.parseFloat(locData[5]);
+			int dimension = Integer.parseInt(data[0]);
+			double x = Double.parseDouble(data[1]);
+			double y = Double.parseDouble(data[2]);
+			double z = Double.parseDouble(data[3]);
+			float rotation = Float.parseFloat(data[4]);
+			float pitch = Float.parseFloat(data[5]);
 			
 			location = new Location(x, y, z, rotation, pitch);
 			location.dimension = dimension;
@@ -423,6 +464,37 @@ public class Util {
 		{
 			return null;
 		}
+		
+		return location;
+	}
+	
+	public static WorldLocation locationToWorldLocation(CraftBookWorld cbworld, Location location)
+	{
+		if(cbworld == null || location == null)
+			return null;
+		
+		return new WorldLocation(cbworld,
+								location.x,
+								location.y,
+								location.z,
+								location.rotX,
+								location.rotY
+								);
+	}
+	
+	public static Location worldLocationToLocation(WorldLocation wLocation)
+	{
+		if(wLocation == null)
+			return null;
+		
+		Location location =  new Location(wLocation.getX(),
+											wLocation.getY(),
+											wLocation.getZ(),
+											wLocation.rotation(),
+											wLocation.pitch()
+											);
+		
+		location.dimension = wLocation.getCBWorld().dimension();
 		
 		return location;
 	}

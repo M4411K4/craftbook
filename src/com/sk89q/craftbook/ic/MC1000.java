@@ -30,6 +30,7 @@ public class MC1000 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "REPEATER";
     }
@@ -39,6 +40,7 @@ public class MC1000 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         chip.getOut(1).set(chip.getIn(1).is());
     }

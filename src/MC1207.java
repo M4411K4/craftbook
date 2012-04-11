@@ -26,6 +26,7 @@ public class MC1207 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "FLEX SET";
     }
@@ -35,6 +36,7 @@ public class MC1207 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -47,7 +49,8 @@ public class MC1207 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	String line3 = sign.getLine3().toUpperCase();
         //String line4 = sign.getLine4();
         
@@ -99,6 +102,7 @@ public class MC1207 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         String line3 = chip.getText().getLine3().toUpperCase();
         String line4 = chip.getText().getLine4();
@@ -159,8 +163,8 @@ public class MC1207 extends BaseIC {
             z += dist;
 
         if (inp)
-        	CraftBook.setBlockID(chip.getWorldType(), x, y, z, block);
+        	CraftBook.setBlockID(chip.getCBWorld(), x, y, z, block);
         else if (hold)
-        	CraftBook.setBlockID(chip.getWorldType(), x, y, z, 0);
+        	CraftBook.setBlockID(chip.getCBWorld(), x, y, z, 0);
     }
 }

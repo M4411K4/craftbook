@@ -20,6 +20,7 @@ package lymia.plc;
 
 import java.util.logging.Logger;
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.ChipState;
@@ -34,5 +35,5 @@ public interface PlcLang extends StateHolder {
     String getName();
     boolean[] tick(ChipState chip, String program) throws PlcException;
     void checkSyntax(String program) throws PlcException;
-    String validateEnvironment(int worldType, Vector v, SignText t, String code);
+    String validateEnvironment(CraftBookWorld cbworld, Vector v, SignText t, String code);
 }

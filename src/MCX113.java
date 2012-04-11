@@ -36,18 +36,20 @@ public class MCX113 extends BaseIC {
 	/**
      * Data store.
      */
-    public static Map<String,Location> airwaves =
-            new HistoryHashMap<String,Location>(100);
+    public static Map<String,WorldLocation> airwaves =
+            new HistoryHashMap<String,WorldLocation>(100);
 	
     /**
      * Get the title of the IC.
      *
      * @return
      */
+    @Override
     public String getTitle() {
         return TITLE;
     }
 
+    @Override
     public boolean requiresPermission() {
         return true;
     }
@@ -60,7 +62,8 @@ public class MCX113 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -78,6 +81,7 @@ public class MCX113 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         String id = chip.getText().getLine3();
         
@@ -110,17 +114,17 @@ public class MCX113 extends BaseIC {
         	{
 	        	Vector bpos = chip.getBlockPosition();
 				
-				Location loc = new Location(bpos.getX(), bpos.getY(), bpos.getZ(), 90, 0);
-				loc.dimension = chip.getWorldType();
-				
-				if(bpos.getBlockX() - pt.getBlockX() > 0)
-					loc.rotX = 90;
+	        	float rotation;
+	        	if(bpos.getBlockX() - pt.getBlockX() > 0)
+					rotation = 90;
 				else if(bpos.getBlockX() - pt.getBlockX() < 0)
-					loc.rotX = 270;
+					rotation = 270;
 				else if(bpos.getBlockZ() - pt.getBlockZ() > 0)
-					loc.rotX = 180;
+					rotation = 180;
 				else
-					loc.rotX = 0;
+					rotation = 0;
+	        	
+	        	WorldLocation loc = new WorldLocation(chip.getCBWorld(), bpos.getX(), bpos.getY(), bpos.getZ(), rotation, 0);
 				
 	            airwaves.put(id, loc);
         	}

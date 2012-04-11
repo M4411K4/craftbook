@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package lymia.customic;
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 
@@ -37,10 +38,10 @@ class CustomICBase extends PlcBase {
         return name;
     }
     
-    protected String getCode(int worldType, Vector v) throws PlcException {
+    protected String getCode(CraftBookWorld cbworld, Vector v) throws PlcException {
         return code;
     }
-    protected String validateEnviromentEx(int worldType, Vector v, SignText t) {
+    protected String validateEnviromentEx(CraftBookWorld cbworld, Vector v, SignText t) {
     	if(t.getLine4().isEmpty())
     		t.setLine4("AAAAAAAAAAAA");
         return null;

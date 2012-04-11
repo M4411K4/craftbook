@@ -1,0 +1,130 @@
+#
+# List of custom Enchantment recipes
+#
+# Recipes are created in the workbench block or player
+#     2x2 inventory crafting slots if the recipe fits.
+# Recipes will also match flipped shapes. So an L shaped recipe
+#     is the same as a backwards L shaped recipe.
+#
+# Format
+# (may be easier to look at the examples near the bottom first)
+#     1. Recipes start with the line "recipe:" (without quotes)
+#     2. Resulting Enchantment type and optional level
+#         ex: Smite#2 will add Smite II to the item, Smite will
+#         add Smite I
+#     3. Item type to add the Enchantment to.
+#         Swords, diamond swords, helmets, boots, etc
+#     4. First row of recipe item locations in the 3x3 workbench
+#         crafting area.
+#         This will be 3 characters max. Each character
+#         represents where an item needs to be in the workbench.
+#         Spaces ' ' can be used for empty boxes
+#     5. Second row of item locations. Same 3 characters max.
+#         This row is required even if the recipe is just 1 row.
+#     6. Third row of item locations. Same 3 characters max.
+#         This row is required even if the recipe is 1 or 2 rows.
+#     7. The following lines will be the definitions for the
+#         characters used in the 3x3 item locations.
+#
+# NOTE!
+# letter case (upper/lower) matters for characters used in the
+#     recipe shape (lines 4, 5, & 6)
+#     Example: 'g' is different from 'G'
+#
+# Item formats are the same as in Cauldron and Cart Craft recipes
+#     @ specifies color/damage
+#     * specifies the amount
+#     & specifies enchantment
+#     # after an enchantment specifies enchantment level
+# Item names are either names found in the items.txt server
+#     config, or the id numbers.
+#
+# Names that can be used to represent any item of the same type:
+#     Helmet
+#     Chestplate
+#     Leggings
+#     Boots
+#     Sword
+#     Shovel
+#     Pickaxe
+#     Axe
+#     Bow
+#     Hoe
+# Ex: Using "Sword" will match any type of sword (gold, diamond,
+#    iron, wood, etc).
+#
+#
+###################
+# Example Recipes #
+###################
+#
+# The following examples are commented out with #
+# Real recipes should not start with # on each line
+#
+############
+### This recipe will add "Smite II" to any type of sword.
+### It uses 3 Ghast Tears, a water bucket, and any type of sword
+### The recipe also requires that the items form a 'T' shape
+#recipe:
+#Smite#2
+#Sword
+#$$$
+# @
+# !
+#$=ghasttear
+#@=waterbucket
+#!=Sword
+#
+############
+### This recipe will add "Smite II" just like above, but requires
+### a diamond sword instead of any type of sword
+### Note the only difference is changing Sword to diamondsword
+#recipe:
+#Smite#2
+#Sword
+#$$$
+# @
+# !
+#$=ghasttear
+#@=waterbucket
+#!=diamondsword
+#
+############
+### A two row recipe that adds Efficiency to Pickaxes
+### Note how the 3rd row is left empty
+### It uses 1 green cloth (green damage/color value = 5),
+###     1 potion of swiftness, any type of pickaxe, and
+###     8 bottles of enchanting.
+#recipe:
+#Efficiency
+#Pickaxe
+# %*
+#X&
+#
+#%=cloth@5
+#*=potion@2
+#X=Pickaxe
+#&=bottleoenchanting*8
+#
+############
+### A backwards 'L' shaped recipe that also uses only item id
+###     numbers.
+### Players can also build this by creating a normal 'L' shape
+###     which is the flipped version of this recipe.
+### This will add Fire Protection IV (Fire P) to Chestplates.
+### Remember that letter case (upper/lower) matters!
+### It uses 2 magma creams (#378), 1 potion of fire resistance
+###     (#373 with damage value 3), 1 slimeball (#341), and
+###     64 bottles of enchanting (#384).
+#recipe:
+#Fire P#4
+#Chestplate
+#  g
+#  G
+#hHq
+#g=378*2
+#G=373@3
+#h=341
+#H=384*64
+#q=Chestplate
+#

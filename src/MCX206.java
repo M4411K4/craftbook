@@ -26,6 +26,7 @@ public class MCX206 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "FLEX SET";
     }
@@ -35,6 +36,7 @@ public class MCX206 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -47,7 +49,8 @@ public class MCX206 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	String line3 = sign.getLine3().toUpperCase();
         //String line4 = sign.getLine4();
         
@@ -123,6 +126,7 @@ public class MCX206 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         String line3 = chip.getText().getLine3().toUpperCase();
         String line4 = chip.getText().getLine4();
@@ -188,14 +192,14 @@ public class MCX206 extends BaseIC {
             z += dist;
         
         BlockBag bag = (BlockBag) chip.getExtra();
-        bag.addSourcePosition(chip.getWorldType(), chip.getPosition());
+        bag.addSourcePosition(chip.getCBWorld(), chip.getPosition());
 
         try
 		{
 	        if (inp)
-	        	bag.setBlockID(chip.getWorldType(), x, y, z, block, color);
+	        	bag.setBlockID(chip.getCBWorld(), x, y, z, block, color);
 	        else if (hold)
-	        	bag.setBlockID(chip.getWorldType(), x, y, z, 0);
+	        	bag.setBlockID(chip.getCBWorld(), x, y, z, 0);
 		}
         catch(BlockSourceException e) {}
     }

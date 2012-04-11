@@ -31,6 +31,7 @@ public class MC1202 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "CHEST DISPENSER";
     }
@@ -40,6 +41,7 @@ public class MC1202 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MC1202 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -91,13 +94,14 @@ public class MC1202 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         if (!chip.getIn(1).is()) {
             return;
         }
         
-        NearbyChestBlockBag source = new NearbyChestBlockBag(chip.getWorldType(), chip.getPosition());
-        source.addSourcePosition(chip.getWorldType(), chip.getPosition());
+        NearbyChestBlockBag source = new NearbyChestBlockBag(chip.getCBWorld(), chip.getPosition());
+        source.addSourcePosition(chip.getCBWorld(), chip.getPosition());
         
         String id = chip.getText().getLine3();
         int quantity = 1;
@@ -116,7 +120,7 @@ public class MC1202 extends BaseIC {
             int x = pos.getBlockX();
             int z = pos.getBlockZ();
 
-            World world = CraftBook.getWorld(chip.getWorldType());
+            World world = CraftBook.getWorld(chip.getCBWorld());
             for (int y = pos.getBlockY() + 1; y <= maxY; y++) {
                 if (BlockType.canPassThrough(CraftBook.getBlockID(world, x, y, z))) {
                     int n = 0;

@@ -45,8 +45,8 @@ public class ToggleArea extends SignOrientedMechanism {
      * @param signText
      * @param copyManager
      */
-    public ToggleArea(int worldType, Vector pt, CopyManager copyManager) {
-        super(worldType, pt);
+    public ToggleArea(CraftBookWorld cbworld, Vector pt, CopyManager copyManager) {
+        super(cbworld, pt);
         
         this.copyManager = copyManager;
         
@@ -60,8 +60,8 @@ public class ToggleArea extends SignOrientedMechanism {
      * @param signText
      * @param copyManager
      */
-    private ToggleArea(int worldType, Vector pt, SignText signText) {
-        super(worldType, pt, signText);
+    private ToggleArea(CraftBookWorld cbworld, Vector pt, SignText signText) {
+        super(cbworld, pt, signText);
         
         isNewArea = getSignIdentifier().equalsIgnoreCase("[Area]");
     }
@@ -171,7 +171,7 @@ public class ToggleArea extends SignOrientedMechanism {
             String namespace = getNamespace();
             String activeID = getActiveStateID();
             
-            CuboidCopy copy = copyManager.load(namespace, activeID);
+            CuboidCopy copy = copyManager.load(cbworld, namespace, activeID);
 
             if (!isNewArea && copy.distance(pt) > 4) {
                 player.printError("This sign is too far away!");
@@ -188,7 +188,7 @@ public class ToggleArea extends SignOrientedMechanism {
                 } else if (inactiveID.length() == 0) {
                     copy.clear(bag);
                 } else {
-                    copy = copyManager.load(namespace, inactiveID);
+                    copy = copyManager.load(cbworld, namespace, inactiveID);
                     copy.paste(bag);
                 }
             }
@@ -218,7 +218,7 @@ public class ToggleArea extends SignOrientedMechanism {
             String namespace = getNamespace();
             String activeID = getActiveStateID();
             
-            CuboidCopy copy = copyManager.load(namespace, activeID);
+            CuboidCopy copy = copyManager.load(cbworld, namespace, activeID);
 
             if (!isNewArea && copy.distance(pt) > 4) {
                 return;
@@ -254,7 +254,7 @@ public class ToggleArea extends SignOrientedMechanism {
             else if(inactiveID.length() == 0)
             {
             	String activeID = getActiveStateID();
-            	copy = copyManager.load(namespace, activeID);
+            	copy = copyManager.load(cbworld, namespace, activeID);
             	
             	if (!isNewArea && copy.distance(pt) > 4) {
                     return;
@@ -264,13 +264,13 @@ public class ToggleArea extends SignOrientedMechanism {
             }
             else
             {
-            	copy = copyManager.load(namespace, inactiveID);
+            	copy = copyManager.load(cbworld, namespace, inactiveID);
             	
             	if (!isNewArea && copy.distance(pt) > 4) {
                     return;
                 }
             	
-            	copy = copyManager.load(namespace, inactiveID);
+            	copy = copyManager.load(cbworld, namespace, inactiveID);
                 copy.paste(bag);
             }
         } catch (BlockSourceException e) {
@@ -291,7 +291,7 @@ public class ToggleArea extends SignOrientedMechanism {
     public static boolean validateEnvironment(CraftBookPlayer player,
             Vector pt, SignText signText) {
         
-        ToggleArea area = new ToggleArea(player.getWorldType(), pt, signText);
+        ToggleArea area = new ToggleArea(player.getCBWorld(), pt, signText);
 
         String activeID = area.getSignActiveStateID();
         String inactiveID = area.getSignInactiveStateID();

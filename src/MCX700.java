@@ -23,6 +23,7 @@
 import java.util.Map;
 
 import com.sk89q.craftbook.BlockType;
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.HistoryHashMap;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
@@ -44,6 +45,7 @@ public class MCX700 extends BaseIC {
      *
      * @return
      */
+    @Override
     public String getTitle() {
         return "^"+TITLE;
     }
@@ -53,6 +55,7 @@ public class MCX700 extends BaseIC {
      *
      * @return
      */
+    @Override
     public boolean requiresPermission() {
         return true;
     }
@@ -65,7 +68,8 @@ public class MCX700 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         if (sign.getLine3().length() == 0)
         {
             return "Specify song file name on line 3.";
@@ -123,6 +127,7 @@ public class MCX700 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip)
     {
     	if(music == null)
@@ -150,7 +155,7 @@ public class MCX700 extends BaseIC {
     		Vector noteblockPos = findNoteBlock(chip);
     		
     		MusicPlayer player = new MusicPlayer(chip.getText().getLine3(),
-    											chip.getWorldType(),
+    											chip.getCBWorld(),
 												noteblockPos.getBlockX(),
 												noteblockPos.getBlockY(),
 												noteblockPos.getBlockZ(),
@@ -162,7 +167,7 @@ public class MCX700 extends BaseIC {
     		
     		player.loadSong();
     		
-    		listener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    		listener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     	}
     }
     
@@ -217,7 +222,7 @@ public class MCX700 extends BaseIC {
     
     protected Vector findNoteBlock(ChipState chip)
     {
-    	World world = CraftBook.getWorld(chip.getWorldType());
+    	World world = CraftBook.getWorld(chip.getCBWorld());
     	
     	Vector noteblock = Util.getWallSignBack(world, chip.getPosition(), 2);
     	

@@ -31,6 +31,7 @@ public class MCX515 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "SERVER LOG";
     }
@@ -40,6 +41,7 @@ public class MCX515 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MCX515 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         if(sign.getLine3().isEmpty() && sign.getLine4().isEmpty())
         {
         	return "A message on the 3rd or 4th line is required.";
@@ -66,6 +69,7 @@ public class MCX515 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (!chip.getIn(1).is()) {
         	chip.getOut(1).set(false);

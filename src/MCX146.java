@@ -37,6 +37,7 @@ public class MCX146 extends BaseIC {
 	protected String settings = "";
 	private final String TITLE = "POTION";
 	
+	@Override
     public String getTitle() {
     	return "^"+TITLE+settings;
     }
@@ -46,6 +47,7 @@ public class MCX146 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -58,7 +60,8 @@ public class MCX146 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	
     	if(PotionType.getEffect(sign.getLine3()) == null)
     	{
@@ -111,6 +114,7 @@ public class MCX146 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip)
     {
     	if(chip.inputAmount() == 0
@@ -154,8 +158,8 @@ public class MCX146 extends BaseIC {
 	    	if(length > RedstoneListener.icInAreaMaxLength)
 	    		length = RedstoneListener.icInAreaMaxLength;
 	    	
-	    	World world = CraftBook.getWorld(chip.getWorldType());
-	    	Vector lever = Util.getWallSignBack(chip.getWorldType(), chip.getPosition(), 2);
+	    	World world = CraftBook.getWorld(chip.getCBWorld());
+	    	Vector lever = Util.getWallSignBack(chip.getCBWorld(), chip.getPosition(), 2);
 	        int data = CraftBook.getBlockData(world, chip.getPosition());
 	        BlockArea area = MCX220.getBlockArea(chip, data, width, height, length, offx, offy, offz);
 	        
@@ -169,7 +173,7 @@ public class MCX146 extends BaseIC {
     			chip.getText().supressUpdate();
     			
     			RedstoneListener redListener = (RedstoneListener) chip.getExtra();
-    			redListener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    			redListener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     		}
     		else if(!chip.getIn(1).is() && chip.getText().getLine1().charAt(0) != '^')
     		{
@@ -232,7 +236,7 @@ public class MCX146 extends BaseIC {
 			
 			for(Player player : players)
 			{
-				if(AREA.containsPoint(AREA.getWorldType(),
+				if(AREA.containsPoint(AREA.getCBWorld(),
 									OMathHelper.b(player.getX()),
 									OMathHelper.b(player.getY()),
 									OMathHelper.b(player.getZ()) )
@@ -366,7 +370,7 @@ public class MCX146 extends BaseIC {
 				}
 			}
 			
-			Redstone.setOutput(AREA.getWorldType(), LEVER, output);
+			Redstone.setOutput(AREA.getCBWorld(), LEVER, output);
 		}
     }
     

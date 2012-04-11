@@ -43,12 +43,12 @@ public abstract class BlockBag {
      * @return
      * @throws OutOfSpaceException
      */
-    public boolean setBlockID(int worldType, int x, int y, int z, int id) throws BlockSourceException {
-        return setBlockID(worldType, new Vector(x, y, z), id);
+    public boolean setBlockID(CraftBookWorld cbworld, int x, int y, int z, int id) throws BlockSourceException {
+        return setBlockID(cbworld, new Vector(x, y, z), id);
     }
     
-    public boolean setBlockID(int worldType, int x, int y, int z, int id, int data) throws BlockSourceException {
-        return setBlockID(worldType, new Vector(x, y, z), id, data);
+    public boolean setBlockID(CraftBookWorld cbworld, int x, int y, int z, int id, int data) throws BlockSourceException {
+        return setBlockID(cbworld, new Vector(x, y, z), id, data);
     }
 
     /**
@@ -59,14 +59,14 @@ public abstract class BlockBag {
      * @return
      * @throws OutOfSpaceException
      */
-    public boolean setBlockID(int worldType, Vector pos, int id) throws BlockSourceException
+    public boolean setBlockID(CraftBookWorld cbworld, Vector pos, int id) throws BlockSourceException
     {
-    	return setBlockID(worldType, pos, id, 0);
+    	return setBlockID(cbworld, pos, id, 0);
     }
     
-    public boolean setBlockID(int worldType, Vector pos, int id, int data) throws BlockSourceException
+    public boolean setBlockID(CraftBookWorld cbworld, Vector pos, int id, int data) throws BlockSourceException
     {
-    	return setBlockID(CraftBook.getWorld(worldType), pos, id, data);
+    	return setBlockID(CraftBook.getWorld(cbworld), pos, id, data);
     }
     
     public boolean setBlockID(World world, int x, int y, int z, int id) throws BlockSourceException {
@@ -249,14 +249,14 @@ public abstract class BlockBag {
      * @param pos
      * @return
      */
-    public abstract void addSourcePosition(int worldType, Vector pos);
+    public abstract void addSourcePosition(CraftBookWorld cbworld, Vector pos);
     /**
      * Adds a position to be used a source.
      *
      * @param pos
      * @return
      */
-    public abstract void addSingleSourcePosition(int worldType, Vector pos);
+    public abstract void addSingleSourcePosition(CraftBookWorld cbworld, Vector pos);
     
     /**
      * Returns if the BlockBag has a real fetch or unlimited

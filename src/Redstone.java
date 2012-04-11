@@ -18,6 +18,7 @@
 */
 
 import com.sk89q.craftbook.BlockType;
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.WorldBlockVector;
 
@@ -39,8 +40,8 @@ public class Redstone {
      * @param considerWires
      * @return
      */
-    static boolean isHighBinary(int worldType, Vector pt, boolean considerWires) {
-        Boolean result = Redstone.isHigh(worldType, pt, CraftBook.getBlockID(worldType, pt), considerWires);
+    static boolean isHighBinary(CraftBookWorld cbworld, Vector pt, boolean considerWires) {
+        Boolean result = Redstone.isHigh(cbworld, pt, CraftBook.getBlockID(cbworld, pt), considerWires);
         if (result != null && result) {
             return true;
         } else {
@@ -57,8 +58,8 @@ public class Redstone {
      * @param z
      * @return
      */
-    static Boolean testAnyInput(int worldType, Vector pt) {
-        return testAnyInput(worldType, pt, true, false);
+    static Boolean testAnyInput(CraftBookWorld cbworld, Vector pt) {
+        return testAnyInput(cbworld, pt, true, false);
     }
     
     static Boolean testAnyInput(World world, Vector pt) {
@@ -74,9 +75,9 @@ public class Redstone {
      * @param z
      * @return
      */
-    static Boolean testAnyInput(int worldType, Vector pt, boolean checkWiresAbove,
+    static Boolean testAnyInput(CraftBookWorld cbworld, Vector pt, boolean checkWiresAbove,
             boolean checkOnlyHorizontal) {
-    	return testAnyInput(CraftBook.getWorld(worldType), pt, checkWiresAbove, checkOnlyHorizontal);
+    	return testAnyInput(CraftBook.getWorld(cbworld), pt, checkWiresAbove, checkOnlyHorizontal);
     }
     static Boolean testAnyInput(World world, Vector pt, boolean checkWiresAbove,
             boolean checkOnlyHorizontal) {
@@ -231,8 +232,8 @@ public class Redstone {
      * @param sidePt2
      * @return
      */
-    static Boolean isWireHigh(int worldType, Vector pt, Vector sidePt1, Vector sidePt2) {
-    	return isWireHigh(CraftBook.getWorld(worldType), pt, sidePt1, sidePt2);
+    static Boolean isWireHigh(CraftBookWorld cbworld, Vector pt, Vector sidePt1, Vector sidePt2) {
+    	return isWireHigh(CraftBook.getWorld(cbworld), pt, sidePt1, sidePt2);
     }
     static Boolean isWireHigh(World world, Vector pt, Vector sidePt1, Vector sidePt2) {
         int side1 = CraftBook.getBlockID(world, sidePt1);
@@ -263,8 +264,8 @@ public class Redstone {
      * @param considerWires
      * @return
      */
-    static Boolean isHigh(int worldType, Vector pt, int type, boolean considerWires) {
-    	return isHigh(CraftBook.getWorld(worldType), pt, type, considerWires);
+    static Boolean isHigh(CraftBookWorld cbworld, Vector pt, int type, boolean considerWires) {
+    	return isHigh(CraftBook.getWorld(cbworld), pt, type, considerWires);
     }
     static Boolean isHigh(World world, Vector pt, int type, boolean considerWires) {
         if (type == BlockType.LEVER) {
@@ -295,8 +296,8 @@ public class Redstone {
      * @param considerWires
      * @return
      */
-    static Boolean isHigh(int worldType, Vector pt, boolean considerWires) {
-        return isHigh(worldType, pt, CraftBook.getBlockID(worldType, pt), considerWires);
+    static Boolean isHigh(CraftBookWorld cbworld, Vector pt, boolean considerWires) {
+        return isHigh(cbworld, pt, CraftBook.getBlockID(cbworld, pt), considerWires);
     }
     static Boolean isHigh(World world, Vector pt, boolean considerWires) {
     	return isHigh(world, pt, CraftBook.getBlockID(world, pt), considerWires);
@@ -308,19 +309,19 @@ public class Redstone {
      * @param pt
      * @return
      */
-    public static Boolean testSimpleInput(int worldType, Vector pt) {
+    public static Boolean testSimpleInput(CraftBookWorld cbworld, Vector pt) {
         Boolean result = null;
         Boolean temp;
         
-        temp = isHigh(worldType, pt.add(1, 0, 0), true);
+        temp = isHigh(cbworld, pt.add(1, 0, 0), true);
         if (temp != null) if (temp) return true; else result = false;
-        temp = isHigh(worldType, pt.add(-1, 0, 0), true);
+        temp = isHigh(cbworld, pt.add(-1, 0, 0), true);
         if (temp != null) if (temp) return true; else result = false;
-        temp = isHigh(worldType, pt.add(0, 0, 1), true);
+        temp = isHigh(cbworld, pt.add(0, 0, 1), true);
         if (temp != null) if (temp) return true; else result = false;
-        temp = isHigh(worldType, pt.add(0, 0, -1), true);
+        temp = isHigh(cbworld, pt.add(0, 0, -1), true);
         if (temp != null) if (temp) return true; else result = false;
-        temp = isHigh(worldType, pt.add(0, -1, 0), true);
+        temp = isHigh(cbworld, pt.add(0, -1, 0), true);
         if (temp != null) if (temp) return true; else result = false;
         return result;
     }
@@ -331,10 +332,8 @@ public class Redstone {
      * @param getPosition
      * @param state
      */
-    static void setOutput(int worldType, Vector pos, boolean state) {
-    	setOutput(CraftBook.getWorld(worldType), pos, state);
-    }
-    static void setOutput(World world, Vector pos, boolean state) {
+    static void setOutput(CraftBookWorld cbworld, Vector pos, boolean state) {
+    	World world = CraftBook.getWorld(cbworld);
         if (CraftBook.getBlockID(world, pos) == BlockType.LEVER) {
             int data = CraftBook.getBlockData(world, pos);
             int newData = data & 0x7;
@@ -346,7 +345,7 @@ public class Redstone {
             }
 
             if (newData != data && outputLever != null) {
-            	outputLever.addToOutputQueue(new WorldBlockVector(world.getType().getId(), pos.getBlockX(), pos.getBlockY(), pos.getBlockZ()));
+            	outputLever.addToOutputQueue(new WorldBlockVector(cbworld, pos.getBlockX(), pos.getBlockY(), pos.getBlockZ()));
             }
         }
     }
@@ -357,8 +356,8 @@ public class Redstone {
      * @param getPosition
      * @param state
      */
-    static boolean getOutput(int worldType, Vector pos) {
-    	return getOutput(CraftBook.getWorld(worldType), pos);
+    static boolean getOutput(CraftBookWorld cbworld, Vector pos) {
+    	return getOutput(CraftBook.getWorld(cbworld), pos);
     }
     static boolean getOutput(World world, Vector pos) {
         if (CraftBook.getBlockID(world, pos) == BlockType.LEVER) {
@@ -374,13 +373,10 @@ public class Redstone {
      * @param pos
      * @return
      */
-    static void toggleOutput(int worldType, Vector pos) {
-        toggleOutput(CraftBook.getWorld(worldType), pos);
-    }
-    
-    static void toggleOutput(World world, Vector pos) {
+    static void toggleOutput(CraftBookWorld cbworld, Vector pos) {
+    	World world = CraftBook.getWorld(cbworld);
         if (CraftBook.getBlockID(world, pos) == BlockType.LEVER) {
-            setOutput(world, pos, (CraftBook.getBlockData(world, pos) & 0x8) != 0x8);
+            setOutput(cbworld, pos, (CraftBook.getBlockData(world, pos) & 0x8) != 0x8);
         }
     }
 
@@ -390,8 +386,8 @@ public class Redstone {
      * @param getPosition
      * @param state
      */
-    static void setTrackTrigger(int worldType, Vector pos) {
-    	setTrackTrigger(CraftBook.getWorld(worldType), pos);
+    static void setTrackTrigger(CraftBookWorld cbworld, Vector pos) {
+    	setTrackTrigger(CraftBook.getWorld(cbworld), pos);
     }
     static void setTrackTrigger(World world, Vector pos) {
         if (CraftBook.getBlockID(world, pos) == BlockType.LEVER) {

@@ -25,10 +25,12 @@ package com.sk89q.craftbook.ic;
  * @author Lymia
  */
 public class MC4000 extends BaseIC {
+	@Override
     public String getTitle() {
         return "FULL ADDER";
     }
 
+	@Override
     public void think(ChipState chip) {
         boolean A = chip.getIn(1).is();
         boolean B = chip.getIn(2).is();

@@ -29,6 +29,7 @@ public class MCX208 extends MCX210 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "DOOR";
     }

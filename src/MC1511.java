@@ -32,10 +32,16 @@ public class MC1511 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "MESSAGE ALL";
     }
     
+	@Override
+    public boolean requiresPermission() {
+        return true; //Could be used for über-spam
+    }
+	
     /**
      * Validates the IC's environment. The position of the sign is given.
      * Return a string in order to state an error message and deny
@@ -44,8 +50,8 @@ public class MC1511 extends BaseIC {
      * @param sign
      * @return
      */
-    
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length()==0) {
@@ -57,10 +63,6 @@ public class MC1511 extends BaseIC {
         }
         return null;
     }
-    
-    public boolean requiresPermission() {
-        return true; //Could be used for über-spam
-    }
 
     
     /**
@@ -68,6 +70,7 @@ public class MC1511 extends BaseIC {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (chip.getIn(1).is()) {
             String theMessage = chip.getText().getLine3();

@@ -18,6 +18,7 @@
 
 package com.sk89q.craftbook.ic;
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 
@@ -27,6 +28,7 @@ public class MC2999 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "MARQUEE";
     }
@@ -39,7 +41,8 @@ public class MC2999 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         if (!sign.getLine3().isEmpty()) {
             return "3rd line must be blank.";
         }
@@ -55,6 +58,7 @@ public class MC2999 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         if (!chip.getIn(1).is())
             return;

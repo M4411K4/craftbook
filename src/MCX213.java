@@ -35,6 +35,7 @@ public class MCX213 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "^+"+TITLE+"0:0";
     }
@@ -44,6 +45,7 @@ public class MCX213 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -56,7 +58,8 @@ public class MCX213 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign)
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign)
     {
     	return validate(sign.getLine3(), sign.getLine4());
     }
@@ -225,6 +228,7 @@ public class MCX213 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip)
     {
     	if(chip.inputAmount() == 0)
@@ -285,19 +289,19 @@ public class MCX213 extends BaseIC {
     			chip.getText().setLine1("^"+state+TITLE+""+tick+":"+loc);
     			chip.getText().supressUpdate();
     			
-    			World world = CraftBook.getWorld(chip.getWorldType());
+    			World world = CraftBook.getWorld(chip.getCBWorld());
     			int data = CraftBook.getBlockData(world, chip.getPosition());
     			
 				int direction = getBlockDirection(chip, data);
 				int[] baseRow = getRowCoords(chip, data, size, 0);
-				clearRows(loc, direction, chip.getWorldType(), baseRow);
+				clearRows(loc, direction, chip.getCBWorld(), baseRow);
     			return;
     		}
     		
-    		BlockBag bag = redListener.getBlockBag(chip.getWorldType(), chip.getPosition());
-    		bag.addSourcePosition(chip.getWorldType(), chip.getPosition());
+    		BlockBag bag = redListener.getBlockBag(chip.getCBWorld(), chip.getPosition());
+    		bag.addSourcePosition(chip.getCBWorld(), chip.getPosition());
     		
-    		World world = CraftBook.getWorld(chip.getWorldType());
+    		World world = CraftBook.getWorld(chip.getCBWorld());
             int data = CraftBook.getBlockData(world, chip.getPosition());
             
             int[] coord = getRowCoords(chip, data, size, loc);
@@ -340,7 +344,7 @@ public class MCX213 extends BaseIC {
 		            	setTileRows(loc, direction, types, bag, world, coord);
 		            	
 		            	int[] baseRow = getRowCoords(chip, data, size, 0);
-        				setPistonRows(loc, direction, chip.getWorldType(), baseRow, false);
+        				setPistonRows(loc, direction, chip.getCBWorld(), baseRow, false);
             		}
             	}
             	else
@@ -381,7 +385,7 @@ public class MCX213 extends BaseIC {
 			{
 				int direction = getBlockDirection(chip, data);
 				int[] baseRow = getRowCoords(chip, data, size, 0);
-				clearRows(loc, direction, chip.getWorldType(), baseRow);
+				clearRows(loc, direction, chip.getCBWorld(), baseRow);
 			}
     	}
     	else if(chip.getIn(1).isTriggered())
@@ -474,7 +478,7 @@ public class MCX213 extends BaseIC {
 		chip.getText().supressUpdate();
 		
 		redListener = (RedstoneListener) chip.getExtra();
-		redListener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+		redListener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     }
     
     protected String[] getLine4Values(ChipState chip)
@@ -533,7 +537,7 @@ public class MCX213 extends BaseIC {
     	}
     }
     
-    protected static void setPistonRows(int row, int data, int worldType, int[] baseRow, boolean clear)
+    protected static void setPistonRows(int row, int data, CraftBookWorld cbworld, int[] baseRow, boolean clear)
     {
     	if(row < 1)
     		return;
@@ -543,7 +547,7 @@ public class MCX213 extends BaseIC {
     	
     	for(int i = 0; i < maxRow; i++)
     	{
-    		setPistonRow(BlockType.PISTON, data, worldType, baseRow, clear);
+    		setPistonRow(BlockType.PISTON, data, cbworld, baseRow, clear);
     		
     		for(int j = 0; j < 12; j++)
     		{
@@ -552,22 +556,22 @@ public class MCX213 extends BaseIC {
     	}
     }
     
-    protected static void clearRows(int row, int direction, int worldType, int[] baseRow)
+    protected static void clearRows(int row, int direction, CraftBookWorld cbworld, int[] baseRow)
     {
     	direction = reverseDirection(direction);
     	for(int i = 0; i < row; i++)
     	{
-    		setPistonRow(0, 0, worldType, baseRow, true);
+    		setPistonRow(0, 0, cbworld, baseRow, true);
     		baseRow = increaseRow(direction, baseRow);
     	}
     }
     
-    protected static void setPistonRow(int id, int data, int worldType, int[] coords, boolean clear)
+    protected static void setPistonRow(int id, int data, CraftBookWorld cbworld, int[] coords, boolean clear)
     {
     	coords[1] = MCX211.setYLimit(coords[1]);
     	coords[4] = MCX211.setYLimit(coords[4]);
     	
-    	OWorld oworld = CraftBook.getOWorldServer(worldType);
+    	OWorldServer oworld = CraftBook.getOWorldServer(cbworld);
     	
     	for(int x = coords[0]; x < coords[3]; x++)
         {
@@ -582,11 +586,11 @@ public class MCX213 extends BaseIC {
 	        			packet.e = data;
 	        		}
 	        		
-	        		etc.getMCServer().h.a(x, y, z, 64.0D, worldType, packet);
+	        		etc.getMCServer().h.a(x, y, z, 64.0D, cbworld.dimension(), packet);
 	        		
 	        		if(!clear)
 	        		{
-	        			etc.getMCServer().h.a(x, y, z, 64.0D, worldType,
+	        			etc.getMCServer().h.a(x, y, z, 64.0D, cbworld.dimension(),
 	        					new OPacket54PlayNoteBlock(x, y, z, 0, data));
 	        		}
 	        	}

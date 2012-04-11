@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.BaseIC;
@@ -33,6 +34,7 @@ public class MCX233 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "WEATHER CONTROL";
     }
@@ -42,6 +44,7 @@ public class MCX233 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -54,7 +57,8 @@ public class MCX233 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() > 0)
@@ -85,7 +89,7 @@ public class MCX233 extends BaseIC {
      */
     public void think(ChipState chip) {
     	
-    	World world = CraftBook.getWorld(chip.getWorldType());
+    	World world = CraftBook.getWorld(chip.getCBWorld());
     	int duration;
     	
     	if(chip.getIn(1).is())

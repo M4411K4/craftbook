@@ -1,3 +1,4 @@
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.ChipState;
@@ -36,6 +37,7 @@ public class MCX214 extends MCX213 {
      *
      * @return
      */
+	@Override
 	public String getTitle() {
         return "^+"+TITLE+"0:0";
     }
@@ -45,6 +47,7 @@ public class MCX214 extends MCX213 {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -58,7 +61,7 @@ public class MCX214 extends MCX213 {
      * @return
      */
     @Override
-    public String validateEnvironment(int worldType, Vector pos, SignText sign)
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign)
     {
     	String line4 = sign.getLine4();
     	if(!line4.isEmpty())

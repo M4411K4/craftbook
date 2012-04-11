@@ -31,6 +31,7 @@ public class MCX205 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "DETECT BLOCK";
     }
@@ -40,6 +41,7 @@ public class MCX205 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MCX205 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
         String[] direction = sign.getLine4().split(":",2);
 
@@ -104,6 +107,7 @@ public class MCX205 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
     	if(chip.inputAmount() != 0 && !chip.getIn(1).is())
     	{
@@ -130,7 +134,7 @@ public class MCX205 extends BaseIC {
         
         int item = getItem(id);
         
-        World world = CraftBook.getWorld(chip.getWorldType());
+        World world = CraftBook.getWorld(chip.getCBWorld());
         
         char mode;
         if(chip.inputAmount() == 0)

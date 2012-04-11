@@ -19,6 +19,7 @@
 
 
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.ChipState;
@@ -36,10 +37,12 @@ public class MCX133 extends MCX119 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "HUMANS ONLY";
     }
     
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +55,8 @@ public class MCX133 extends MCX119 {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	if(!sign.getLine3().isEmpty())
     	{
     		sign.setLine3("");
@@ -79,6 +83,7 @@ public class MCX133 extends MCX119 {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
     	
     	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
@@ -87,8 +92,8 @@ public class MCX133 extends MCX119 {
     		if(!chip.getText().getLine4().isEmpty())
     			dist = Double.parseDouble(chip.getText().getLine4());
     		dist *= dist;
-    		Vector lever = Util.getWallSignBack(chip.getWorldType(), chip.getPosition(), 2);
-    		World world = CraftBook.getWorld(chip.getWorldType());
+    		Vector lever = Util.getWallSignBack(chip.getCBWorld(), chip.getPosition(), 2);
+    		World world = CraftBook.getWorld(chip.getCBWorld());
     		
     		//since self-updates don't get mode, we need to get it
     		char mode = ' ';

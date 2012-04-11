@@ -25,10 +25,12 @@ package com.sk89q.craftbook.ic;
  * @author Lymia
  */
 public class MC4100 extends BaseIC {
+	@Override
     public String getTitle() {
         return "FULL SUBTRACTOR";
     }
 
+	@Override
     public void think(ChipState chip) {
         boolean A = chip.getIn(1).is();
         boolean B = chip.getIn(2).is();

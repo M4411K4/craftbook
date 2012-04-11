@@ -25,10 +25,12 @@ package com.sk89q.craftbook.ic;
  * @author Lymia
  */
 public class MC4200 extends BaseIC {
-    public String getTitle() {
+	@Override
+	public String getTitle() {
         return "DISPATCHER";
     }
 
+    @Override
     public void think(ChipState chip) {
         boolean value = chip.getIn(1).is();
         boolean targetB = chip.getIn(2).is();

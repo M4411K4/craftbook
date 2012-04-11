@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.BaseIC;
@@ -33,6 +34,7 @@ public class MC1240 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "ARROW SHOOTER";
     }
@@ -42,6 +44,7 @@ public class MC1240 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -54,7 +57,8 @@ public class MC1240 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String speedSpreadLine = sign.getLine3();
         String vertVelLine = sign.getLine4();
 
@@ -93,6 +97,7 @@ public class MC1240 extends BaseIC {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (chip.getIn(1).is()) {
             String speedSpreadLine = chip.getText().getLine3();
@@ -134,7 +139,7 @@ public class MC1240 extends BaseIC {
         Vector backDir = chip.getBlockPosition().subtract(
                 chip.getPosition());
         Vector firePos = chip.getBlockPosition().add(backDir);
-        OWorld oworld = CraftBook.getOWorld(chip.getWorldType());
+        OWorldServer oworld = CraftBook.getOWorldServer(chip.getCBWorld());
         OEntityArrow arrow = new OEntityArrow(oworld);
         arrow.c(firePos.getBlockX() + 0.5, firePos.getBlockY() + 0.5,
                 firePos.getBlockZ() + 0.5, 0, 0);

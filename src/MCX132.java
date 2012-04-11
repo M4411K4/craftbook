@@ -18,6 +18,7 @@
 
 import java.util.List;
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.*;
@@ -30,6 +31,7 @@ public class MCX132 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "HIT MOB ABOVE";
     }
@@ -39,6 +41,7 @@ public class MCX132 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -51,7 +54,8 @@ public class MCX132 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	String id = sign.getLine3();
 
         if (id.length() != 0)
@@ -89,13 +93,14 @@ public class MCX132 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip)
     {
     	if(!chip.getIn(1).is() || !chip.getIn(1).isTriggered())
     		return;
     	
     	String id = chip.getText().getLine3();
-    	World world = CraftBook.getWorld(chip.getWorldType());
+    	World world = CraftBook.getWorld(chip.getCBWorld());
     	@SuppressWarnings("rawtypes")
 		List list;
     	if(id.equalsIgnoreCase("mob") || id.equalsIgnoreCase("mobs"))

@@ -32,6 +32,7 @@ public class MC1510 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "MESSAGE PLAYER";
     }
@@ -41,6 +42,7 @@ public class MC1510 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -53,8 +55,8 @@ public class MC1510 extends BaseIC {
      * @param sign
      * @return
      */
-    
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0 || id.contains(" ")) {
@@ -73,6 +75,7 @@ public class MC1510 extends BaseIC {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (chip.getIn(1).is()) {
             String thePlayerString = chip.getText().getLine3();

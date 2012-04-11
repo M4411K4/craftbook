@@ -30,6 +30,7 @@ public class MC1001 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "NOT";
     }
@@ -39,6 +40,7 @@ public class MC1001 extends BaseIC {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         chip.getOut(1).set(chip.getIn(1).not());
     }

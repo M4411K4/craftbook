@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.sk89q.craftbook.*;
 import com.sk89q.craftbook.ic.MCX120;
@@ -59,6 +61,7 @@ public class MechanismListener extends CraftBookDelegateListener {
     private boolean useBridges = true;
     private boolean redstoneBridges = true;
     private boolean useDoors = true;
+    private boolean useConvertExp = false;
     private boolean redstoneDoors = true;
     private boolean useHiddenSwitches = true;
     private boolean useToggleAreas;
@@ -71,6 +74,7 @@ public class MechanismListener extends CraftBookDelegateListener {
     private int maxPages = 20;
     private boolean usePageSwitches = true;
     private boolean useMapChanger = true;
+    protected static int maxEnchantAmount = 3;
 
     /**
      * Construct the object.
@@ -139,6 +143,10 @@ public class MechanismListener extends CraftBookDelegateListener {
         	if(Bounce.allowedICBlocks.size() == 0)
         		Bounce.allowedICBlocks = null;
         }
+        if(properties.containsKey("convert-exp-enable"))
+        	useConvertExp = properties.getBoolean("convert-exp-enable", false);
+        if(properties.containsKey("enchantment-craft-max"))
+        	maxEnchantAmount = properties.getInt("enchantment-craft-max", 3);
         if(this.properties.containsKey("sitting-enabled"))
 			Sitting.enabled = this.properties.getBoolean("sitting-enabled", true);
 		if(this.properties.containsKey("require-permission-to-right-click-sit"))
@@ -192,6 +200,7 @@ public class MechanismListener extends CraftBookDelegateListener {
 
         loadCauldron();
         loadMinecartCraftRecipes();
+        EnchantCraft.load();
     }
     
     private ArrayList<Integer> getICBlockList(String arg)
@@ -302,7 +311,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             final boolean isOn, final Vector changed) {
         
         int type = CraftBook.getBlockID(world, pt);
-        final int worldType = world.getType().getId();
+        final CraftBookWorld cbworld = CraftBook.getCBWorld(world);
         
         // Sign gates
         if (type == BlockType.WALL_SIGN
@@ -315,7 +324,6 @@ public class MechanismListener extends CraftBookDelegateListener {
 
             final Sign sign = (Sign)cblock;
             final String line2 = sign.getText(1);
-            final int worldIndex = CraftBook.getWorldIndex(worldType);
 
             if(useGates && redstoneGates
             		&& (   line2.equalsIgnoreCase("[Gate]")
@@ -327,8 +335,8 @@ public class MechanismListener extends CraftBookDelegateListener {
             			)
             		)
             {
-            	BlockBag bag = getBlockBag(worldType, pt);
-            	bag.addSourcePosition(worldType, pt);
+            	BlockBag bag = getBlockBag(cbworld, pt);
+            	bag.addSourcePosition(cbworld, pt);
             	
             	// A gate may toggle or not
             	try
@@ -345,7 +353,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             						|| line2.equalsIgnoreCase("[IronDGate]")
             						|| line2.equalsIgnoreCase("[DGate]");
             		
-            		GateSwitch.setGateState(blockType, worldType, pt, bag, isOn, dgate);
+            		GateSwitch.setGateState(blockType, cbworld, pt, bag, isOn, dgate);
             	}
             	catch(BlockSourceException e){}
 
@@ -354,14 +362,14 @@ public class MechanismListener extends CraftBookDelegateListener {
                     && redstoneBridges
                     && type == BlockType.SIGN_POST
                     && line2.equalsIgnoreCase("[Bridge]")) {
-                craftBook.getDelay(worldIndex).delayAction(
+                craftBook.getDelay(cbworld).delayAction(
                     new TickDelayer.Action(world, pt.toBlockVector(), 2) {
                         @Override
                         public void run() {
-                            BlockBag bag = listener.getBlockBag(worldType, pt);
-                            bag.addSourcePosition(worldType, pt);
+                            BlockBag bag = listener.getBlockBag(cbworld, pt);
+                            bag.addSourcePosition(cbworld, pt);
                             
-                            Bridge bridge = new Bridge(worldType, pt);
+                            Bridge bridge = new Bridge(cbworld, pt);
                             if (isOn) {
                                 bridge.setActive(bag);
                             } else {
@@ -376,14 +384,14 @@ public class MechanismListener extends CraftBookDelegateListener {
                     && type == BlockType.SIGN_POST
                     && (line2.equalsIgnoreCase("[Door Up]")
                         || line2.equalsIgnoreCase("[Door Down]"))) {
-                craftBook.getDelay(worldIndex).delayAction(
+                craftBook.getDelay(cbworld).delayAction(
                     new TickDelayer.Action(world, pt.toBlockVector(), 2) {
                         @Override
                         public void run() {
-                            BlockBag bag = getBlockBag(worldType, pt);
-                            bag.addSourcePosition(worldType, pt);
+                            BlockBag bag = getBlockBag(cbworld, pt);
+                            bag.addSourcePosition(cbworld, pt);
                             
-                            Door door = new Door(worldType, pt);
+                            Door door = new Door(cbworld, pt);
                             if (isOn) {
                                 door.setActive(bag);
                             } else {
@@ -396,14 +404,14 @@ public class MechanismListener extends CraftBookDelegateListener {
             } else if (useToggleAreas && redstoneToggleAreas
                     && (line2.equalsIgnoreCase("[Toggle]")
                     || line2.equalsIgnoreCase("[Area]"))) {                
-                craftBook.getDelay(worldIndex).delayAction(
+                craftBook.getDelay(cbworld).delayAction(
                     new TickDelayer.Action(world, pt.toBlockVector(), 2) {
                         @Override
                         public void run() {
-                            BlockBag bag = listener.getBlockBag(worldType, pt);
-                            bag.addSourcePosition(worldType, pt);
+                            BlockBag bag = listener.getBlockBag(cbworld, pt);
+                            bag.addSourcePosition(cbworld, pt);
 
-                            ToggleArea area = new ToggleArea(worldType, pt, listener.getCopyManager());
+                            ToggleArea area = new ToggleArea(cbworld, pt, listener.getCopyManager());
                             
                             if (isOn) { 
                                 area.setActive(bag);
@@ -415,15 +423,15 @@ public class MechanismListener extends CraftBookDelegateListener {
             } else if (usePageReader && usePageSwitches
                     && line2.equalsIgnoreCase("[Book][X]")) {
             	
-            	Vector redstonept = Util.getWallSignBack(worldType, pt, -1);
+            	Vector redstonept = Util.getWallSignBack(cbworld, pt, -1);
             	if(changed.equals(redstonept)
             		&& CraftBook.getBlockID(world, redstonept) == BlockType.REDSTONE_WIRE)
             	{
-            		craftBook.getDelay(worldIndex).delayAction(
+            		craftBook.getDelay(cbworld).delayAction(
             			new TickDelayer.Action(world, pt.toBlockVector(), 2) {
             				@Override
             				public void run() {
-            					Vector blockpt = Util.getWallSignBack(worldType, pt, 1);
+            					Vector blockpt = Util.getWallSignBack(cbworld, pt, 1);
                 	            
         		            	int x = blockpt.getBlockX();
         		                int y = blockpt.getBlockY();
@@ -505,7 +513,7 @@ public class MechanismListener extends CraftBookDelegateListener {
         SignTextImpl signText = new SignTextImpl(sign);
         Vector pt = new Vector(sign.getX(), sign.getY(), sign.getZ());
         World world = player.getWorld();
-        int worldType = world.getType().getId();
+        CraftBookWorld cbworld = CraftBook.getCBWorld(world);
         
         String line2 = sign.getText(1);
         
@@ -595,7 +603,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             
             if (useElevators) {
                 if (line2.equalsIgnoreCase("[Lift Up]")) {
-                    if (Elevator.hasLinkedLift(worldType, pt, true)) {
+                    if (Elevator.hasLinkedLift(cbworld, pt, true)) {
                         player.sendMessage(Colors.Gold
                                 + "Elevator created and linked!");
                     } else {
@@ -603,7 +611,7 @@ public class MechanismListener extends CraftBookDelegateListener {
                                 + "Elevator created but not yet linked to an existing lift sign.");
                     }
                 } else if (line2.equalsIgnoreCase("[Lift Down]")) {
-                    if (Elevator.hasLinkedLift(worldType, pt, false)) {
+                    if (Elevator.hasLinkedLift(cbworld, pt, false)) {
                         player.sendMessage(Colors.Gold
                                 + "Elevator created and linked!");
                     } else {
@@ -611,8 +619,8 @@ public class MechanismListener extends CraftBookDelegateListener {
                                 + "Elevator created but not yet linked to an existing lift sign.");
                     }
                 } else if (line2.equalsIgnoreCase("[Lift]")) {
-                    if (Elevator.hasLinkedLift(worldType, pt, true)
-                            || Elevator.hasLinkedLift(worldType, pt, false)) {
+                    if (Elevator.hasLinkedLift(cbworld, pt, true)
+                            || Elevator.hasLinkedLift(cbworld, pt, false)) {
                         player.sendMessage(Colors.Gold
                                 + "Elevator created and linked!");
                     } else {
@@ -769,6 +777,68 @@ public class MechanismListener extends CraftBookDelegateListener {
     		}
     		
     		sign.update();
+    		
+    	// Convert Exp
+        } else if (line2.equalsIgnoreCase("[Convert EXP]")) {
+            if(useConvertExp)
+            {
+                if(player.canUseCommand("/makeconvertexp"))
+                {
+                	Pattern regex = Pattern.compile("^[0-9]+");
+                	Matcher match = regex.matcher(sign.getText(2));
+                	
+                	if(match.find())
+                	{
+                		int levels = Integer.parseInt(match.group());
+                		if(levels < 1)
+                		{
+                			CraftBook.dropSign(world, pt);
+                    		player.sendMessage(Colors.Rose+"Invalid # of EXP levels on 3rd line of the sign.");
+                    		return true;
+                		}
+                	}
+                	else
+                	{
+                		CraftBook.dropSign(world, pt);
+                		player.sendMessage(Colors.Rose+"Failed to find EXP level # on 3rd line of the sign.");
+                		return true;
+                	}
+                	
+                	match = regex.matcher(sign.getText(3));
+                	
+                	if(match.find())
+                	{
+                		int bottles = Integer.parseInt(match.group());
+                		int size = player.getInventory().getContentsSize();
+                		size -= 4; //armor slots
+                		if(bottles < 0 || (int)Math.ceil(bottles / 64.0D) > size)
+                		{
+                			CraftBook.dropSign(world, pt);
+                    		player.sendMessage(Colors.Rose+"Invalid # of EXP bottles on 4th line of the sign.");
+                    		return true;
+                		}
+                	}
+                	else
+                	{
+                		CraftBook.dropSign(world, pt);
+                		player.sendMessage(Colors.Rose+"Failed to find # of EXP bottles on 4th line of the sign.");
+                		return true;
+                	}
+                	
+                	signText.setLine2("[Convert EXP]");
+                    signText.flushChanges();
+                }
+                else
+                {
+                    CraftBook.dropSign(world, pt);
+                    player.sendMessage(Colors.Rose+"You do not have permission to build that.");
+                }
+            }
+            else
+            {
+            	CraftBook.dropSign(world, pt);
+                player.sendMessage(Colors.Rose + "Convert EXP is disabled on this server.");
+            }
         }
 
         return false;
@@ -914,7 +984,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             throws BlockSourceException {
 
     	World world = player.getWorld();
-    	int worldType = world.getType().getId();
+    	CraftBookWorld cbworld = CraftBook.getCBWorld(world);
     	
     	int blockType = blockClicked.getType();
     	
@@ -1102,8 +1172,8 @@ public class MechanismListener extends CraftBookDelegateListener {
                 	if(!CBHooked.getBoolean(CBHook.SIGN_MECH, new Object[] {CBPluginInterface.CBSignMech.GATE, sign, player}))
                 		return true;
                 	
-                    BlockBag bag = getBlockBag(worldType, pt);
-                    bag.addSourcePosition(worldType, pt);
+                    BlockBag bag = getBlockBag(cbworld, pt);
+                    bag.addSourcePosition(cbworld, pt);
 
                     int gateType;
             		if(line2.equalsIgnoreCase("[GlassGate]") || line2.equalsIgnoreCase("[GlassDGate]"))
@@ -1118,7 +1188,7 @@ public class MechanismListener extends CraftBookDelegateListener {
             						|| line2.equalsIgnoreCase("[DGate]");
                     
                     // A gate may toggle or not
-                    if (GateSwitch.toggleGates(gateType, worldType, pt, bag, dgate)) {
+                    if (GateSwitch.toggleGates(gateType, cbworld, pt, bag, dgate)) {
                         player.sendMessage(Colors.Gold + "*screeetch* Gate moved!");
                     } else {
                         player.sendMessage(Colors.Rose + "No nearby gate to toggle.");
@@ -1128,10 +1198,10 @@ public class MechanismListener extends CraftBookDelegateListener {
                 } else if (useLightSwitches &&
                         (line2.equalsIgnoreCase("[|]") || line2.equalsIgnoreCase("[I]"))
                         && checkPermission(player, "/lightswitch")) {
-                    BlockBag bag = getBlockBag(worldType, pt);
-                    bag.addSourcePosition(worldType, pt);
+                    BlockBag bag = getBlockBag(cbworld, pt);
+                    bag.addSourcePosition(cbworld, pt);
                     
-                    return LightSwitch.toggleLights(worldType, pt, bag);
+                    return LightSwitch.toggleLights(cbworld, pt, bag);
 
                 // Elevator
                 } else if (blockType == BlockType.WALL_SIGN && useElevators
@@ -1156,10 +1226,10 @@ public class MechanismListener extends CraftBookDelegateListener {
                 	if(!CBHooked.getBoolean(CBHook.SIGN_MECH, new Object[] {CBPluginInterface.CBSignMech.AREA, sign, player}))
                 		return true;
                 	
-                    BlockBag bag = getBlockBag(worldType, pt);
-                    bag.addSourcePosition(worldType, pt);
+                    BlockBag bag = getBlockBag(cbworld, pt);
+                    bag.addSourcePosition(cbworld, pt);
                     
-                    ToggleArea area = new ToggleArea(worldType, pt, listener.getCopyManager());
+                    ToggleArea area = new ToggleArea(cbworld, pt, listener.getCopyManager());
                     area.playerToggle(new CraftBookPlayerImpl(player), bag);
 
                     // Tell the player of missing blocks
@@ -1183,10 +1253,10 @@ public class MechanismListener extends CraftBookDelegateListener {
                 	if(!CBHooked.getBoolean(CBHook.SIGN_MECH, new Object[] {CBPluginInterface.CBSignMech.BRIDGE, sign, player}))
                 		return true;
                 	
-                    BlockBag bag = getBlockBag(worldType, pt);
-                    bag.addSourcePosition(worldType, pt);
+                    BlockBag bag = getBlockBag(cbworld, pt);
+                    bag.addSourcePosition(cbworld, pt);
                     
-                    Bridge bridge = new Bridge(worldType, pt);
+                    Bridge bridge = new Bridge(cbworld, pt);
                     bridge.playerToggleBridge(new CraftBookPlayerImpl(player), bag);
                     
                     return true;
@@ -1201,12 +1271,104 @@ public class MechanismListener extends CraftBookDelegateListener {
                 	if(!CBHooked.getBoolean(CBHook.SIGN_MECH, new Object[] {CBPluginInterface.CBSignMech.DOOR, sign, player}))
                 		return true;
                 	
-                    BlockBag bag = getBlockBag(worldType, pt);
-                    bag.addSourcePosition(worldType, pt);
+                    BlockBag bag = getBlockBag(cbworld, pt);
+                    bag.addSourcePosition(cbworld, pt);
                     
-                    Door door = new Door(worldType, pt);
+                    Door door = new Door(cbworld, pt);
                     door.playerToggleDoor(new CraftBookPlayerImpl(player), bag);
                     
+                    return true;
+                    
+                // Convert EXP
+                } else if (useConvertExp
+                        && (blockType == BlockType.SIGN_POST || blockType == BlockType.WALL_SIGN)
+                        && line2.equalsIgnoreCase("[Convert Exp]")
+                        && checkPermission(player, "/convertexpsign")) {
+                    
+                	Pattern regex = Pattern.compile("^[0-9]+");
+                	Matcher match = regex.matcher(sign.getText(2));
+                	
+                	int levels = -1;
+                	if(match.find())
+                	{
+                		levels = Integer.parseInt(match.group());
+                	}
+                	else
+                	{
+                		player.sendMessage(Colors.Rose+"Failed to find EXP levels on sign.");
+                		return true;
+                	}
+                	
+                	if(levels < 1)
+                	{
+                		player.sendMessage(Colors.Rose+"Invalid EXP level # on sign.");
+                		return true;
+                	}
+                	
+                	if(player.getLevel() < levels)
+                	{
+            			player.sendMessage(Colors.Rose+"You do not have enough EXP levels");
+            			return true;
+                	}
+                	
+                	match = regex.matcher(sign.getText(3));
+                	
+                	int bottles = -1;
+                	if(match.find())
+                	{
+                		bottles = Integer.parseInt(match.group());
+                		
+                		if(bottles > 0)
+                		{
+	                		int slots = (int)Math.ceil(bottles / 64.0D);
+	                		int size = player.getInventory().getContentsSize();
+	                		size -= 4; //armor slots
+	                		int emptyslots = 0;
+	                		for(int i = 0; i < size; i++)
+	                		{
+	                			if(player.getInventory().getItemFromSlot(i) == null)
+	                			{
+	                				emptyslots++;
+	                				if(emptyslots >= slots)
+	                					break;
+	                			}
+	                		}
+	                		if(emptyslots < slots)
+	                		{
+	                			player.sendMessage(Colors.Rose+"You do not have enough room in your inventory!");
+	                			player.sendMessage(Colors.Rose+"You need "+Colors.White+slots+Colors.Rose+" empty slots.");
+	                			return true;
+	                		}
+                		}
+                	}
+                	else
+                	{
+                		player.sendMessage(Colors.Rose+"Failed to find # of EXP bottles on sign.");
+                		return true;
+                	}
+                	
+                	if(bottles < 0)
+                	{
+                		player.sendMessage(Colors.Rose+"Invalid # of EXP bottles on sign.");
+                		return true;
+                	}
+                	
+                	if(!CBHooked.getBoolean(CBHook.SIGN_MECH, new Object[] {CBPluginInterface.CBSignMech.CONVERT_EXP, sign, player}))
+                		return true;
+                	
+                	player.getEntity().e_(levels); //remove levels
+                	
+                	while(bottles > 64)
+                	{
+                		bottles -= 64;
+                		Item item = new Item(384, 64);
+                    	player.giveItem(item);
+                	}
+                	if(bottles > 0)
+                	{
+                		Item item = new Item(384, bottles);
+                		player.giveItem(item);
+                	}
                     return true;
                 }
             }
@@ -1263,12 +1425,13 @@ public class MechanismListener extends CraftBookDelegateListener {
             Sign sign = (Sign)cblock;
             
             if (sign.getText(1).equalsIgnoreCase(type)) {
-                Redstone.toggleOutput(world, new Vector(x, y - 1, z));
-                Redstone.toggleOutput(world, new Vector(x, y + 1, z));
-                Redstone.toggleOutput(world, new Vector(x - 1, y, z));
-                Redstone.toggleOutput(world, new Vector(x + 1, y, z));
-                Redstone.toggleOutput(world, new Vector(x, y, z - 1));
-                Redstone.toggleOutput(world, new Vector(x, y, z + 1));
+            	CraftBookWorld cbworld = CraftBook.getCBWorld(world);
+                Redstone.toggleOutput(cbworld, new Vector(x, y - 1, z));
+                Redstone.toggleOutput(cbworld, new Vector(x, y + 1, z));
+                Redstone.toggleOutput(cbworld, new Vector(x - 1, y, z));
+                Redstone.toggleOutput(cbworld, new Vector(x + 1, y, z));
+                Redstone.toggleOutput(cbworld, new Vector(x, y, z - 1));
+                Redstone.toggleOutput(cbworld, new Vector(x, y, z + 1));
             }
         }
     }
@@ -1280,12 +1443,13 @@ public class MechanismListener extends CraftBookDelegateListener {
             Sign sign = (Sign)cblock;
             
             if (sign.getText(1).equalsIgnoreCase(type)) {
-                Redstone.setOutput(world, new Vector(x, y - 1, z), state);
-                Redstone.setOutput(world, new Vector(x, y + 1, z), state);
-                Redstone.setOutput(world, new Vector(x - 1, y, z), state);
-                Redstone.setOutput(world, new Vector(x + 1, y, z), state);
-                Redstone.setOutput(world, new Vector(x, y, z - 1), state);
-                Redstone.setOutput(world, new Vector(x, y, z + 1), state);
+            	CraftBookWorld cbworld = CraftBook.getCBWorld(world);
+                Redstone.setOutput(cbworld, new Vector(x, y - 1, z), state);
+                Redstone.setOutput(cbworld, new Vector(x, y + 1, z), state);
+                Redstone.setOutput(cbworld, new Vector(x - 1, y, z), state);
+                Redstone.setOutput(cbworld, new Vector(x + 1, y, z), state);
+                Redstone.setOutput(cbworld, new Vector(x, y, z - 1), state);
+                Redstone.setOutput(cbworld, new Vector(x, y, z + 1), state);
             }
         }
     }
@@ -1352,6 +1516,10 @@ public class MechanismListener extends CraftBookDelegateListener {
                 Vector min = LocalWorldEditBridge.getRegionMinimumPoint(player);
                 Vector max = LocalWorldEditBridge.getRegionMaximumPoint(player);
                 Vector size = max.subtract(min).add(1, 1, 1);
+                
+                //[TODO]: use world from WorldEdit bridge instead if WorldEdit ever gets support
+                //Can have potential exploits without it!
+                CraftBookWorld cbworld = CraftBook.getCBWorld(player.getWorld());
 
                 // Check maximum size
                 if (size.getBlockX() * size.getBlockY() * size.getBlockZ() > maxToggleAreaSize) {
@@ -1364,7 +1532,7 @@ public class MechanismListener extends CraftBookDelegateListener {
                 // areas (to prevent flooding the server with files)
                 if (maxUserToggleAreas >= 0 && !namespace.equals("global")) {
                     int count = listener.getCopyManager().meetsQuota(
-                            namespace, id, maxUserToggleAreas);
+                            cbworld, namespace, id, maxUserToggleAreas);
 
                     if (count > -1) {
                         player.sendMessage(Colors.Rose + "You are limited to "
@@ -1388,8 +1556,7 @@ public class MechanismListener extends CraftBookDelegateListener {
                 lastCopySave.put(player.getName(), now);
                 
                 // Copy
-                int worldType = player.getWorld().getType().getId();
-                CuboidCopy copy = new CuboidCopy(worldType, min, size);
+                CuboidCopy copy = new CuboidCopy(cbworld, min, size);
                 copy.copy();
                 
                 logger.info(player.getName() + " saving toggle area with folder '"
@@ -1500,7 +1667,7 @@ public class MechanismListener extends CraftBookDelegateListener {
         				String title = "";
         				if(split.length > 3)
         					title = Util.joinString(split, " ", 3);
-        				CBWarp.WarpError error = CBWarp.addWarp(player, split[2], player.getLocation(), title, null);
+        				CBWarp.WarpError error = CBWarp.addWarp(player, split[2], Util.locationToWorldLocation(CraftBook.getCBWorld(player.getWorld()), player.getLocation()), title, null);
         				
         				if(error != null)
         				{
@@ -1632,7 +1799,7 @@ public class MechanismListener extends CraftBookDelegateListener {
         				String title = "";
         				if(split.length > 4)
         					title = Util.joinString(split, " ", 4);
-        				CBWarp.WarpError error = CBWarp.addWarp(player, split[2], player.getLocation(), title, split[3]);
+        				CBWarp.WarpError error = CBWarp.addWarp(player, split[2], Util.locationToWorldLocation(CraftBook.getCBWorld(player.getWorld()), player.getLocation()), title, split[3]);
         				
         				if(error != null)
         				{
@@ -2118,6 +2285,12 @@ public class MechanismListener extends CraftBookDelegateListener {
         	PageWriter.handleNSCommand(player, split, pageMaxCharacters, maxPages);
         	return true;
         }
+        else if(split[0].equalsIgnoreCase("/reloadcbenchantrecipes") && player.canUseCommand("/reloadcbenchantrecipes"))
+        {
+        	EnchantCraft.load();
+        	player.sendMessage(Colors.Gold+"CraftBook Enchantment recipes reloaded");
+        	return true;
+        }
 
         return false;
     }
@@ -2199,7 +2372,6 @@ public class MechanismListener extends CraftBookDelegateListener {
 
         for (String part : parts) {
             int multiplier = 1;
-            int color = 0;
             try {
                 // Multiplier
                 if (part.matches("^.*\\*([0-9]+)$")) {
@@ -2209,39 +2381,24 @@ public class MechanismListener extends CraftBookDelegateListener {
                     part = part.substring(0, at);
                 }
                 
-                String[] itemtype = part.split("@",2);
-                if(itemtype.length > 1)
+                CraftBookItem cbitem = UtilItem.parseCBItem(part);
+                if(cbitem == null || cbitem.id() == 0)
                 {
-                	part = itemtype[0];
-                	try
-                	{
-                		color = Integer.parseInt(itemtype[1]);
-                	}
-                	catch(NumberFormatException e)
-                	{
-                		color = 0;
-                	}
-                }
-
-                int item = -1;
-                try {
-                    item = Integer.valueOf(part);
-                } catch (NumberFormatException e) {
-                    item = etc.getDataSource().getItem(part);
-
-                    if (item <= 0) {
-                        logger.log(Level.WARNING, "Cauldron: Unknown item " + part);
-                    }
+                	logger.warning("Cauldron: invalid item: "+part);
+                	continue;
                 }
                 
-                if(item > 0)
+                if(cbitem.color() == -1)
+                	cbitem = cbitem.setColor(0);
+                
+                if(BlockType.isDirectionBlock(cbitem.id()))
                 {
-                	if(BlockType.isDirectionBlock(item))
-                		color = 0;
-                	
-                	for (int i = 0; i < multiplier; i++) {
-                        out.add(new CraftBookItem(item, color));
-                    }
+            		cbitem = cbitem.setColor(0);
+                }
+                
+                for(int i = 0; i < multiplier; i++)
+                {
+                	out.add(cbitem.clone());
                 }
                 
             } catch (NumberFormatException e) { // Bad multiplier

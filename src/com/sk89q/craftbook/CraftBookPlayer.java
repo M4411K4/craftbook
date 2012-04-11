@@ -84,7 +84,7 @@ public abstract class CraftBookPlayer {
      *
      * @return int
      */
-    public abstract int getWorldType();
+    public abstract CraftBookWorld getCBWorld();
 
     /**
      * Get the player's view pitch.

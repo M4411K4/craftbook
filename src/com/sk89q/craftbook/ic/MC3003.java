@@ -30,6 +30,7 @@ public class MC3003 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "3-INPUT NAND";
     }
@@ -39,6 +40,7 @@ public class MC3003 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         chip.getOut(1).set(!(chip.getIn(1).is() && chip.getIn(2).is()
                 && chip.getIn(3).is()));

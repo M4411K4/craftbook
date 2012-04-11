@@ -1,19 +1,22 @@
+import com.sk89q.craftbook.CraftBookWorld;
+import com.sk89q.craftbook.WorldLocation;
+
 
 public class CBWarpObject
 {
-	public final Location LOCATION;
+	public final WorldLocation LOCATION;
 	public final String TITLE;
 	public final String MESSAGE;
 	public final String PASSWORD;
 	
-	public CBWarpObject(Location location, String title, String message)
+	public CBWarpObject(WorldLocation location, String title, String message)
 	{
 		this(location, title, message, null);
 	}
 	
-	public CBWarpObject(Location location, String title, String message, String password)
+	public CBWarpObject(WorldLocation location, String title, String message, String password)
 	{
-		LOCATION = location;
+		LOCATION = location.setCBWorld(new CraftBookWorld(convertString(location.getCBWorld().name()), location.getCBWorld().dimension()));
 		title = convertString(title);
 		if(title.length() > 40)
 			title = title.substring(0, 40);
@@ -49,7 +52,7 @@ public class CBWarpObject
 	public String toSaveString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(Util.locationToString(LOCATION)).append(":");
+		sb.append(convertToSafeString(Util.worldLocationToString(LOCATION))).append(":");
 		
 		if(PASSWORD != null && !PASSWORD.isEmpty())
 			sb.append(PASSWORD).append(":");

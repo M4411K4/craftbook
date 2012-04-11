@@ -30,6 +30,7 @@ public class MC1230 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "IS IT DAY";
     }
@@ -39,6 +40,7 @@ public class MC1230 extends BaseIC {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         long time = (chip.getTime() % 24000);
         if (time < 0) time += 24000;

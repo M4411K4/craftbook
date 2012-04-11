@@ -28,6 +28,7 @@ import java.util.EmptyStackException;
 import java.util.Stack;
 
 import com.sk89q.craftbook.BlockVector;
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.ChipState;
@@ -214,7 +215,7 @@ public final class Perlstone_1_0 implements PlcLang {
         }
     }
     
-    public final String validateEnvironment(int worldType, Vector v, SignText t, String code) {
+    public final String validateEnvironment(CraftBookWorld cbworld, Vector v, SignText t, String code) {
         if(!t.getLine4().isEmpty()) return "line 4 is not empty";
         t.setLine4("AAAAAAAAAAAA");
         return null;
@@ -391,10 +392,10 @@ public final class Perlstone_1_0 implements PlcLang {
         out[1] = new Signal(false);
         out[2] = new Signal(false);
         
-        //[TODO]: Support world types?
-        int worldType = 0;
+        //[TODO]: Support world types? If possible...
+        CraftBookWorld cbworld = new CraftBookWorld("world", 0);
         
-        ChipState chip = new ChipState(worldType, new Vector(0,0,0), new BlockVector(0,0,0), in, out, new SignText("","[MC5000]","HASH:"+Integer.toHexString(program.hashCode()),"AAAAAAAAAAAA"), 0);
+        ChipState chip = new ChipState(cbworld, new Vector(0,0,0), new BlockVector(0,0,0), in, out, new SignText("","[MC5000]","HASH:"+Integer.toHexString(program.hashCode()),"AAAAAAAAAAAA"), 0);
         
         while(true) {
             System.out.print("Input: ");

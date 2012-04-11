@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.BaseIC;
@@ -40,6 +41,7 @@ public class MCX513 extends BaseIC {
 	 * 
 	 * @return
 	 */
+	@Override
 	public String getTitle() {
 		return TITLE + distance;
 	}
@@ -49,6 +51,7 @@ public class MCX513 extends BaseIC {
 	 * 
 	 * @return
 	 */
+	@Override
 	public boolean requiresPermission() {
 		return true;
 	}
@@ -61,7 +64,8 @@ public class MCX513 extends BaseIC {
 	 * @param sign
 	 * @return
 	 */
-	public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+	public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
 		if (sign.getLine1().isEmpty() || sign.getLine1().length() > 2) {
 			return "A distance is required on the 1st line (1 to 64)";
 		}
@@ -88,18 +92,19 @@ public class MCX513 extends BaseIC {
 	 * 
 	 * @param chip
 	 */
+	@Override
 	public void think(ChipState chip) {
 		if (!chip.getIn(1).is()) {
 			chip.getOut(1).set(false);
 			return;
 		}
 
-		processMessage(chip.getText().getLine3() + "" + chip.getText().getLine4(), chip.getBlockPosition(), chip.getWorldType(), Integer.parseInt(chip.getText().getLine1().substring(TITLE.length())));
+		processMessage(chip.getText().getLine3() + "" + chip.getText().getLine4(), chip.getBlockPosition(), chip.getCBWorld(), Integer.parseInt(chip.getText().getLine1().substring(TITLE.length())));
 
 		chip.getOut(1).set(true);
 	}
 
-	protected static void processMessage(String message, Vector position, int worldType, int distance) {
+	protected static void processMessage(String message, Vector position, CraftBookWorld cbworld, int distance) {
 		Player nearest = null;
 		int min = 64;
 		
@@ -110,7 +115,7 @@ public class MCX513 extends BaseIC {
     	{
     		Vector loc = new Vector(player.getX(), player.getY(), player.getZ());
     		int playerDist = (int)Math.floor(loc.distance(position));
-    		if(player.getWorld().getType().getId() == worldType && playerDist <= distance)
+    		if(CraftBook.getCBWorld(player.getWorld()).equals(cbworld) && playerDist <= distance)
     		{
     			if(nearest == null || playerDist < min)
     			{
@@ -123,7 +128,7 @@ public class MCX513 extends BaseIC {
 		for (Player player : etc.getServer().getPlayerList()) {
 			Vector loc = new Vector(player.getX(), player.getY(), player.getZ());
 			int playerDist = (int) Math.floor(loc.distance(position));
-			if (player.getWorld().getType().getId() == worldType && playerDist <= distance) {
+			if (CraftBook.getCBWorld(player.getWorld()).equals(cbworld) && playerDist <= distance) {
 				String msg = message.replaceAll("%p", nearest.getName());
 				msg = msg.replaceAll("&", "§"); // Allow & coloring in message
 				msg = msg + "§7"; // Reset color at end of message

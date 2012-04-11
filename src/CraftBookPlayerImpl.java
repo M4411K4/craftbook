@@ -84,8 +84,8 @@ public class CraftBookPlayerImpl extends CraftBookPlayer {
      * @return int
      */
     @Override
-    public int getWorldType() {
-        return player.getWorld().getType().getId();
+    public CraftBookWorld getCBWorld() {
+        return CraftBook.getCBWorld(player.getWorld());
     }
 
     /**

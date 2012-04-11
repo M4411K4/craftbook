@@ -31,7 +31,7 @@ import com.sk89q.worldedit.DoubleArrayList;
  */
 public class CuboidCopy {
     private Vector origin;
-    private int worldType;
+    private CraftBookWorld cbworld;
     private int width;
     private int height;
     private int length;
@@ -46,9 +46,9 @@ public class CuboidCopy {
      * @param origin
      * @param size
      */
-    public CuboidCopy(int worldType, Vector origin, Vector size) {
+    public CuboidCopy(CraftBookWorld cbworld, Vector origin, Vector size) {
         this.origin = origin;
-        this.worldType = worldType;
+        this.cbworld = cbworld;
         width = size.getBlockX();
         height = size.getBlockY();
         length = size.getBlockZ();
@@ -73,7 +73,7 @@ public class CuboidCopy {
         FileOutputStream out = new FileOutputStream(dest);
         DataOutputStream writer = new DataOutputStream(out);
         writer.writeByte(2);
-        writer.writeInt(worldType);
+        writer.writeInt(cbworld.dimension());
         writer.writeInt(origin.getBlockX());
         writer.writeInt(origin.getBlockY());
         writer.writeInt(origin.getBlockZ());
@@ -104,11 +104,11 @@ public class CuboidCopy {
      * @throws IOException
      * @throws CuboidCopyException
      */
-    public static CuboidCopy load(File file) throws IOException, CuboidCopyException {
+    public static CuboidCopy load(File file, String worldName) throws IOException, CuboidCopyException {
         FileInputStream in = new FileInputStream(file);
         DataInputStream reader = new DataInputStream(in);
 
-        int worldType;
+        int dimension;
         int x, y, z;
         int width, height, length;
         byte[] blocks;
@@ -118,9 +118,9 @@ public class CuboidCopy {
             //@SuppressWarnings("unused")
             byte version = reader.readByte();
             if(version == 2)
-            	worldType = reader.readInt();
+            	dimension = reader.readInt();
             else
-            	worldType = 0;
+            	dimension = 0;
             x = reader.readInt();
             y = reader.readInt();
             z = reader.readInt();
@@ -146,7 +146,7 @@ public class CuboidCopy {
         
         CuboidCopy copy = new CuboidCopy();
         copy.origin = new Vector(x, y, z);
-        copy.worldType = worldType;
+        copy.cbworld = new CraftBookWorld(worldName, dimension);
         copy.width = width;
         copy.height = height;
         copy.length = length;
@@ -165,15 +165,15 @@ public class CuboidCopy {
      * @throws IOException
      * @throws CuboidCopyException
      */
-    public static CuboidCopy load(String path) throws IOException, CuboidCopyException {
-        return load(new File(path));
+    public static CuboidCopy load(String path, String worldName) throws IOException, CuboidCopyException {
+        return load(new File(path), worldName);
     }
 
     /**
      * Make the copy from world.
      */
     public void copy() {
-    	World world = CraftBook.getWorld(worldType);
+    	World world = CraftBook.getWorld(cbworld);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 for (int z = 0; z < length; z++) {
@@ -196,7 +196,7 @@ public class CuboidCopy {
         DoubleArrayList<Vector,byte[]> queueLast =
             new DoubleArrayList<Vector,byte[]>(false);
 
-        World world = CraftBook.getWorld(worldType);
+        World world = CraftBook.getWorld(cbworld);
         
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -220,7 +220,7 @@ public class CuboidCopy {
         for (Map.Entry<Vector,byte[]> entry : queueAfter) {
             byte[] v = entry.getValue();
             try {
-                bag.setBlockID(worldType, entry.getKey(), v[0], v[1]);
+                bag.setBlockID(cbworld, entry.getKey(), v[0], v[1]);
             } catch (OutOfBlocksException e) {
                 // Eat error
             }
@@ -229,7 +229,7 @@ public class CuboidCopy {
         for (Map.Entry<Vector,byte[]> entry : queueLast) {
             byte[] v = entry.getValue();
             try {
-                bag.setBlockID(worldType, entry.getKey(), v[0], v[1]);
+                bag.setBlockID(cbworld, entry.getKey(), v[0], v[1]);
             } catch (OutOfBlocksException e) {
                 // Eat error
             }
@@ -243,14 +243,14 @@ public class CuboidCopy {
      */
     public void clear(BlockBag bag) throws BlockSourceException {
         List<Vector> queued = new ArrayList<Vector>();
-        World world = CraftBook.getWorld(worldType);
+        World world = CraftBook.getWorld(cbworld);
         
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 for (int z = 0; z < length; z++) {
                     Vector pt = origin.add(x, y, z);
                     if (BlockType.shouldPlaceLast(CraftBook.getBlockID(world, pt))) {
-                        bag.setBlockID(worldType, pt, 0);
+                        bag.setBlockID(cbworld, pt, 0);
                     } else {
                         // Can't destroy these blocks yet
                         queued.add(pt);
@@ -260,7 +260,7 @@ public class CuboidCopy {
         }
 
         for (Vector pt : queued) {
-            bag.setBlockID(worldType, pt, 0);
+            bag.setBlockID(cbworld, pt, 0);
         }
 
         bag.flushChanges();
@@ -286,7 +286,7 @@ public class CuboidCopy {
      */
     public boolean shouldClear() {
         Vector v = origin.add(testOffset);
-        return CraftBook.getBlockID(worldType, v) != 0;
+        return CraftBook.getBlockID(cbworld, v) != 0;
     }
 
     /**
@@ -320,5 +320,10 @@ public class CuboidCopy {
         int closestZ = Math.max(origin.getBlockZ(),
                 Math.min(max.getBlockZ(), pos.getBlockZ()));
         return pos.distance(new Vector(closestX, closestY, closestZ));
+    }
+    
+    public CraftBookWorld getCBWorld()
+    {
+    	return cbworld;
     }
 }

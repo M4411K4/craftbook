@@ -33,6 +33,7 @@ import java.util.Stack;
 import java.util.logging.Level;
 
 import com.sk89q.craftbook.BlockVector;
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.ChipState;
@@ -366,7 +367,7 @@ public final class Perlstone32_1 implements PlcLang {
         }
     }
     
-    public final String validateEnvironment(int worldType, Vector v, SignText t, String code) {
+    public final String validateEnvironment(CraftBookWorld cbworld, Vector v, SignText t, String code) {
         privatePersistentStorage.remove(v.toBlockVector());
         try {
             checkSyntax(code);
@@ -549,10 +550,10 @@ public final class Perlstone32_1 implements PlcLang {
         out[1] = new Signal(false);
         out[2] = new Signal(false);
         
-      //[TODO]: Support world types?
-        int worldType = 0;
+      //[TODO]: Support world types? If possible...
+        CraftBookWorld cbworld = new CraftBookWorld("world", 0);
         
-        ChipState chip = new ChipState(worldType, new Vector(0,0,0), new BlockVector(0,0,0), in, out, new SignText("","[MC5032]","","private"), 0);
+        ChipState chip = new ChipState(cbworld, new Vector(0,0,0), new BlockVector(0,0,0), in, out, new SignText("","[MC5032]","","private"), 0);
         
         while(true) {
             System.out.print("Input: ");

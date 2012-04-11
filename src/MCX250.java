@@ -26,6 +26,7 @@ public class MCX250 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "PARTICLE";
     }
@@ -35,6 +36,7 @@ public class MCX250 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -47,7 +49,8 @@ public class MCX250 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	String line3 = sign.getLine3();
         String line4 = sign.getLine4().toUpperCase();
         
@@ -104,6 +107,7 @@ public class MCX250 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         chip.getOut(1).set(chip.getIn(1).is());
         
@@ -151,6 +155,6 @@ public class MCX250 extends BaseIC {
         	data = 3; //dirt
         }
         
-        etc.getMCServer().h.a(x, y, z, 64.0D, chip.getWorldType(), new OPacket61DoorChange(particleType.getId(), x, y, z, data));
+        etc.getMCServer().h.a(x, y, z, 64.0D, chip.getCBWorld().dimension(), new OPacket61DoorChange(particleType.getId(), x, y, z, data));
     }
 }

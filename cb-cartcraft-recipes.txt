@@ -16,6 +16,22 @@
 # the color/damage value.
 # Ex: 35@1*4 means 4 of item 35 (wool) colored 1 (orange)
 #
+# Enchantment values use the & symbol followed by the enchantment name or
+#     enchantment ID #
+#     ID #'s can be found here:
+#     http://www.minecraftwiki.net/wiki/Enchanting#Enchantment_Types
+#     under the EID column on the far left.
+# Enchantment names use a special format meant to fit on signs, so it is
+#     better to use the ID #'s
+# Enchantments can be placed anywhere after the item ID.
+# Ex1: 276&Smite is a diamond sword (276) with Smite I
+# Ex2: 276&Smite&Bane of Arthro
+#     is a diamond sword with Smite I and Bane of Arthropods I
+# Ex3: 276&17 is a diamond sword with Smite I (17)
+# For optional enchantment levels, put a # symbol after then enchantment
+# name, then put the level number.
+# Ex: 276&Smite#5 is a diamond sword with Smite V
+#
 # If one recipe's ingredients are a subset of another, it should go below
 # the other recipe.
 #

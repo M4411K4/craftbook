@@ -36,6 +36,7 @@ public class MCX217 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "^+"+TITLE;
     }
@@ -45,6 +46,7 @@ public class MCX217 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -57,7 +59,8 @@ public class MCX217 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign)
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign)
     {
     	if(!sign.getLine3().isEmpty())
     	{
@@ -139,6 +142,7 @@ public class MCX217 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip)
     {
     	if(chip.inputAmount() == 0)
@@ -203,7 +207,7 @@ public class MCX217 extends BaseIC {
     			return;
     		}
     		
-    		World world = CraftBook.getWorld(chip.getWorldType());
+    		World world = CraftBook.getWorld(chip.getCBWorld());
             int data = CraftBook.getBlockData(world, chip.getPosition());
             
             ArrayList<BlockArea> prevRows = getRows(chip, data, width, length, offy, rot);
@@ -258,7 +262,7 @@ public class MCX217 extends BaseIC {
 		chip.getText().supressUpdate();
 		
 		RedstoneListener redListener = (RedstoneListener) chip.getExtra();
-		redListener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+		redListener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     }
     
     private void turnOff(ChipState chip, char state)
@@ -380,16 +384,16 @@ public class MCX217 extends BaseIC {
 					switch(data)
 					{
 						case 0x2:
-							rows.add(new BlockArea(chip.getWorldType(), sx, sy+qx, sz+qy, ed, sy+qx+1, sz+qy+1));
+							rows.add(new BlockArea(chip.getCBWorld(), sx, sy+qx, sz+qy, ed, sy+qx+1, sz+qy+1));
 							break;
 						case 0x3:
-							rows.add(new BlockArea(chip.getWorldType(), sx, sy+qx, sz-qy, ed, sy+qx+1, sz-qy+1));
+							rows.add(new BlockArea(chip.getCBWorld(), sx, sy+qx, sz-qy, ed, sy+qx+1, sz-qy+1));
 							break;
 						case 0x4:
-							rows.add(new BlockArea(chip.getWorldType(), sx+qy, sy+qx, sz, sx+qy+1, sy+qx+1, ed));
+							rows.add(new BlockArea(chip.getCBWorld(), sx+qy, sy+qx, sz, sx+qy+1, sy+qx+1, ed));
 							break;
 						case 0x5:
-							rows.add(new BlockArea(chip.getWorldType(), sx-qy, sy+qx, sz, sx-qy+1, sy+qx+1, ed));
+							rows.add(new BlockArea(chip.getCBWorld(), sx-qy, sy+qx, sz, sx-qy+1, sy+qx+1, ed));
 							break;
 					}
 				}
@@ -398,16 +402,16 @@ public class MCX217 extends BaseIC {
 					switch(data)
 					{
 						case 0x2:
-							rows.add(new BlockArea(chip.getWorldType(), sx, sy+qy, sz+qx, ed, sy+qy+1, sz+qx+1));
+							rows.add(new BlockArea(chip.getCBWorld(), sx, sy+qy, sz+qx, ed, sy+qy+1, sz+qx+1));
 							break;
 						case 0x3:
-							rows.add(new BlockArea(chip.getWorldType(), sx, sy+qy, sz-qx, ed, sy+qy+1, sz-qx+1));
+							rows.add(new BlockArea(chip.getCBWorld(), sx, sy+qy, sz-qx, ed, sy+qy+1, sz-qx+1));
 							break;
 						case 0x4:
-							rows.add(new BlockArea(chip.getWorldType(), sx+qx, sy+qy, sz, sx+qx+1, sy+qy+1, ed));
+							rows.add(new BlockArea(chip.getCBWorld(), sx+qx, sy+qy, sz, sx+qx+1, sy+qy+1, ed));
 							break;
 						case 0x5:
-							rows.add(new BlockArea(chip.getWorldType(), sx-qx, sy+qy, sz, sx-qx+1, sy+qy+1, ed));
+							rows.add(new BlockArea(chip.getCBWorld(), sx-qx, sy+qy, sz, sx-qx+1, sy+qy+1, ed));
 							break;
 					}
 				}

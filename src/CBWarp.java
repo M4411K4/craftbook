@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.sk89q.craftbook.WorldLocation;
+
 
 public class CBWarp
 {
@@ -170,7 +172,7 @@ public class CBWarp
 	/*
 	 * @returns null if no error has occurred
 	 */
-	protected static WarpError addWarp(Player player, String name, Location location, String title, String pass)
+	protected static WarpError addWarp(Player player, String name, WorldLocation location, String title, String pass)
 	{
 		if(name.isEmpty() || name.length() > 15)
 			return WarpError.WARP_NAME_SIZE;
@@ -564,7 +566,7 @@ public class CBWarp
 					return WarpError.BAD_FILE;
 	    		}
 	    		
-	    		Location loc = Util.stringToLocation(params[1]);
+	    		WorldLocation loc = Util.stringToWorldLocation(params[1]);
 	    		
 	    		if(loc == null || (hasPassword && (params[2] == null || params[2].isEmpty())))
 	    		{

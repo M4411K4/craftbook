@@ -29,6 +29,7 @@ public class MCX131 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "HIT PLAYER ABV";
     }
@@ -38,6 +39,7 @@ public class MCX131 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -50,7 +52,8 @@ public class MCX131 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	String id = sign.getLine3().toLowerCase();
 
         if (id.length() != 0)
@@ -86,12 +89,13 @@ public class MCX131 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip)
     {
     	if(!chip.getIn(1).is() || !chip.getIn(1).isTriggered())
     		return;
     	
-    	boolean damaged = damagePlayers(CraftBook.getWorld(chip.getWorldType()),
+    	boolean damaged = damagePlayers(CraftBook.getWorld(chip.getCBWorld()),
 										chip.getBlockPosition().getBlockX(),
 										chip.getBlockPosition().getBlockY(),
 										chip.getBlockPosition().getBlockZ(),

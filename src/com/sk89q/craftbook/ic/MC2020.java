@@ -37,6 +37,7 @@ public class MC2020 extends BaseIC {
      *
      * @return
      */
+    @Override
     public String getTitle() {
         return "3-BIT RANDOM";
     }
@@ -46,6 +47,7 @@ public class MC2020 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         if (chip.getIn(1).is()) {
             chip.getOut(1).set(random.nextBoolean());

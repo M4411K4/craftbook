@@ -31,6 +31,7 @@ public class MCX201 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "DISPENSER 2.0";
     }
@@ -40,6 +41,7 @@ public class MCX201 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MCX201 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -115,6 +118,7 @@ public class MCX201 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         if (!chip.getIn(1).is()) {
             return;
@@ -132,7 +136,7 @@ public class MCX201 extends BaseIC {
         
         int item = getItem(id);
 
-        World world = CraftBook.getWorld(chip.getWorldType());
+        World world = CraftBook.getWorld(chip.getCBWorld());
         if (item > 0 && !(item >= 21 && item <= 34) && item != 36) {
             Vector pos = chip.getBlockPosition();
             int maxY = Math.min(CraftBook.MAP_BLOCK_HEIGHT, pos.getBlockY() + 10);

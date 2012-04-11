@@ -30,6 +30,7 @@ public class MCX142 extends MCX140 {
      */
 	protected String settings = "";
 	
+	@Override
     public String getTitle() {
     	return "^"+settings;
     }
@@ -39,6 +40,7 @@ public class MCX142 extends MCX140 {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -51,7 +53,8 @@ public class MCX142 extends MCX140 {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	
     	if(!sign.getLine1().isEmpty())
     	{
@@ -101,17 +104,15 @@ public class MCX142 extends MCX140 {
     	if(id.isEmpty())
     		return;
     	
-    	Location dest = MCX113.airwaves.get(id);
+    	WorldLocation dest = MCX113.airwaves.get(id);
     	if(dest == null)
     	{
-    		Redstone.setOutput(world.getType().getId(), lever, false);
+    		Redstone.setOutput(CraftBook.getCBWorld(world), lever, false);
     		return;
     	}
     	
-    	int dimension = dest.dimension;
-    	dest = new Location(dest.x+0.5, dest.y, dest.z+0.5, dest.rotX, dest.rotY);
-    	dest.dimension = dimension;
-    	dest.y = MCX112.getSafeY(CraftBook.getWorld(dest.dimension), new Vector(dest.x, dest.y, dest.z)) + 1.0;
+    	dest = dest.add(0.5D, 0.0D, 0.5D);
+    	dest = dest.setY(MCX112.getSafeY(CraftBook.getWorld(dest.getCBWorld()), dest.getCoordinate()) + 1.0D);
     	
     	String[] args = chip.getText().getLine1().substring(1).split("\\+", 2);
         

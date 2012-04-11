@@ -19,6 +19,7 @@
 
 
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.ChipState;
@@ -36,10 +37,12 @@ public class MCX119 extends MCX118 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "MOB NEAR?";
     }
     
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +55,8 @@ public class MCX119 extends MCX118 {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() != 0)
@@ -86,6 +90,7 @@ public class MCX119 extends MCX118 {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
     	
     	if(chip.inputAmount() == 0 || (chip.getIn(1).is() && chip.getIn(1).isTriggered()) )
@@ -94,8 +99,8 @@ public class MCX119 extends MCX118 {
     		if(!chip.getText().getLine4().isEmpty())
     			dist = Double.parseDouble(chip.getText().getLine4());
     		dist *= dist;
-    		Vector lever = Util.getWallSignBack(chip.getWorldType(), chip.getPosition(), 2);
-    		World world = CraftBook.getWorld(chip.getWorldType());
+    		Vector lever = Util.getWallSignBack(chip.getCBWorld(), chip.getPosition(), 2);
+    		World world = CraftBook.getWorld(chip.getCBWorld());
     		
     		String id = chip.getText().getLine3();
     		int type;

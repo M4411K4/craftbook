@@ -9,11 +9,16 @@ public class BlockArea
 	private final int Y2;
 	private final int Z2;
 	
-	private final int WORLD_TYPE;
+	private final CraftBookWorld CB_WORLD;
 	
-	public BlockArea(int worldType, int x, int y, int z, int x2, int y2, int z2)
+	public BlockArea(CraftBookWorld cbworld, int x, int y, int z, int x2, int y2, int z2)
 	{
-		this.WORLD_TYPE = worldType;
+		if(cbworld == null)
+		{
+			throw new IllegalArgumentException("CraftBookWorld must not be null.");
+		}
+		
+		this.CB_WORLD = cbworld;
 		
 		this.X = x;
 		this.Y = y;
@@ -25,12 +30,12 @@ public class BlockArea
 	
 	public BlockArea add(int x, int y, int z)
 	{
-		return new BlockArea(WORLD_TYPE, X + x, Y + y, Z + z, X2 + x, Y2 + y, Z2 + z);
+		return new BlockArea(CB_WORLD, X + x, Y + y, Z + z, X2 + x, Y2 + y, Z2 + z);
 	}
 	
-	public boolean containsPoint(int worldType, int x, int y, int z)
+	public boolean containsPoint(CraftBookWorld cbworld, int x, int y, int z)
 	{
-		if(worldType != WORLD_TYPE
+		if(!cbworld.equals(CB_WORLD)
 			|| x < this.X
 			|| x > this.X2
 			|| y < this.Y
@@ -75,33 +80,54 @@ public class BlockArea
 		return Z2;
 	}
 	
-	public int getWorldType()
+	public CraftBookWorld getCBWorld()
 	{
-		return WORLD_TYPE;
+		return CB_WORLD;
 	}
 	
 	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((CB_WORLD == null) ? 0 : CB_WORLD.hashCode());
+		result = prime * result + X;
+		result = prime * result + X2;
+		result = prime * result + Y;
+		result = prime * result + Y2;
+		result = prime * result + Z;
+		result = prime * result + Z2;
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object obj)
 	{
-		if(!(obj instanceof BlockArea))
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
-		
-		BlockArea area = (BlockArea)obj;
-		
-		if(area.getWorldType() != this.WORLD_TYPE
-			|| area.getX() != this.X
-			|| area.getX2() != this.X2
-			|| area.getY() != this.Y
-			|| area.getY2() != this.Y2
-			|| area.getZ() != this.Z
-			|| area.getZ2() != this.Z2
-			)
-		{
+		if (!(obj instanceof BlockArea))
 			return false;
-		}
+		BlockArea other = (BlockArea) obj;
+		if (!CB_WORLD.equals(other.CB_WORLD))
+			return false;
+		if (X != other.X)
+			return false;
+		if (X2 != other.X2)
+			return false;
+		if (Y != other.Y)
+			return false;
+		if (Y2 != other.Y2)
+			return false;
+		if (Z != other.Z)
+			return false;
+		if (Z2 != other.Z2)
+			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString()
 	{

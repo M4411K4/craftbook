@@ -31,6 +31,7 @@ public class MCX209 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "BRIDGE+";
     }
@@ -40,6 +41,7 @@ public class MCX209 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MCX209 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign)
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign)
     {
     	int[] type = getType(sign.getLine3());
         
@@ -233,6 +236,7 @@ public class MCX209 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip)
     {
         if (!chip.getIn(1).isTriggered())
@@ -248,9 +252,9 @@ public class MCX209 extends BaseIC {
 			type[2] = 0;
         
         BlockBag bag = (BlockBag) chip.getExtra();
-        bag.addSourcePosition(chip.getWorldType(), chip.getPosition());
+        bag.addSourcePosition(chip.getCBWorld(), chip.getPosition());
         
-        World world = CraftBook.getWorld(chip.getWorldType());
+        World world = CraftBook.getWorld(chip.getCBWorld());
         
         int data = CraftBook.getBlockData(world, chip.getPosition());
         

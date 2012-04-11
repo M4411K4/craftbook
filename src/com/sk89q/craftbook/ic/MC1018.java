@@ -30,6 +30,7 @@ public class MC1018 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "FALLING TOGGLE";
     }
@@ -39,6 +40,7 @@ public class MC1018 extends BaseIC {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (chip.getIn(1).not())
             chip.getOut(1).invert();

@@ -35,10 +35,12 @@ public class MCX114 extends MCX112 {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "CBWARP";
     }
     
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -51,7 +53,8 @@ public class MCX114 extends MCX112 {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -75,6 +78,7 @@ public class MCX114 extends MCX112 {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         String id = chip.getText().getLine3();
 

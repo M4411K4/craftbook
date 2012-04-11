@@ -31,6 +31,7 @@ public class MCX256 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "HOLY SMITE";
     }
@@ -40,6 +41,7 @@ public class MCX256 extends BaseIC {
      *
      * @return
      */
+	@Override
     public boolean requiresPermission() {
         return true;
     }
@@ -52,7 +54,8 @@ public class MCX256 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	if (sign.getLine3().length() != 0) {
             try
             {
@@ -87,6 +90,7 @@ public class MCX256 extends BaseIC {
      *
      * @param chip
      */
+	@Override
     public void think(ChipState chip) {
         if (!chip.getIn(1).is()) {
         	chip.getOut(1).set(false);
@@ -122,7 +126,7 @@ public class MCX256 extends BaseIC {
 		int zmax = zcenter + radius;
 
 		boolean fill = chip.getMode() != '1';
-		OWorld world = CraftBook.getOWorld(chip.getWorldType());
+		OWorldServer world = CraftBook.getOWorldServer(chip.getCBWorld());
 		
 		for(int x = xmin; x <= xmax; x++)
 		{

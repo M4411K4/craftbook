@@ -39,6 +39,7 @@ public class MC1110 extends BaseIC {
      *
      * @return
      */
+    @Override
     public String getTitle() {
         return "TRANSMITTER";
     }
@@ -51,7 +52,8 @@ public class MC1110 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         String id = sign.getLine3();
 
         if (id.length() == 0) {
@@ -66,6 +68,7 @@ public class MC1110 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         String id = chip.getText().getLine3();
 

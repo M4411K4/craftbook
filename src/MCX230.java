@@ -1,5 +1,6 @@
 
 
+import com.sk89q.craftbook.CraftBookWorld;
 import com.sk89q.craftbook.SignText;
 import com.sk89q.craftbook.Vector;
 import com.sk89q.craftbook.ic.BaseIC;
@@ -16,11 +17,13 @@ public class MCX230 extends BaseIC {
      *
      * @return
      */
+	@Override
     public String getTitle() {
         return "IS IT RAIN";
     }
     
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+	@Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
         if (sign.getLine3().length() != 0) {
         	return "Third line needs to be blank";
         }
@@ -37,9 +40,10 @@ public class MCX230 extends BaseIC {
      * 
      * @param chip
      */
+	@Override
     public void think(ChipState chip)
     {
-    	World world = CraftBook.getWorld(chip.getWorldType());
+    	World world = CraftBook.getWorld(chip.getCBWorld());
     	chip.getOut(1).set(world.isRaining());
     }
 }

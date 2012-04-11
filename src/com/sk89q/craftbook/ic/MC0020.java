@@ -38,6 +38,7 @@ public class MC0020 extends BaseIC {
      *
      * @return
      */
+    @Override
     public String getTitle() {
         return "RANDOM BIT";
     }
@@ -47,6 +48,7 @@ public class MC0020 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip) {
         chip.getOut(1).set(random.nextBoolean());
     }

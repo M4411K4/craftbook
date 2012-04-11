@@ -182,7 +182,7 @@ public class CraftBookListener extends PluginListener {
                 // Add a default block bag
                 this.blockBags.clear();
                 this.blockBags.add(new BlockBagFactory() {
-                    public BlockBag createBlockSource(int worldType, Vector v) {
+                    public BlockBag createBlockSource(CraftBookWorld cbworld, Vector v) {
                         return new DummyBlockSource();
                     }
                 });
@@ -253,7 +253,7 @@ public class CraftBookListener extends PluginListener {
         int y = v.getBlockY();
         int z = v.getBlockZ();
         
-        int worldType = world.getType().getId();
+        CraftBookWorld cbworld = CraftBook.getCBWorld(world);
 
         int type = CraftBook.getBlockID(world, x, y, z);
 
@@ -264,31 +264,31 @@ public class CraftBookListener extends PluginListener {
         try {
             if (type == BlockType.LEVER) {
                 // Fake data
-                CraftBook.fakeBlockData(worldType, x, y, z,
+                CraftBook.fakeBlockData(cbworld, x, y, z,
                         newLevel > 0
                             ? CraftBook.getBlockData(world, x, y, z) | 0x8
                             : CraftBook.getBlockData(world, x, y, z) & 0x7);
             } else if (type == BlockType.STONE_PRESSURE_PLATE) {
                 // Fake data
-                CraftBook.fakeBlockData(worldType, x, y, z,
+                CraftBook.fakeBlockData(cbworld, x, y, z,
                         newLevel > 0
                             ? CraftBook.getBlockData(world, x, y, z) | 0x1
                             : CraftBook.getBlockData(world, x, y, z) & 0x14);
             } else if (type == BlockType.WOODEN_PRESSURE_PLATE) {
                 // Fake data
-                CraftBook.fakeBlockData(worldType, x, y, z,
+                CraftBook.fakeBlockData(cbworld, x, y, z,
                         newLevel > 0
                             ? CraftBook.getBlockData(world, x, y, z) | 0x1
                             : CraftBook.getBlockData(world, x, y, z) & 0x14);
             } else if (type == BlockType.STONE_BUTTON) {
                 // Fake data
-                CraftBook.fakeBlockData(worldType, x, y, z,
+                CraftBook.fakeBlockData(cbworld, x, y, z,
                         newLevel > 0
                             ? CraftBook.getBlockData(world, x, y, z) | 0x8
                             : CraftBook.getBlockData(world, x, y, z) & 0x7);
             } else if (type == BlockType.REDSTONE_WIRE) {
                 // Fake data
-                CraftBook.fakeBlockData(worldType, x, y, z, newLevel);
+                CraftBook.fakeBlockData(cbworld, x, y, z, newLevel);
 
                 int westSide = CraftBook.getBlockID(world, x, y, z + 1);
                 int westSideAbove = CraftBook.getBlockID(world, x, y + 1, z + 1);
@@ -354,7 +354,7 @@ public class CraftBookListener extends PluginListener {
 
             return newLevel;
         } finally {
-            CraftBook.clearFakeBlockData(worldType);
+            CraftBook.clearFakeBlockData(cbworld);
         }
     }
     
@@ -531,12 +531,12 @@ public class CraftBookListener extends PluginListener {
      * @param origin
      * @return
      */
-    public BlockBag getBlockBag(int worldType, Vector origin) {
+    public BlockBag getBlockBag(CraftBookWorld cbworld, Vector origin) {
         List<BlockBag> bags = new ArrayList<BlockBag>();
         
         for (BlockBagFactory f : blockBags) {
             
-            BlockBag b = f.createBlockSource(worldType, origin);
+            BlockBag b = f.createBlockSource(cbworld, origin);
             if (b == null) {
                 continue;
             }

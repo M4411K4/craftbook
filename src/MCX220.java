@@ -32,7 +32,8 @@ public class MCX220 extends BaseIC {
      * @return
      */
 	private final String TITLE = "DETECT BREAK";
-    public String getTitle() {
+	@Override
+	public String getTitle() {
         return "^"+TITLE;
     }
     protected String thisTitle()
@@ -45,6 +46,7 @@ public class MCX220 extends BaseIC {
      *
      * @return
      */
+    @Override
     public boolean requiresPermission() {
         return true;
     }
@@ -57,7 +59,8 @@ public class MCX220 extends BaseIC {
      * @param sign
      * @return
      */
-    public String validateEnvironment(int worldType, Vector pos, SignText sign) {
+    @Override
+    public String validateEnvironment(CraftBookWorld cbworld, Vector pos, SignText sign) {
     	if(!sign.getLine3().isEmpty())
     	{
     		String[] args = sign.getLine3().split("/", 2);
@@ -106,8 +109,8 @@ public class MCX220 extends BaseIC {
 
     protected static boolean blockBroke(WorldBlockVector chipBlock, SignText text)
     {
-    	Vector lever = Util.getWallSignBack(chipBlock.getWorldType(), chipBlock, 2);
-    	Redstone.setOutput(chipBlock.getWorldType(), lever, true);
+    	Vector lever = Util.getWallSignBack(chipBlock.getCBWorld(), chipBlock, 2);
+    	Redstone.setOutput(chipBlock.getCBWorld(), lever, true);
     	
     	char mode = ' ';
 		if(text.getLine2().length() > 8)
@@ -121,13 +124,14 @@ public class MCX220 extends BaseIC {
      *
      * @param chip
      */
+    @Override
     public void think(ChipState chip)
     {
     	chip.getOut(1).set(false);
     	
     	if(chip.inputAmount() == 0)
     	{
-    		WorldBlockVector wblockVec = new WorldBlockVector(chip.getWorldType(), chip.getPosition());
+    		WorldBlockVector wblockVec = new WorldBlockVector(chip.getCBWorld(), chip.getPosition());
     		if(hasArea(wblockVec))
     		{
     			return;
@@ -158,7 +162,7 @@ public class MCX220 extends BaseIC {
 	    		}
 	    	}
 	    	
-	    	World world = CraftBook.getWorld(chip.getWorldType());
+	    	World world = CraftBook.getWorld(chip.getCBWorld());
 	        int data = CraftBook.getBlockData(world, chip.getPosition());
 	        BlockArea area = getBlockArea(chip, data, width, height, length, offx, offy, offz);
 	        addArea(wblockVec, area);
@@ -171,11 +175,11 @@ public class MCX220 extends BaseIC {
     			chip.getText().supressUpdate();
     			
     			RedstoneListener redListener = (RedstoneListener) chip.getExtra();
-    			redListener.onSignAdded(CraftBook.getWorld(chip.getWorldType()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
+    			redListener.onSignAdded(CraftBook.getWorld(chip.getCBWorld()), chip.getPosition().getBlockX(), chip.getPosition().getBlockY(), chip.getPosition().getBlockZ());
     		}
     		else if(!chip.getIn(1).is() && chip.getText().getLine1().charAt(0) != '^')
     		{
-    			WorldBlockVector wblockVec = new WorldBlockVector(chip.getWorldType(), chip.getPosition());
+    			WorldBlockVector wblockVec = new WorldBlockVector(chip.getCBWorld(), chip.getPosition());
     			removeArea(wblockVec);
     			chip.getText().setLine1("^"+thisTitle());
     			chip.getText().supressUpdate();
@@ -246,6 +250,6 @@ public class MCX220 extends BaseIC {
         
         int y = (int)chip.getPosition().getY() + offy;
         
-        return new BlockArea(chip.getWorldType(), startX + offx, y, startZ + offz, endX + offx, y + height, endZ + offz);
+        return new BlockArea(chip.getCBWorld(), startX + offx, y, startZ + offz, endX + offx, y + height, endZ + offz);
     }
 }
