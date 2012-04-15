@@ -303,6 +303,7 @@ public class RedstoneListener extends CraftBookDelegateListener
             internalRegisterIC("MC0261", new MC1261(false), ICType.ZISO);
             internalRegisterIC("MC0262", new MC1262(false), ICType.ZISO);
             
+            internalRegisterIC("MCO116", new MCM116(), ICType.ZISO);
             internalRegisterIC("MCZ027", new MCX027(), ICType.ZISO);
             internalRegisterIC("MCZ116", new MCX116(), ICType.ZISO);
             internalRegisterIC("MCZ117", new MCX117(), ICType.ZISO);
@@ -318,6 +319,7 @@ public class RedstoneListener extends CraftBookDelegateListener
             internalRegisterIC("MCZ231", new MCX231(), ICType.ZISO);
             internalRegisterIC("MCZ236", new MCX236(), ICType.ZISO);
             internalRegisterIC("MCZ238", new MCX238(), ICType.ZISO);
+            internalRegisterIC("MCZ295", new MCX295(), ICType.ZISO);
         }
         
         internalRegisterIC("MC1000", new MC1000(), ICType.SISO);
@@ -378,6 +380,7 @@ public class RedstoneListener extends CraftBookDelegateListener
         
         internalRegisterIC("MCX027", new MCX027(), ICType.SISO);
         internalRegisterIC("MCX111", new MCX111(), ICType.SISO);
+        internalRegisterIC("MCM112", new MCM112(), ICType.SISO);
         internalRegisterIC("MCX112", new MCX112(), ICType.SISO);
         internalRegisterIC("MCX114", new MCX114(), ICType.SISO);
         internalRegisterIC("MCX115", new MCX115(), ICType.SISO);
@@ -423,6 +426,8 @@ public class RedstoneListener extends CraftBookDelegateListener
         internalRegisterIC("MCX251", new MCX251(), ICType.SISO);
         internalRegisterIC("MCX255", new MCX255(), ICType.SISO);
         internalRegisterIC("MCX256", new MCX256(), ICType.SISO);
+        internalRegisterIC("MCX295", new MCX295(), ICType.SISO);
+        internalRegisterIC("MCX296", new MCX296(), ICType.SISO);       
         internalRegisterIC("MCX512", new MCX512(), ICType.SISO);
         internalRegisterIC("MCX513", new MCX513(), ICType.SISO);
         internalRegisterIC("MCX515", new MCX515(), ICType.SISO);
