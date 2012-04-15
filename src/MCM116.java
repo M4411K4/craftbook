@@ -251,7 +251,6 @@ public class MCM116 extends BaseIC {
 						aboveEnt = ent;
 						break;
 					} else {
-						//logger.info("Did not match: " + oent.getClass().getName());
 						continue;
 					}
 				}
