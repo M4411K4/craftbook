@@ -1,3 +1,4 @@
+
 // $Id$
 /*
  * CraftBook
@@ -23,7 +24,9 @@
  * @author sk89q
  */
 public class InventoryListener extends CraftBookDelegateListener {
-    /**
+	protected static boolean allowEnchantableItemStacking = false;
+	
+	/**
      * Construct the object.
      * 
      * @param craftBook
@@ -37,6 +40,8 @@ public class InventoryListener extends CraftBookDelegateListener {
      * Loads CraftBooks's configuration from file.
      */
     public void loadConfiguration() {
+    	
+    	InventoryListener.allowEnchantableItemStacking = properties.getBoolean("allow-enchantable-item-stacking", false);
     }
 
     /**
