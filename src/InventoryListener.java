@@ -1,4 +1,3 @@
-import java.util.logging.Logger;
 
 // $Id$
 /*
@@ -41,10 +40,8 @@ public class InventoryListener extends CraftBookDelegateListener {
      * Loads CraftBooks's configuration from file.
      */
     public void loadConfiguration() {
-    	logger.info("Loading configuration in InventoryListener");
     	
     	InventoryListener.allowEnchantableItemStacking = properties.getBoolean("allow-enchantable-item-stacking", false);
-    	logger.info("allow-enchantable-item-stacking: " + InventoryListener.allowEnchantableItemStacking);
     }
 
     /**

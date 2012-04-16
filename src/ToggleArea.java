@@ -178,20 +178,9 @@ public class ToggleArea extends SignOrientedMechanism {
                 return;
             }
             
-            if (!copy.shouldClear()) {
-                copy.paste(bag);
-            } else {
-                String inactiveID = getInactiveStateID();
-                
-                if (inactiveID == null) {
-                    // Do nothing
-                } else if (inactiveID.length() == 0) {
-                    copy.clear(bag);
-                } else {
-                    copy = copyManager.load(cbworld, namespace, inactiveID);
-                    copy.paste(bag);
-                }
-            }
+            // Always clear
+            copy.clear(bag);
+            copy.paste(bag);
             
             player.print("Toggled!");
         } catch (InvalidSignNamespace e) {
@@ -224,6 +213,7 @@ public class ToggleArea extends SignOrientedMechanism {
                 return;
             }
             
+            copy.clear(bag);
             copy.paste(bag);
         } catch (BlockSourceException e) {;
         } catch (InvalidSignNamespace e) {
