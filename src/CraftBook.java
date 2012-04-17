@@ -104,6 +104,16 @@ public class CraftBook extends Plugin {
     private final CraftBookDelegateListener vehicle =
             new VehicleListener(this, listener);
     
+    /**
+     * Delegate listener for inventories.
+     * 
+     * This has no hooks to register, but we're using it as
+     * the apropos place to store inventory related config
+     * values.
+     */
+	private final CraftBookDelegateListener inventories = 
+    		new InventoryListener(this, listener);
+    
     private PluginInterface cbRequest = new CBHookFunc();
     
     public static final int MAP_BLOCK_HEIGHT = 256;
@@ -148,6 +158,9 @@ public class CraftBook extends Plugin {
         registerHook(vehicle, "VEHICLE_DESTROYED", PluginListener.Priority.MEDIUM);
         registerHook(vehicle, "VEHICLE_COLLISION", PluginListener.Priority.MEDIUM);
         listener.registerDelegate(vehicle);
+        
+        // Our hook-free inventories listener
+        listener.registerDelegate(inventories);
         
         PluginLoader loader = etc.getLoader();
         loader.addCustomListener(CBPluginInterface.cbSignMech);

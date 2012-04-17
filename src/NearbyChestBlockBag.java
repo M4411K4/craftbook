@@ -115,6 +115,53 @@ public class NearbyChestBlockBag extends BlockBag {
     
                 // Find an existing slot to put it into
                 for (int i = 0; itemArray.length > i; i++) {
+
+                	// Don't allow enchantable items to stack
+                	//
+                	// If a larger stack is dropped than there is space,
+                	// the extras will disappear as this code doesn't
+                	// allow us to re-drop a new stack at this location,
+                	// or return back to the caller any remaining.
+                	//
+                	// @TODO  Investigate updating from void to int 
+                	//        returning back 0 or number of un-stored 
+                	//        items.
+                	
+                	if (!InventoryListener.allowEnchantableItemStacking &&
+                			((id >= 256 && id <= 258) || 
+                    		 (id >= 267 && id <= 279) || 
+                    		 (id >= 283 && id <= 286) ||
+                    		 (id >= 298 && id <= 317) ||
+                    		 (id == 261))) {
+                		// Check if we should add one per slot
+                    	// This is a hack, but it works
+                		for (int n = 1; n <= amount; n++) {
+                			int slot = chest.getEmptySlot();
+                			
+                			if (slot != -1) {
+                    			Item it = new Item(id, 1);
+                    			it.setSlot(slot);
+                    			
+                    			if (data > 0) {
+	     	                    	it.setDamage(data);
+	     	                    }
+	                			
+	    	                    // Add on any enchantments that are needed.
+	    	                    if (enchants != null) {
+	    	                    	for (Enchantment e : enchants) {
+	    	                    		it.addEnchantment(e);
+	    	                    	}
+	    	                    }
+	    	                    
+	    	                    chest.addItem(it);
+	    	                    chest.update();
+                			} else {
+                				return;
+                			}
+                		}
+                		return;
+                	}
+                	
                     if (itemArray[i] != null) {
                         // Found an item
                     	int itemMax = ItemArrayUtil.getStackMax(itemArray[i]);
