@@ -1,3 +1,7 @@
+Moving git repo to:
+https://github.com/CraftBook-Extra/craftbook
+
+
 2.0extra17.0:
 - updated to minecraft 1.2.5
 - added multi-world support
